@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <manifest>
-  <remote name="origin" fetch="ssh://git@github.com:Azure/"/>
+  <remote name="origin" fetch="ssh://git@github.com/Azure/"/>
   <default remote="origin" revision="master" sync-j="4"/>
   <project path="sonic-pas-config-s6000" name="sonic-pas-config-s6000.git"/>
   <project path="sonic-common-utils" name="sonic-common-utils.git" />
