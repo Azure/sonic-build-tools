@@ -1,29 +1,17 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <manifest>
-  <remote name="origin" fetch="ssh://git@localhost:10022/"/>
+  <remote name="origin" fetch="ssh://git@github.com/Azure/"/>
   <default remote="origin" revision="master" sync-j="4"/>
-  <project path="Networking-dell-platform-modules-s6000" name="cwichmann/Networking-dell-platform-modules-s6000.git"/>
-  <project path="Networking-dell-nas-ndi-api" name="cwichmann/Networking-dell-nas-ndi-api.git"/>
-  <project path="Networking-dell-nas-platform-S6000 " name="cwichmann/Networking-dell-nas-platform-S6000.git"/>
-  <project path="Networking-dell-nas-ndi" name="cwichmann/Networking-dell-nas-ndi.git"/>
-  <project path="Networking-dell-nas-daemon" name="cwichmann/Networking-dell-nas-daemon.git"/>
-  <project path="Networking-dell-nas-l3" name="cwichmann/Networking-dell-nas-l3.git"/>
-  <project path="Networking-dell-nas-l2" name="cwichmann/Networking-dell-nas-l2.git" />
-  <project path="Networking-dell-nas-interface" name="cwichmann/Networking-dell-nas-interface.git" />
-  <project path="Networking-dell-nas-qos" name="cwichmann/Networking-dell-nas-qos.git" />
-  <project path="Networking-dell-nas-acl" name="cwichmann/Networking-dell-nas-acl.git" />
-  <project path="Networking-dell-nas-common" name="cwichmann/Networking-dell-nas-common.git" />
-  <project path="Networking-dell-nas-linux" name="cwichmann/Networking-dell-nas-linux.git" />
-  <project path="Networking-dell-sdi-api" name="cwichmann/Networking-dell-sdi-api.git" />
-  <project path="Networking-dell-cps-api" name="cwichmann/Networking-dell-cps-api.git" />
-  <project path="Networking-dell-sdi-device-drivers" name="cwichmann/Networking-dell-sdi-device-drivers.git" />
-  <project path="Networking-dell-sdi-sys" name="cwichmann/Networking-dell-sdi-sys.git" />
-  <project path="Networking-dell-sdi-framework" name="cwichmann/Networking-dell-sdi-framework.git" />
-  <project path="Networking-dell-common-utils" name="cwichmann/Networking-dell-common-utils.git" />
-  <project path="Networking-dell-logging" name="cwichmann/Networking-dell-logging.git" />
-  <project path="Networking-dell-pas" name="cwichmann/Networking-dell-pas.git" />
-  <project path="Networking-acs-sswsyncd" name="cwichmann/Networking-acs-sswsyncd.git" />
-  <project path="swss" name="cwichmann/swss.git" />
-  <project path="Networking-acs-sswsdk" name="cwichmann/Networking-acs-sswsdk.git" />
+  <project path="sonic-pas-config-s6000" name="sonic-pas-config-s6000.git"/>
+  <project path="sonic-common-utils" name="sonic-common-utils.git" />
+  <project path="sonic-pas" name="sonic-pas.git" />
+  <project path="sonic-sdi-api" name="sonic-sdi-api.git" />
+  <project path="sonic-object-library" name="sonic-object-library.git" />
+  <project path="sonic-sdi-device-drivers" name="sonic-sdi-device-drivers.git" />
+  <project path="sonic-sdi-sys" name="sonic-sdi-sys.git" />
+  <project path="sonic-sdi-framework" name="sonic-sdi-framework.git" />
+  <project path="sonic-logging" name="sonic-logging.git" />
+  <project path="sonic-build-tools" name="sonic-build-tools.git" />
+  <project path="swss" name="swss.git" />
 </manifest>
 
