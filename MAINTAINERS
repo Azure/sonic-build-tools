@@ -1,0 +1,7 @@
+# This file describes the maintainers for sonic-build-tools
+# See the SONiC project governance document for more information
+
+Name = "John Arnold"
+Email = "johnar@microsoft.com"
+Github = johnarnold
+Mailinglist = sonicproject@googlegroups.com
