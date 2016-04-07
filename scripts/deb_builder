@@ -1,0 +1,72 @@
+#!/usr/bin/python
+
+import os
+import sys
+import subprocess
+
+_deb_path="../deb"
+
+
+def main():
+  __params=[]
+  __pkgs=[]
+
+  if len(sys.argv) < 3:
+    print('Invalid params... ')
+    print sys.argv
+    sys.exit(-1)
+  
+  dir=sys.argv[1]
+   
+  os.chdir(dir)
+  _args = sys.argv[2:]
+  
+  print('Building in %s' %(os.getcwd()))
+  print('Debian cache in %s' %(_deb_path))
+  sys.stdout.flush()
+
+  for i in _args:
+    if i == '--':
+      __pkgs = __params
+      __params = []
+      continue
+    __params.append(i)
+
+  _files=[]
+  for i in os.listdir(_deb_path):
+    _files.append(i)
+   
+  __pkgs_new=[]
+  for i in __pkgs:
+    for j in _files:
+      if i in j:
+        __pkgs_new.append( os.path.join(_deb_path,j) )
+  
+  __pkgs= __pkgs_new
+
+  
+  if len(__pkgs) > 0:
+    print('Installing the following packages')
+    print(' '.join(__pkgs))
+    __pkgs = ['dpkg','-i'] + __pkgs
+  
+    sys.stdout.flush()
+
+    p = subprocess.Popen(__pkgs)
+    print (p.communicate()[0])
+
+  __params = [ 'fakeroot', 'debian/rules' ] + __params
+  
+  sys.stdout.flush()
+  p = subprocess.Popen(__params)
+  print ("Building with %s" %(' '.join(__params)))
+  print (p.communicate()[0])
+  
+    
+if __name__=='__main__':
+  main()
+
+
+#dpkg -i ../deb/*
+
+#fakeroot debian/rules $*

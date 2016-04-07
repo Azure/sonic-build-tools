@@ -1,0 +1,11 @@
+#!/bin/bash -x
+
+TOOL_ROOT=$(realpath $(dirname $0))
+
+docker run -it \
+  --entrypoint /tools/sonic_run_sim \
+  -v $TOOL_ROOT:/tools \
+  -v $PWD:$PWD \
+  --cap-add=SYS_PTRACE --security-opt=apparmor:unconfined \
+  docker-sonic $PWD
+

@@ -1,0 +1,23 @@
+#!/bin/bash -x
+
+DOCKER_IMAGE=docker-sonic
+
+
+ROOT_FOLDER=$(dirname $PWD)
+RELATIVE_FOLDER=$(basename $PWD)
+
+
+DOCKER_BUILD=$ROOT_FOLDER
+
+DOCKER_TOOLS=$(realpath $(dirname $0))
+BUILDER=deb_builder
+
+#move to relative folder
+if [ ! -d debian ] ; then
+  echo "Need to be in a debian build environment"
+  exit 1
+fi
+
+docker run --rm -v $DOCKER_TOOLS:/tools -v $ROOT_FOLDER:$DOCKER_BUILD \
+  --entrypoint /tools/$BUILDER ${DOCKER_IMAGE} $DOCKER_BUILD/$RELATIVE_FOLDER $*
+
