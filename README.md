@@ -4,8 +4,8 @@
 # Description
 Tools, data and documenation to help build the SONiC project
 
-See the current status of the build at the [Jenkins instance](https://acs-jenkins.westus.cloudapp.azure.com/) for SONiC
+See the current status of the build at the [Jenkins instance](https://sonic-jenkins.westus.cloudapp.azure.com/) for SONiC
 
 # Contribution guide
 
-See the [SONiC contributors guide](https://azure.github.io/SONiC/CONTRIBUTING.md for more information
+See the [SONiC contributors guide](https://azure.github.io/SONiC/CONTRIBUTING.md) for more information
