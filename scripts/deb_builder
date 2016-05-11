@@ -4,23 +4,29 @@ import os
 import sys
 import subprocess
 
-_deb_path="../deb"
 
+_dir = '.'
+_deb_path="../deb"
+_debs = []
 
 def main():
+  global _deb_path
+
   __params=[]
   __pkgs=[]
+  
+  if len(sys.argv) < 2:
+    print('Invalid params... build_type deb_path .deb .deb .deb -- added build args')
+    sys.exit(1)
 
-  if len(sys.argv) < 3:
-    print('Invalid params... ')
-    print sys.argv
-    sys.exit(-1)
+  _dir=sys.argv[1]
+  os.chdir(_dir)
   
-  dir=sys.argv[1]
-   
-  os.chdir(dir)
+  if len(sys.argv) > 2:
+    _deb_path = sys.argv[2]
+  
   _args = sys.argv[2:]
-  
+  print _args
   print('Building in %s' %(os.getcwd()))
   print('Debian cache in %s' %(_deb_path))
   sys.stdout.flush()
@@ -33,8 +39,9 @@ def main():
     __params.append(i)
 
   _files=[]
-  for i in os.listdir(_deb_path):
-    _files.append(i)
+  if os.path.exists(_deb_path):
+    for i in os.listdir(_deb_path):
+      _files.append(i)
    
   __pkgs_new=[]
   for i in __pkgs:
