@@ -29,8 +29,7 @@ RUN apt-get update && apt-get install -y gem2deb libboost-all-dev libevent-dev l
 perl openjdk-7-jdk javahelper maven-debian-helper ant libmaven-ant-tasks-java libhttpclient-java libslf4j-java libservlet3.1-java
 
 # For build image
-RUN apt-get update && apt-get install -y cpio
+RUN apt-get update && apt-get install -y cpio squashfs-tools zip
 
 # teamd build
 RUN apt-get update && apt-get install -y libdaemon-dev libdbus-1-dev libjansson-dev libnl-cli-3-dev libnl-genl-3-dev
-
