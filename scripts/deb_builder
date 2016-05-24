@@ -4,15 +4,16 @@ import os
 import sys
 import subprocess
 
-_deb_path="../deb"
-
 
 def main():
   __params=[]
   __pkgs=[]
 
+  _deb_path = os.getenv('DEB_BINS','../deb')
+  
   if len(sys.argv) < 3:
     print('Invalid params... ')
+    print('%s repo_path ' % (sys.argv[0]) )
     print sys.argv
     sys.exit(-1)
   
@@ -32,10 +33,14 @@ def main():
       continue
     __params.append(i)
 
+  #look at the path specified that contains debian files and list all 
+  #files
   _files=[]
-  for i in os.listdir(_deb_path):
-    _files.append(i)
+  if os.path.exists(_deb_path):
+    for i in os.listdir(_deb_path):
+      _files.append(i)
    
+  #add any files that you find that match the input prefixes 
   __pkgs_new=[]
   for i in __pkgs:
     for j in _files:

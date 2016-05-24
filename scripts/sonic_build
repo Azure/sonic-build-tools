@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash 
 
 DOCKER_IMAGE=docker-sonic
 
@@ -6,11 +6,34 @@ DOCKER_IMAGE=docker-sonic
 ROOT_FOLDER=$(dirname $PWD)
 RELATIVE_FOLDER=$(basename $PWD)
 
-
 DOCKER_BUILD=$ROOT_FOLDER
 
 DOCKER_TOOLS=$(realpath $(dirname $0))
 BUILDER=deb_builder
+
+_docker_image_exists=$(docker images | grep $DOCKER_IMAGE | wc -w )
+
+if [ $# == 0 ] ; then
+  echo " 
+This tool will invole the debian automke build in a docker container $DOCKER_IMAGE.  The $DOCKER_IMAGE docker image should be already configured.  
+
+$DOCKER_IMAGE: 
+The inputs to this tool are:
+
+Environment Variables:    
+DEB_BINS=[path to .deb]   
+
+$0 [--it] [package_prefix1] [package_prefix...] 
+  --it     Compile interactively in the docker build environment. 
+           ie. build manually " 
+  echo "Args.. "
+  exit 1
+fi
+
+if [ "$_docker_image_exists"b = 0b ] ; then
+  echo "$DOCKER_IMAGE is not initialized."
+  exit 1
+fi
 
 #move to relative folder
 if [ ! -d debian ] ; then
@@ -18,6 +41,17 @@ if [ ! -d debian ] ; then
   exit 1
 fi
 
-docker run --rm -v $DOCKER_TOOLS:/tools -v $ROOT_FOLDER:$DOCKER_BUILD \
-  --entrypoint /tools/$BUILDER ${DOCKER_IMAGE} $DOCKER_BUILD/$RELATIVE_FOLDER $*
+ENTRY_POINT="--entrypoint /tools/$BUILDER"
+ENTRY_ARGS="$DOCKER_BUILD/$RELATIVE_FOLDER $*"
+
+if [ "$1"b = "--itb" ] ; then
+  shift
+  ENTRY_POINT="-it"
+  ENTRY_ARGS="/bin/bash"
+fi
+
+_DOCK="docker run --rm -v $DOCKER_TOOLS:/tools -v $ROOT_FOLDER:$DOCKER_BUILD"
+
+$_DOCK ${ENTRY_POINT} ${DOCKER_IMAGE} ${ENTRY_ARGS}
+
 
