@@ -11,8 +11,7 @@ RUN apt-get install -y sudo dh-make kmod libtinyxml2-2 libboost-program-options1
 RUN apt-get install -y doxygen devscripts git-buildpackage perl-modules libswitch-perl dh-systemd
 
 # For quagga build
-RUN apt-get install -y libreadline-dev texlive-latex-base texlive-generic-recommended texlive-fonts-recommended libpam0g-dev libpam-dev libcap-dev imagemagick ghostsc
-ript groff libpcre3-dev gawk chrpath libsnmp-dev
+RUN apt-get install -y libreadline-dev texlive-latex-base texlive-generic-recommended texlive-fonts-recommended libpam0g-dev libpam-dev libcap-dev imagemagick ghostscript groff libpcre3-dev gawk chrpath libsnmp-dev
 
 # For sswsdk build
 RUN apt-get install -y libhiredis-dev
@@ -25,8 +24,7 @@ RUN apt-get -y build-dep linux
 RUN apt-get update && apt-get install -y module-assistant
 
 # For thrift build
-RUN apt-get update && apt-get install -y gem2deb libboost-all-dev libevent-dev libglib2.0-dev libqt4-dev python-all-dev python-twisted php5-dev phpunit libbit-vector-
-perl openjdk-7-jdk javahelper maven-debian-helper ant libmaven-ant-tasks-java libhttpclient-java libslf4j-java libservlet3.1-java
+RUN apt-get update && apt-get install -y gem2deb libboost-all-dev libevent-dev libglib2.0-dev libqt4-dev python-all-dev python-twisted php5-dev phpunit libbit-vector-perl openjdk-7-jdk javahelper maven-debian-helper ant libmaven-ant-tasks-java libhttpclient-java libslf4j-java libservlet3.1-java
 
 # For build image
 RUN apt-get update && apt-get install -y cpio squashfs-tools zip
