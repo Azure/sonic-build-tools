@@ -1,0 +1,10 @@
+#!/bin/bash -x
+
+cp /tools/sshd_config /etc/ssh
+ip addr show 
+/usr/sbin/sshd -D &
+
+cd $1 
+
+/bin/bash
+
