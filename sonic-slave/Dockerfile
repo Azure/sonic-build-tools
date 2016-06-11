@@ -35,7 +35,7 @@ RUN apt-get update && apt-get install -y libpcre3 libpcre3-dev byacc flex libgli
 RUN apt-get update && apt-get install -y libtool-bin libxml2-dev
 
 # For build image
-RUN apt-get update && apt-get install -y cpio
+RUN apt-get update && apt-get install -y cpio squashfs-tools zip
 
 # For broadcom sdk build
 RUN apt-get update && apt-get install -y linux-compiler-gcc-4.8-x86 linux-kbuild-3.16
