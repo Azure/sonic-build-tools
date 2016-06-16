@@ -2,7 +2,6 @@
 
 DOCKER_IMAGE=docker-sonic
 
-
 ROOT_FOLDER=$(dirname $PWD)
 RELATIVE_FOLDER=$(basename $PWD)
 
