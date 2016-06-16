@@ -10,10 +10,6 @@ DOCKER_BUILD=$ROOT_FOLDER
 DOCKER_TOOLS=$(realpath $(dirname $0))
 BUILDER=deb_builder
 
-if [ "${DEB_BINS}b" = b ]; then
-  export DEB_BINS=../
-fi
-
 _docker_image_exists=$(docker images | grep $DOCKER_IMAGE | wc -w )
 
 if [ $# == 0 ] ; then
