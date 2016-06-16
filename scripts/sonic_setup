@@ -1,0 +1,17 @@
+#!/bin/bash
+
+which docker 2>/dev/null >&2
+if [ ! $? = 0 ] ; then
+  echo "You will need to install dockers for this to work."
+  exit 1
+fi
+
+ID=$(docker ps -f ancestor=docker-sonic --format "{{.ID}}")
+
+if [ "${ID}b" = b ] ; then
+  docker build -t docker-sonic -f sonic_build_Dockerfile .
+fi
+
+echo "SONiC Docker Image"
+docker ps -f ancestor=docker-sonic 
+
