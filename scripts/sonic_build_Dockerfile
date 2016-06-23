@@ -3,6 +3,7 @@ FROM debian:jessie
 RUN apt-get update 
 RUN apt-get upgrade -y
 
+
 #Some general build artifiacts
 RUN apt-get install -y bison build-essential byacc cmake cpio dh-make dh-buildinfo dh-make-perl dh-python  dh-systemd doxygen dpatch expat exuberant-ctags fakeroot flex g++ gcc git iptables-dev libdb-dev libexpat1-dev libglib2.0-dev libhiredis-dev libnl-3-dev libnl-route-3-dev libpam-dev libpcap-dev libpcre3 libpcre3-dev libreadline-dev libtool-bin libxml2-dev linux-headers-amd64 make pbuilder python python-pip python2.7-dev quagga redis-server swig vim 
 
@@ -12,4 +13,19 @@ RUN apt-get install -y cppcheck clang pylint python-pytest gcovr python-pytest=2
 
 ## For thrift build
 #RUN apt-get install -y gem2deb libboost-all-dev libevent-dev libglib2.0-dev libqt4-dev python-all-dev python-twisted php5-dev phpunit libbit-vector-perl openjdk-7-jdk javahelper maven-debian-helper ant libmaven-ant-tasks-java libhttpclient-java libslf4j-java libservlet3.1-java
+
+RUN echo "deb http://debian-archive.trafficmanager.net/debian/ jessie main contrib non-free" > /etc/apt/sources.list
+RUN echo "deb-src http://debian-archive.trafficmanager.net/debian/ jessie main contrib non-free" >> /etc/apt/sources.list
+RUN echo "deb http://debian-archive.trafficmanager.net/debian-security/ jessie/updates main contrib non-free" >> /etc/apt/sources.list
+RUN echo "deb-src http://debian-archive.trafficmanager.net/debian-security/ jessie/updates main contrib non-free" >> /etc/apt/sources.list
+
+# For linux build
+RUN apt-get update && apt-get install -y bc fakeroot build-essential devscripts quilt stgit
+RUN apt-get update && apt-get -y build-dep linux
+
+# For build image
+RUN apt-get update && apt-get install -y cpio squashfs-tools zip
+
+# For broadcom sdk build
+RUN apt-get update && apt-get install -y linux-compiler-gcc-4.8-x86 linux-kbuild-3.16
 
