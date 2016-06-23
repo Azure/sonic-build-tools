@@ -1,6 +1,7 @@
-#!/bin/bash
+
 
 which docker 2>/dev/null >&2
+
 if [ ! $? = 0 ] ; then
   echo "You will need to install dockers for this to work."
   exit 1
@@ -15,3 +16,4 @@ fi
 echo "SONiC Docker Image"
 docker ps -f ancestor=docker-sonic 
 
+export PATH=$(dirname $1):$PATH
