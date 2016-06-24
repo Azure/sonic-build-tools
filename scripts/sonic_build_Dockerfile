@@ -33,6 +33,6 @@ RUN apt-get update && apt-get install -y cpio squashfs-tools zip
 RUN apt-get update && apt-get install -y linux-compiler-gcc-4.8-x86 linux-kbuild-3.16
 
 # For broadcom kernel modules
-RUN apt-get update && apt-get autoconf dh-autoreconf
+RUN apt-get update && apt-get install -y  dh-autoreconf
 
 
