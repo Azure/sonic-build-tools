@@ -18,6 +18,9 @@ RUN echo "deb http://debian-archive.trafficmanager.net/debian/ jessie main contr
 RUN echo "deb-src http://debian-archive.trafficmanager.net/debian/ jessie main contrib non-free" >> /etc/apt/sources.list
 RUN echo "deb http://debian-archive.trafficmanager.net/debian-security/ jessie/updates main contrib non-free" >> /etc/apt/sources.list
 RUN echo "deb-src http://debian-archive.trafficmanager.net/debian-security/ jessie/updates main contrib non-free" >> /etc/apt/sources.list
+RUN echo "deb http://ftp.debian.org/debian/ jessie main"
+RUN echo "deb-src http://ftp.debian.org/debian/ jessie main"
+
 
 # For linux build
 RUN apt-get update && apt-get install -y bc fakeroot build-essential devscripts quilt stgit
@@ -28,4 +31,8 @@ RUN apt-get update && apt-get install -y cpio squashfs-tools zip
 
 # For broadcom sdk build
 RUN apt-get update && apt-get install -y linux-compiler-gcc-4.8-x86 linux-kbuild-3.16
+
+# For broadcom kernel modules
+RUN apt-get update && apt-get autoconf dh-autoreconf
+
 
