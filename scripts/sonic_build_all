@@ -2,6 +2,7 @@
 
 import subprocess
 import os
+import sys
 
 def get_build_command():
   if not os.path.exists('README.md'): return ""
@@ -24,19 +25,25 @@ def __run(args):
     return []
 
 
-SONIC_DIRS=[ 'sonic-logging', 'sonic-common-utils', 'sonic-object-library', 'sonic-base-model', 'sonic-nas-platform-s6000', 'sonic-nas-acl', 'sonic-pas-config-s6000', 'sonic-nas-ndi-api', 'sonic-nas-interface', 'sonic-nas-common', 'sonic-nas-l2', 'sonic-sdi-framework', 'sonic-nas-sai-api', 'sonic-bcm-klm', 'sonic-sdi-sys', 'sonic-nas-linux', 'sonic-nas-daemon', 'sonic-sdi-device-drivers', 'sonic-sdi-api', 'sonic-nas-ndi',  'sonic-nas-l3', 'sonic-dell-linux-kernel', 'sonic-nas-qos', 'sonic-pas' ]
+SONIC_DIRS=[ 'sonic-logging', 'sonic-common-utils', 'sonic-object-library', 'sonic-base-model', 'sonic-nas-ndi-api', 'sonic-nas-ndi', 'sonic-nas-platform-s6000', 'sonic-nas-acl', 'sonic-pas-config-s6000',  'sonic-nas-interface', 'sonic-nas-common', 'sonic-nas-l2', 'sonic-sdi-framework', 'sonic-nas-sai-api', 'sonic-bcm-klm', 'sonic-sdi-sys', 'sonic-nas-linux', 'sonic-nas-daemon', 'sonic-sdi-device-drivers', 'sonic-sdi-api',  'sonic-nas-l3', 'sonic-dell-linux-kernel', 'sonic-nas-qos', 'sonic-pas' ]
 
 __top_dir = os.getcwd()
 
+_args = sys.argv
 
 for __dir in SONIC_DIRS:
   os.chdir(os.path.join(__top_dir,__dir))
   __pwd = os.getcwd()
   __cmd = get_build_command()
+  if "--rebuild" in _args:
+    __cmd_target_override = "-- binary"
+  else:
+    __cmd_target_override = ""
+
   if len(__cmd) > 0:
-    if __cmd.find('sonic_build')!=-1 and __cmd.find('--')!=-1:
+    if __cmd.find('sonic_build')!=-1 and __cmd.find('--')!=-1 and len(__cmd_target_override)>0:
       __cmd = __cmd[:__cmd.find('--')]
-      __cmd += ' -- binary'
+      __cmd += __cmd_target_override
     print ('Building %s with the command %s' % (__pwd,__cmd) )
     __run(__cmd.split(' '))
   else:
