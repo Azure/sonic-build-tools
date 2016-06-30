@@ -8,6 +8,7 @@ import subprocess
 def main():
   __params=[]
   __pkgs=[]
+  __scripts=[]
 
   _deb_path = os.getenv('DEB_BINS','..')
   
@@ -27,6 +28,11 @@ def main():
   sys.stdout.flush()
 
   for i in _args:
+    if i.find('--script=')!=-1:
+      __cmd = i[len('--script='):]
+      __scripts.append(__cmd)
+      print("Found command %s" % __cmd)
+
     if i == '--':
       __pkgs = __params
       __params = []
@@ -48,7 +54,6 @@ def main():
         __pkgs_new.append( os.path.join(_deb_path,j) )
   
   __pkgs= __pkgs_new
-
   
   if len(__pkgs) > 0:
     print('Installing the following packages')
@@ -61,7 +66,11 @@ def main():
     print (p.communicate()[0])
 
   __params = [ 'fakeroot', 'debian/rules' ] + __params
-  
+  for i in __scripts:
+    print (i.split(' '))
+    p = subprocess.Popen([i])
+    print (p.communicate()[0])
+
   sys.stdout.flush()
   p = subprocess.Popen(__params)
   print ("Building with %s" %(' '.join(__params)))
