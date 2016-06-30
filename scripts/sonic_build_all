@@ -25,7 +25,7 @@ def __run(args):
     return []
 
 
-SONIC_DIRS=[ 'sonic-logging', 'sonic-common-utils', 'sonic-object-library', 'sonic-base-model', 'sonic-nas-ndi-api', 'sonic-nas-common', 'sonic-nas-ndi', 'sonic-nas-platform-s6000', 'sonic-nas-acl', 'sonic-pas-config-s6000',  'sonic-nas-interface',  'sonic-nas-l2', 'sonic-sdi-framework', 'sonic-nas-sai-api', 'sonic-bcm-klm', 'sonic-sdi-sys', 'sonic-nas-linux', 'sonic-nas-daemon', 'sonic-sdi-device-drivers', 'sonic-sdi-api',  'sonic-nas-l3', 'sonic-dell-linux-kernel', 'sonic-nas-qos', 'sonic-pas' ]
+SONIC_DIRS=[ 'sonic-logging', 'sonic-common-utils', 'sonic-object-library', 'sonic-base-model', 'sonic-nas-ndi-api', 'sonic-nas-common', 'sonic-nas-ndi', 'sonic-nas-platform-s6000', 'sonic-nas-linux', 'sonic-nas-acl', 'sonic-pas-config-s6000',  'sonic-nas-interface',  'sonic-nas-l2', 'sonic-sdi-framework', 'sonic-nas-sai-api', 'sonic-bcm-klm', 'sonic-sdi-sys',  'sonic-nas-daemon', 'sonic-sdi-device-drivers', 'sonic-sdi-api',  'sonic-nas-l3', 'sonic-dell-linux-kernel', 'sonic-nas-qos', 'sonic-pas' ]
 
 __top_dir = os.getcwd()
 
