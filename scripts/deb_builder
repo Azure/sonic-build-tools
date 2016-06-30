@@ -9,7 +9,7 @@ def main():
   __params=[]
   __pkgs=[]
 
-  _deb_path = os.getenv('DEB_BINS','..'/)
+  _deb_path = os.getenv('DEB_BINS','..')
   
   if len(sys.argv) < 3:
     print('Invalid params... ')
