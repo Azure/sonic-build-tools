@@ -11,15 +11,11 @@ RUN apt-get update
 RUN apt-get upgrade -y
 
 #Some general build artifiacts
-RUN apt-get install -y bison build-essential byacc cmake cpio dh-make dh-buildinfo dh-make-perl dh-python  dh-systemd doxygen dpatch expat exuberant-ctags fakeroot flex g++ gcc git iptables-dev libdb-dev libexpat1-dev libglib2.0-dev libhiredis-dev libnl-3-dev libnl-route-3-dev libpam-dev libpcap-dev libpcre3 libpcre3-dev libreadline-dev libtool-bin libxml2-dev linux-headers-amd64 make pbuilder python python-pip python2.7-dev quagga redis-server swig vim libssl-dev
+RUN apt-get install -y bison build-essential byacc cmake cpio dh-make dh-buildinfo dh-make-perl dh-python  dh-systemd doxygen dpatch expat exuberant-ctags fakeroot flex g++ gcc git iptables-dev libdb-dev libexpat1-dev libglib2.0-dev libhiredis-dev libnl-3-dev libnl-route-3-dev libpam-dev libpcap-dev libpcre3 libpcre3-dev libreadline-dev libtool-bin libxml2-dev linux-headers-amd64 make pbuilder python python-pip python2.7-dev quagga redis-server swig vim libssl-dev libfuse fuse
 
 
 # For Jenkins static analysis, unit testing and code coverage
 RUN apt-get install -y cppcheck clang pylint python-pytest gcovr python-pytest=2.6.3* python-pytest-cov python-parse
-
-## For thrift build
-#RUN apt-get install -y gem2deb libboost-all-dev libevent-dev libglib2.0-dev libqt4-dev python-all-dev python-twisted php5-dev phpunit libbit-vector-perl openjdk-7-jdk javahelper maven-debian-helper ant libmaven-ant-tasks-java libhttpclient-java libslf4j-java libservlet3.1-java
-
 
 # For linux build
 RUN apt-get update && apt-get install -y bc fakeroot build-essential devscripts quilt stgit
