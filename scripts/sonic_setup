@@ -1,4 +1,4 @@
-
+#!/bin/bash
 
 which docker 2>/dev/null >&2
 
@@ -17,3 +17,4 @@ echo "SONiC Docker Image"
 docker ps -f ancestor=docker-sonic 
 
 export PATH=$(dirname $1):$PATH
+
