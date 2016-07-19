@@ -7,7 +7,9 @@ RELATIVE_FOLDER=$(basename $PWD)
 
 DOCKER_BUILD=$ROOT_FOLDER
 
-DOCKER_TOOLS=$(realpath $(dirname $0))
+DOCKER_TOOLS=$(realpath  $(dirname $0))
+DOCKER_CONFIG=$(realpath  $(dirname $0)/../config)
+
 BUILDER=deb_builder
 
 _docker_image_exists=$(docker images | grep $DOCKER_IMAGE | wc -w )
@@ -49,7 +51,7 @@ if [ "$1"b = "--itb" ] ; then
   ENTRY_ARGS="/bin/bash"
 fi
 
-_DOCK="docker run --rm -v $DOCKER_TOOLS:/tools -v $ROOT_FOLDER:$DOCKER_BUILD"
+_DOCK="docker run --rm -v $DOCKER_TOOLS:/tools -v $DOCKER_CONFIG:/tools-config -v $ROOT_FOLDER:$DOCKER_BUILD"
 
 $_DOCK ${ENTRY_POINT} ${DOCKER_IMAGE} ${ENTRY_ARGS}
 
