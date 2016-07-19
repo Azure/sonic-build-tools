@@ -24,14 +24,16 @@ The inputs to this tool are:
 Environment Variables:    
 DEB_BINS=[path to .deb]  (default to ..)
 
-$0 [--it] --dpkg [ package package ... ] --apt-get [ package package ... ]  -- [ target target ] 
+$0 [--it] --dpkg [ package package ... ] --apt-get [ package package ... ] [ --keep-def-sources ] -- [ target target ] 
   --it     Compile interactively in the docker build environment. 
            ie. build manually 
   --dpkg    Indicate that the following packages will be .deb files (or prefixes) that are 
             installed into the build environment using the DEB_BINS path
   --apt     Indicate that the following packages are files that will be installed via
             apt-get and the SONiC binary repository.  
+  --keep-def-sources  if using apt to install packages, keep the default debian sources list 
   --        This marks the start of the actual target in the container
+
   target    This is a valid debian rules target
 "
 
