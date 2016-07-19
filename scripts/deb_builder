@@ -100,10 +100,6 @@ def main():
 
     __params.append(i)
 
-  print __dpkg_pkgs
-  print __apt_pkgs
-  print __params
-
   if len(__dpkg_pkgs) > 0:
     dpkg_install(__dpkg_pkgs)
 
@@ -117,7 +113,9 @@ def main():
     print (p.communicate()[0])
 
   sys.stdout.flush()
-  p = subprocess.Popen(__params)
+  
+  _local_env = os.environ.copy()
+  p = subprocess.Popen(__params,env=_local_env)
   print ("Building with %s" %(' '.join(__params)))
   print (p.communicate()[0])
   
@@ -125,7 +123,8 @@ def main():
 if __name__=='__main__':
   main()
 
-
-#dpkg -i ../deb/*
+#essentially the following 
+#dpkg -i packages
+#apt-get install packages
 
 #fakeroot debian/rules $*
