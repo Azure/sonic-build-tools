@@ -7,7 +7,9 @@ RELATIVE_FOLDER=$(basename $PWD)
 
 DOCKER_BUILD=$ROOT_FOLDER
 
-DOCKER_TOOLS=$(realpath $(dirname $0))
+DOCKER_TOOLS=$(realpath  $(dirname $0))
+DOCKER_CONFIG=$(realpath  $(dirname $0)/../config)
+
 BUILDER=deb_builder
 
 _docker_image_exists=$(docker images | grep $DOCKER_IMAGE | wc -w )
@@ -20,13 +22,23 @@ $DOCKER_IMAGE:
 The inputs to this tool are:
 
 Environment Variables:    
-DEB_BINS=[path to .deb]   
+DEB_BINS=[path to .deb]  (default to ..)
 
-$0 [--it] [package_prefix1] [package_prefix...] 
+$0 [--it] --dpkg [ package package ... ] --apt-get [ package package ... ] [ --keep-def-sources ] -- [ target target ] 
   --it     Compile interactively in the docker build environment. 
-           ie. build manually " 
-  echo "Args.. "
+           ie. build manually 
+  --dpkg    Indicate that the following packages will be .deb files (or prefixes) that are 
+            installed into the build environment using the DEB_BINS path
+  --apt     Indicate that the following packages are files that will be installed via
+            apt-get and the SONiC binary repository.  
+  --keep-def-sources  if using apt to install packages, keep the default debian sources list 
+  --        This marks the start of the actual target in the container
+
+  target    This is a valid debian rules target
+"
+
   exit 1
+
 fi
 
 if [ "$_docker_image_exists"b = 0b ] ; then
@@ -43,13 +55,15 @@ fi
 ENTRY_POINT="--entrypoint /tools/$BUILDER"
 ENTRY_ARGS="$DOCKER_BUILD/$RELATIVE_FOLDER $*"
 
+#environment for compiling and possibly simple testing environment 
+#possibly used to validate a debian config before configuring an automated environment
 if [ "$1"b = "--itb" ] ; then
   shift
   ENTRY_POINT="-it"
   ENTRY_ARGS="/bin/bash"
 fi
 
-_DOCK="docker run --rm -v $DOCKER_TOOLS:/tools -v $ROOT_FOLDER:$DOCKER_BUILD"
+_DOCK="docker run --rm -v $DOCKER_TOOLS:/tools -v $DOCKER_CONFIG:/tools-config -v $ROOT_FOLDER:$DOCKER_BUILD"
 
 $_DOCK ${ENTRY_POINT} ${DOCKER_IMAGE} ${ENTRY_ARGS}
 

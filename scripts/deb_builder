@@ -3,41 +3,11 @@
 import os
 import sys
 import subprocess
+import shutil
 
-
-def main():
-  __params=[]
-  __pkgs=[]
-  __scripts=[]
-
+def dpkg_install(__pkgs):
   _deb_path = os.getenv('DEB_BINS','..')
-  
-  if len(sys.argv) < 3:
-    print('Invalid params... ')
-    print('%s repo_path ' % (sys.argv[0]) )
-    print sys.argv
-    sys.exit(-1)
-  
-  dir=sys.argv[1]
-   
-  os.chdir(dir)
-  _args = sys.argv[2:]
-  
-  print('Building in %s' %(os.getcwd()))
   print('Debian cache in %s' %(_deb_path))
-  sys.stdout.flush()
-
-  for i in _args:
-    if i.find('--script=')!=-1:
-      __cmd = i[len('--script='):]
-      __scripts.append(__cmd)
-      print("Found command %s" % __cmd)
-
-    if i == '--':
-      __pkgs = __params
-      __params = []
-      continue
-    __params.append(i)
 
   #look at the path specified that contains debian files and list all 
   #files
@@ -52,18 +22,89 @@ def main():
     for j in _files:
       if i in j:
         __pkgs_new.append( os.path.join(_deb_path,j) )
-  
-  __pkgs= __pkgs_new
-  
-  if len(__pkgs) > 0:
-    print('Installing the following packages')
-    print(' '.join(__pkgs))
-    __pkgs = ['dpkg','-i'] + __pkgs
-  
-    sys.stdout.flush()
 
-    p = subprocess.Popen(__pkgs)
-    print (p.communicate()[0])
+  __pkgs = __pkgs_new
+
+  print('Installing the following packages')
+  print(' '.join(__pkgs))
+  __pkgs = ['dpkg','-i'] + __pkgs
+
+  sys.stdout.flush()
+
+  p = subprocess.Popen(__pkgs)
+  print (p.communicate()[0])
+
+def apt_get_install(_keep_default_sources, __pkgs):
+  print('Apt-getting the following packages')
+  print(' '.join(__pkgs))
+  
+  if not _keep_default_sources:
+    os.remove('/etc/apt/sources.list')
+  
+  shutil.copyfile('/tools-config/sonic-nas.sources.list','/etc/apt/sources.list.d/nas.list')
+
+  p = subprocess.Popen(['apt-get','update'])
+  print (p.communicate()[0])
+
+  __pkgs = ['apt-get','install','-y','--force-yes'] + __pkgs
+
+  sys.stdout.flush()
+
+  p = subprocess.Popen(__pkgs)
+  print (p.communicate()[0])
+
+def main():
+  __params=[]
+  __dpkg_pkgs=[]
+  __apt_pkgs=[]
+
+  __scripts=[]
+
+  
+  if len(sys.argv) < 3:
+    print('Invalid params... ')
+    print('%s repo_path ' % (sys.argv[0]) )
+    print sys.argv
+    sys.exit(-1)
+  
+  dir=sys.argv[1]
+   
+  os.chdir(dir)
+  _args = sys.argv[2:]
+  
+  print('Building in %s' %(os.getcwd()))
+  sys.stdout.flush()
+
+  _use_apt = False
+  _keep_default_sources=False
+
+  __params = __dpkg_pkgs
+
+  for i in _args:
+    if i.find('--dpkg')!=-1:
+      __params = __dpkg_pkgs
+      continue
+
+    if i.find('--apt')!=-1:
+      __params = __apt_pkgs
+      continue
+
+    if i.find('--keep-def-sources')!=-1:
+      _keep_default_sources=True
+      continue
+
+    if i == '--':
+      __pkgs = __params
+      __params = []
+      continue
+
+    __params.append(i)
+
+  if len(__dpkg_pkgs) > 0:
+    dpkg_install(__dpkg_pkgs)
+
+  if len(__apt_pkgs) > 0:
+    apt_get_install(_keep_default_sources,__apt_pkgs)
 
   __params = [ 'fakeroot', 'debian/rules' ] + __params
   for i in __scripts:
@@ -72,7 +113,9 @@ def main():
     print (p.communicate()[0])
 
   sys.stdout.flush()
-  p = subprocess.Popen(__params)
+  
+  _local_env = os.environ.copy()
+  p = subprocess.Popen(__params,env=_local_env)
   print ("Building with %s" %(' '.join(__params)))
   print (p.communicate()[0])
   
@@ -80,7 +123,8 @@ def main():
 if __name__=='__main__':
   main()
 
-
-#dpkg -i ../deb/*
+#essentially the following 
+#dpkg -i packages
+#apt-get install packages
 
 #fakeroot debian/rules $*
