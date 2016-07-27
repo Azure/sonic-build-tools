@@ -1,0 +1,51 @@
+#!/usr/bin/python
+
+import subprocess
+import os
+import sys
+
+def get_build_command():
+  if not os.path.exists('README.md'): return ""
+  with open('README.md','r') as __f:
+    while True:
+      __line = __f.readline()
+      if len(__line)==0:
+        break;
+      __pos = __line.find('BUILD CMD:')
+      if __pos == 0:
+        __cmd = __line[__pos+len('BUILD CMD:'):]
+        return __cmd.strip();
+  return ""
+
+def __run(args):
+    __process = subprocess.Popen(args,stdout=subprocess.PIPE)
+    __lines = []
+    for __line in iter(__process.stdout.readline,''):
+        print __line.rstrip()
+    return []
+
+
+SONIC_DIRS=[ 'sonic-logging', 'sonic-common-utils', 'sonic-object-library', 'sonic-base-model', 'sonic-nas-sai-api', 'sonic-nas-ndi-api', 'sonic-nas-common', 'sonic-nas-ndi', 'sonic-nas-platform-s6000', 'sonic-nas-linux', 'sonic-nas-acl', 'sonic-nas-qos','sonic-pas-config-s6000',  'sonic-nas-interface',  'sonic-nas-l2', 'sonic-nas-l3', 'sonic-sdi-api', 'sonic-sdi-framework', 'sonic-sdi-sys', 'sonic-sdi-device-drivers', 'sonic-pas', 'sonic-nas-daemon', 'sonic-bcm-klm',    'sonic-dell-linux-kernel' ]
+
+__top_dir = os.getcwd()
+
+_args = sys.argv
+
+for __dir in SONIC_DIRS:
+  os.chdir(os.path.join(__top_dir,__dir))
+  __pwd = os.getcwd()
+  __cmd = get_build_command()
+  if "--rebuild" in _args:
+    __cmd_target_override = "-- binary"
+  else:
+    __cmd_target_override = ""
+
+  if len(__cmd) > 0:
+    if __cmd.find('sonic_build')!=-1 and __cmd.find('--')!=-1 and len(__cmd_target_override)>0:
+      __cmd = __cmd[:__cmd.find('--')]
+      __cmd += __cmd_target_override
+    print ('Building %s with the command %s' % (__pwd,__cmd) )
+    __run(__cmd.split(' '))
+  else:
+    print("%s is missing BUILD CMD in the README.md", __pwd )
+

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+_base=$(dirname $0)
+_dir=$(readlink -f $_base/../..)
+
+docker run -v $_dir:$_dir -v $PWD:$PWD docker-sonic $_base/sonic_dep_fetch_impl $PWD $*
+
