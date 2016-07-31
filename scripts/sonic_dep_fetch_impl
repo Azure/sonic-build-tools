@@ -1,0 +1,18 @@
+#!/bin/bash 
+
+_dir=$(dirname $0)
+
+rm -f /etc/apt/sources.list.d/*
+rm -f /etc/apt/sources.list
+
+cp $_dir/../config/sonic-nas.sources.list /etc/apt/sources.list.d
+
+apt-get update
+
+_dest=$1
+shift
+
+apt-get install -d -y --force-yes $*
+
+cp /var/cache/apt/archives/*.deb $_dest
+

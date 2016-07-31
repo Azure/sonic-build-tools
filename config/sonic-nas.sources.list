@@ -1,2 +1,3 @@
+deb https://dell-networking.bintray.com/sonic-apt/ jessie main
 deb http://10.14.1.29/sonic unstable main
 

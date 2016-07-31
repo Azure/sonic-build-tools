@@ -22,6 +22,9 @@ def __run(args):
     __lines = []
     for __line in iter(__process.stdout.readline,''):
         print __line.rstrip()
+    _rc = __process.wait()
+    if (_rc!=0):
+      sys.exit(_rc)
     return []
 
 
