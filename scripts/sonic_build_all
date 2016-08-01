@@ -1,0 +1,80 @@
+#!/usr/bin/python
+#
+# Copyright (c) 2015 Dell Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+#
+# THIS CODE IS PROVIDED ON AN #AS IS* BASIS, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT
+#  LIMITATION ANY IMPLIED WARRANTIES OR CONDITIONS OF TITLE, FITNESS
+# FOR A PARTICULAR PURPOSE, MERCHANTABLITY OR NON-INFRINGEMENT.
+#
+# See the Apache Version 2.0 License for specific language governing
+# permissions and limitations under the License.
+#
+
+import subprocess
+import os
+import sys
+
+def get_build_command():
+  if not os.path.exists('README.md'): return ""
+  with open('README.md','r') as __f:
+    while True:
+      __line = __f.readline()
+      if len(__line)==0:
+        break;
+      __pos = __line.find('BUILD CMD:')
+      if __pos == 0:
+        __cmd = __line[__pos+len('BUILD CMD:'):]
+        return __cmd.strip();
+  return ""
+
+def __run(args):
+    __process = subprocess.Popen(args,stdout=subprocess.PIPE)
+    __lines = []
+    for __line in iter(__process.stdout.readline,''):
+        print __line.rstrip()
+    _rc = __process.wait()
+    if (_rc!=0):
+      sys.exit(_rc)
+    return []
+
+
+SONIC_DIRS=[ 'sonic-logging', 'sonic-common-utils', 'sonic-object-library', 'sonic-base-model', 'sonic-nas-sai-api', 'sonic-nas-ndi-api', 'sonic-nas-common', 'sonic-nas-ndi', 'sonic-nas-platform-s6000', 'sonic-nas-linux', 'sonic-nas-acl', 'sonic-nas-qos','sonic-pas-config-s6000',  'sonic-nas-interface',  'sonic-nas-l2', 'sonic-nas-l3', 'sonic-sdi-api', 'sonic-sdi-framework', 'sonic-sdi-sys', 'sonic-sdi-device-drivers', 'sonic-pas', 'sonic-nas-daemon'  ]
+
+__top_dir = os.getcwd()
+
+_args = sys.argv
+
+__tool_dir = os.path.abspath(sys.argv[0])
+__tool_dir = os.path.dirname(__tool_dir)
+
+for __dir in SONIC_DIRS:
+
+  os.chdir(os.path.join(__top_dir,__dir))
+  __pwd = os.getcwd()
+  __cmd = get_build_command().strip()
+
+  if "--rebuild" in _args:
+    __cmd_target_override = "-- binary"
+  else:
+    __cmd_target_override = ""
+
+  if len(__cmd) > 0:
+    __printed_cmd = __cmd
+
+    if __cmd.find('sonic_build')==0:
+      __cmd = os.path.join(__tool_dir,__cmd)
+
+    if __cmd.find('sonic_build')!=-1 and __cmd.find('--')!=-1 and len(__cmd_target_override)>0:
+      __cmd = __cmd[:__cmd.find('--')]
+      __cmd += __cmd_target_override
+
+    print ('Building %s with the command %s' % (__pwd,__printed_cmd) )
+    __run(__cmd.split(' '))
+  else:
+    print("%s is missing BUILD CMD in the README.md", __pwd )
+
