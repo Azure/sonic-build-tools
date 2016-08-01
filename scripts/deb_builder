@@ -29,7 +29,8 @@ def dpkg_install(__pkgs):
   _files=[]
   if os.path.exists(_deb_path):
     for i in os.listdir(_deb_path):
-      _files.append(i)
+      if '.deb' in i:
+        _files.append(i)
    
   #add any files that you find that match the input prefixes 
   __pkgs_new=[]
@@ -75,6 +76,7 @@ def main():
 
   __scripts=[]
 
+  
   if len(sys.argv) < 3:
     print('Invalid params... ')
     print('%s repo_path ' % (sys.argv[0]) )
@@ -82,13 +84,16 @@ def main():
     sys.exit(-1)
   
   dir=sys.argv[1]
+   
   os.chdir(dir)
-
   _args = sys.argv[2:]
   
   print('Building in %s' %(os.getcwd()))
   sys.stdout.flush()
-
+  try:
+    os.remove(".finished.build")
+  except:
+    pass
   _use_apt = False
   _keep_default_sources=False
 
@@ -111,7 +116,6 @@ def main():
       __pkgs = __params
       __params = []
       continue
-
     __params.append(i)
 
   if len(__dpkg_pkgs) > 0:
@@ -132,8 +136,15 @@ def main():
   p = subprocess.Popen(__params,env=_local_env)
   print ("Building with %s" %(' '.join(__params)))
   print (p.communicate()[0])
-  
-    
+  _rc = p.wait()
+  if (_rc==0):
+    print('Build was successful')
+    with open(".finished.build","w") as f:
+      f.write("");
+  else:
+    print('Build failed')
+  sys.exit(_rc)
+
 if __name__=='__main__':
   main()
 
