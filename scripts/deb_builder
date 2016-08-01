@@ -60,7 +60,6 @@ def main():
 
   __scripts=[]
 
-  
   if len(sys.argv) < 3:
     print('Invalid params... ')
     print('%s repo_path ' % (sys.argv[0]) )
@@ -68,8 +67,8 @@ def main():
     sys.exit(-1)
   
   dir=sys.argv[1]
-   
   os.chdir(dir)
+
   _args = sys.argv[2:]
   
   print('Building in %s' %(os.getcwd()))

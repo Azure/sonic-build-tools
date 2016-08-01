@@ -28,26 +28,37 @@ def __run(args):
     return []
 
 
-SONIC_DIRS=[ 'sonic-logging', 'sonic-common-utils', 'sonic-object-library', 'sonic-base-model', 'sonic-nas-sai-api', 'sonic-sai-common-utils', 'sonic-sai-common', 'sonic-nas-ndi-api', 'sonic-nas-common', 'sonic-nas-ndi', 'sonic-nas-platform-s6000', 'sonic-nas-linux', 'sonic-nas-acl', 'sonic-nas-qos','sonic-pas-config-s6000',  'sonic-nas-interface',  'sonic-nas-l2', 'sonic-nas-l3', 'sonic-sdi-api', 'sonic-sdi-framework', 'sonic-sdi-sys', 'sonic-sdi-device-drivers', 'sonic-pas', 'sonic-nas-daemon', 'sonic-db-sql',  'sonic-nas-platform-vm', 'sonic-platform-vm-config', 'sonic-platform-vm-s6000-config', 'sonic-sai-vm', 'sonic-sdi-sys-vm', 'sonic-bcm-klm', 'sonic-dell-linux-kernel' ]
+SONIC_DIRS=[ 'sonic-logging', 'sonic-common-utils', 'sonic-object-library', 'sonic-base-model', 'sonic-nas-sai-api', 'sonic-nas-ndi-api', 'sonic-nas-common', 'sonic-nas-ndi', 'sonic-nas-platform-s6000', 'sonic-nas-linux', 'sonic-nas-acl', 'sonic-nas-qos','sonic-pas-config-s6000',  'sonic-nas-interface',  'sonic-nas-l2', 'sonic-nas-l3', 'sonic-sdi-api', 'sonic-sdi-framework', 'sonic-sdi-sys', 'sonic-sdi-device-drivers', 'sonic-pas', 'sonic-nas-daemon'  ]
 
 __top_dir = os.getcwd()
 
 _args = sys.argv
 
+__tool_dir = os.path.abspath(sys.argv[0])
+__tool_dir = os.path.dirname(__tool_dir)
+
 for __dir in SONIC_DIRS:
+
   os.chdir(os.path.join(__top_dir,__dir))
   __pwd = os.getcwd()
-  __cmd = get_build_command()
+  __cmd = get_build_command().strip()
+
   if "--rebuild" in _args:
     __cmd_target_override = "-- binary"
   else:
     __cmd_target_override = ""
 
   if len(__cmd) > 0:
+    __printed_cmd = __cmd
+
+    if __cmd.find('sonic_build')==0:
+      __cmd = os.path.join(__tool_dir,__cmd)
+
     if __cmd.find('sonic_build')!=-1 and __cmd.find('--')!=-1 and len(__cmd_target_override)>0:
       __cmd = __cmd[:__cmd.find('--')]
       __cmd += __cmd_target_override
-    print ('Building %s with the command %s' % (__pwd,__cmd) )
+
+    print ('Building %s with the command %s' % (__pwd,__printed_cmd) )
     __run(__cmd.split(' '))
   else:
     print("%s is missing BUILD CMD in the README.md", __pwd )
