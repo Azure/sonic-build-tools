@@ -13,5 +13,5 @@ fi
 for i in $images; do
   img=${i%/}
   echo Building image local/$img
-  docker ${DOCKER_OPTS} build -t local/$img $img || exit $?
+  docker ${DOCKER_OPTS} build --no-cache -t local/$img $img || exit $?
 done
