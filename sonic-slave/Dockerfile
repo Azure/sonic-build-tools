@@ -68,6 +68,6 @@ RUN apt-get update && apt-get install -y cppcheck clang pylint python-pytest gco
 RUN git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git /usr/share/depot_tools
 ENV PATH /usr/share/depot_tools:$PATH
 
-# Install docker inside docker
-RUN curl -sSL https://get.docker.com/ | sh
+# Install docker engine 1.11.2 inside docker
+RUN curl -sSL https://get.docker.com/ | sh && apt-get install -y --force-yes -q docker-engine=1.11.2-0~jessie
 RUN gpasswd -a build docker
