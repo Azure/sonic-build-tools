@@ -15,6 +15,9 @@ RUN apt-get update && apt-get install -y doxygen devscripts git-buildpackage per
 # For quagga build
 RUN apt-get update && apt-get install -y libreadline-dev texlive-latex-base texlive-generic-recommended texlive-fonts-recommended libpam0g-dev libpam-dev libcap-dev imagemagick ghostscript groff libpcre3-dev gawk chrpath libsnmp-dev
 
+# For libnl3 (local) build
+RUN apt-get install -y cdbs
+
 # For sswsdk build
 RUN apt-get update && apt-get install -y libhiredis-dev
 
