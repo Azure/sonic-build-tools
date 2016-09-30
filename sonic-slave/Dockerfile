@@ -18,6 +18,9 @@ RUN apt-get update && apt-get install -y libreadline-dev texlive-latex-base texl
 # For libnl3 (local) build
 RUN apt-get install -y cdbs
 
+# For SAI meta build
+RUN apt-get update && apt-get install -y libxml-simple-perl
+
 # For sswsdk build
 RUN apt-get update && apt-get install -y libhiredis-dev
 
