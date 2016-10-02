@@ -56,6 +56,9 @@ RUN apt-get update && apt-get install -y libpcap-dev dnsutils libusb-dev
 RUN apt-get update && apt-get install -y libyaml-dev libevent-dev libjudy-dev libedit-dev libpcap-dev libnanomsg-dev
 RUN apt-get update && apt-get install -y python-stdeb
 
+# For redis build
+RUN apt-get update && apt-get install -y libjemalloc-dev
+
 RUN useradd -d /var/build -m -s /bin/bash build
 COPY sonic-jenkins-id_rsa.pub /var/build/.ssh/authorized_keys2
 RUN chown build.build ~build/.ssh -R
