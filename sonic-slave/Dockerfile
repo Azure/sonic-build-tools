@@ -52,6 +52,9 @@ RUN apt-get update && apt-get install -y libdaemon-dev libdbus-1-dev libjansson-
 # For cavium sdk build
 RUN apt-get update && apt-get install -y libpcap-dev dnsutils libusb-dev
 
+# For debian image reconfiguration
+RUN apt-get update && apt-get install -y augeas-tools
+
 # For p4 build
 RUN apt-get update && apt-get install -y libyaml-dev libevent-dev libjudy-dev libedit-dev libpcap-dev libnanomsg-dev
 RUN apt-get update && apt-get install -y python-stdeb
