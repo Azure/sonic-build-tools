@@ -73,6 +73,9 @@ EXPOSE 22
 # Allow build account root for testing
 RUN echo "build ALL=(ALL) NOPASSWD:ALL" >>/etc/sudoers
 
+# For gtest
+RUN apt-get update && apt-get install -y libgtest-dev cmake && cd /usr/src/gtest && cmake . && make -C /usr/src/gtest
+
 # For Jenkins static analysis, unit testing and code coverage
 RUN apt-get update && apt-get install -y cppcheck clang pylint python-pytest gcovr python-pytest=2.6.3* python-pytest-cov python-parse
 
