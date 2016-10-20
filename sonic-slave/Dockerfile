@@ -62,6 +62,9 @@ RUN apt-get update && apt-get install -y python-stdeb
 # For redis build
 RUN apt-get update && apt-get install -y libjemalloc-dev
 
+# For mft kernel module build
+RUN apt-get update && apt-get install -y dkms
+
 RUN useradd -d /var/build -m -s /bin/bash build
 COPY sonic-jenkins-id_rsa.pub /var/build/.ssh/authorized_keys2
 RUN chown build.build ~build/.ssh -R
