@@ -31,7 +31,7 @@ _docker_image_exists=$(docker images | grep $DOCKER_IMAGE | wc -w )
 
 if [ $# == 0 ] ; then
   echo " 
-This tool will invole the debian automke build in a docker container $DOCKER_IMAGE.  The $DOCKER_IMAGE docker image should be already configured.  
+This tool will invoke the debian automake build in a docker container $DOCKER_IMAGE.  The $DOCKER_IMAGE docker image should be already configured.  
 
 $DOCKER_IMAGE: 
 The inputs to this tool are:
