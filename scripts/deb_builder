@@ -24,15 +24,15 @@ def dpkg_install(__pkgs):
   _deb_path = os.getenv('DEB_BINS','..')
   print('Debian cache in %s' %(_deb_path))
 
-  #look at the path specified that contains debian files and list all 
+  #look at the path specified that contains debian files and list all
   #files
   _files=[]
   if os.path.exists(_deb_path):
     for i in os.listdir(_deb_path):
       if '.deb' in i:
         _files.append(i)
-   
-  #add any files that you find that match the input prefixes 
+
+  #add any files that you find that match the input prefixes
   __pkgs_new=[]
   for i in __pkgs:
     for j in _files:
@@ -53,10 +53,10 @@ def dpkg_install(__pkgs):
 def apt_get_install(_keep_default_sources, __pkgs):
   print('Apt-getting the following packages')
   print(' '.join(__pkgs))
-  
+
   if not _keep_default_sources:
     os.remove('/etc/apt/sources.list')
-  
+
   shutil.copyfile('/tools-config/sonic-nas.sources.list','/etc/apt/sources.list.d/nas.list')
 
   p = subprocess.Popen(['apt-get','update'])
@@ -76,18 +76,18 @@ def main():
 
   __scripts=[]
 
-  
+
   if len(sys.argv) < 3:
     print('Invalid params... ')
     print('%s repo_path ' % (sys.argv[0]) )
     print sys.argv
     sys.exit(-1)
-  
+
   dir=sys.argv[1]
-   
+
   os.chdir(dir)
   _args = sys.argv[2:]
-  
+
   print('Building in %s' %(os.getcwd()))
   sys.stdout.flush()
   try:
@@ -131,7 +131,7 @@ def main():
     print (p.communicate()[0])
 
   sys.stdout.flush()
-  
+
   _local_env = os.environ.copy()
   p = subprocess.Popen(__params,env=_local_env)
   print ("Building with %s" %(' '.join(__params)))
@@ -148,7 +148,7 @@ def main():
 if __name__=='__main__':
   main()
 
-#essentially the following 
+#essentially the following
 #dpkg -i packages
 #apt-get install packages
 
