@@ -15,6 +15,7 @@
 # permissions and limitations under the License.
 #
 
+from __future__ import print_function
 import argparse
 import os
 import sys
@@ -22,98 +23,98 @@ import subprocess
 import shutil
 
 def dpkg_install(__pkgs):
-  _deb_path = os.getenv('DEB_BINS','..')
-  print('Debian cache in %s' %(_deb_path))
+    _deb_path = os.getenv('DEB_BINS', '..')
+    print('Debian cache in %s' %(_deb_path))
 
-  #look at the path specified that contains debian files and list all
-  #files
-  _files=[]
-  if os.path.exists(_deb_path):
-    for i in os.listdir(_deb_path):
-      if '.deb' in i:
-        _files.append(i)
+    #look at the path specified that contains debian files and list all
+    #files
+    _files = []
+    if os.path.exists(_deb_path):
+        for i in os.listdir(_deb_path):
+            if '.deb' in i:
+                _files.append(i)
 
-  #add any files that you find that match the input prefixes
-  __pkgs_new=[]
-  for i in __pkgs:
-    for j in _files:
-      if i in j:
-        __pkgs_new.append( os.path.join(_deb_path,j) )
+    #add any files that you find that match the input prefixes
+    __pkgs_new = []
+    for i in __pkgs:
+        for j in _files:
+            if i in j:
+                __pkgs_new.append(os.path.join(_deb_path, j))
 
-  __pkgs = __pkgs_new
+    __pkgs = __pkgs_new
 
-  print('Installing the following packages')
-  print(' '.join(__pkgs))
-  __pkgs = ['dpkg','-i'] + __pkgs
+    print('Installing the following packages')
+    print(' '.join(__pkgs))
+    __pkgs = ['dpkg', '-i'] + __pkgs
 
-  sys.stdout.flush()
+    sys.stdout.flush()
 
-  p = subprocess.Popen(__pkgs)
-  print (p.communicate()[0])
+    p = subprocess.Popen(__pkgs)
+    print (p.communicate()[0])
 
 def apt_get_install(_keep_default_sources, __pkgs):
-  print('Apt-getting the following packages')
-  print(' '.join(__pkgs))
+    print('Apt-getting the following packages')
+    print(' '.join(__pkgs))
 
-  if not _keep_default_sources:
-    os.remove('/etc/apt/sources.list')
+    if not _keep_default_sources:
+        os.remove('/etc/apt/sources.list')
 
-  shutil.copyfile('/tools-config/sonic-nas.sources.list','/etc/apt/sources.list.d/nas.list')
+    shutil.copyfile('/tools-config/sonic-nas.sources.list', '/etc/apt/sources.list.d/nas.list')
 
-  p = subprocess.Popen(['apt-get','update'])
-  print (p.communicate()[0])
+    p = subprocess.Popen(['apt-get', 'update'])
+    print (p.communicate()[0])
 
-  __pkgs = ['apt-get','install','-y','--force-yes'] + __pkgs
+    __pkgs = ['apt-get', 'install', '-y', '--force-yes'] + __pkgs
 
-  sys.stdout.flush()
+    sys.stdout.flush()
 
-  p = subprocess.Popen(__pkgs)
-  print (p.communicate()[0])
+    p = subprocess.Popen(__pkgs)
+    print (p.communicate()[0])
 
 def main():
-  parser = argparse.ArgumentParser()
-  parser.add_argument('--dpkg',
-                      nargs='*', dest='dpkg_pkgs', default=[], metavar='PKG')
-  parser.add_argument('--apt',
-                      nargs='*', dest='apt_pkgs', default=[], metavar='PKG')
-  parser.add_argument('--keep-def-sources',
-                      dest='keep_default_sources', action='store_true')
-  parser.add_argument('dir')
-  parser.add_argument('targets',
-                      nargs='+', metavar='target')
-  args = parser.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--dpkg',
+                        nargs='*', dest='dpkg_pkgs', default=[], metavar='PKG')
+    parser.add_argument('--apt',
+                        nargs='*', dest='apt_pkgs', default=[], metavar='PKG')
+    parser.add_argument('--keep-def-sources',
+                        dest='keep_default_sources', action='store_true')
+    parser.add_argument('dir')
+    parser.add_argument('targets',
+                        nargs='+', metavar='target')
+    args = parser.parse_args()
 
-  os.chdir(args.dir)
+    os.chdir(args.dir)
 
-  print('Building in %s' %(os.getcwd()))
-  sys.stdout.flush()
-  try:
-    os.remove(".finished.build")
-  except:
-    pass
+    print('Building in %s' %(os.getcwd()))
+    sys.stdout.flush()
+    try:
+        os.remove(".finished.build")
+    except:
+        pass
 
-  if args.dpkg_pkgs:
-    dpkg_install(args.dpkg_pkgs)
+    if args.dpkg_pkgs:
+        dpkg_install(args.dpkg_pkgs)
 
-  if args.apt_pkgs:
-    apt_get_install(args.keep_default_sources, args.apt_pkgs)
+    if args.apt_pkgs:
+        apt_get_install(args.keep_default_sources, args.apt_pkgs)
 
-  _params = [ 'fakeroot', 'debian/rules' ] + args.targets
-  _local_env = os.environ.copy()
-  p = subprocess.Popen(_params,env=_local_env)
-  print ("Building with %s" %(' '.join(_params)))
-  print (p.communicate()[0])
-  _rc = p.wait()
-  if (_rc==0):
-    print('Build was successful')
-    with open(".finished.build","w") as f:
-      f.write("");
-  else:
-    print('Build failed')
-  sys.exit(_rc)
+    _params = ['fakeroot', 'debian/rules'] + args.targets
+    _local_env = os.environ.copy()
+    p = subprocess.Popen(_params, env=_local_env)
+    print ("Building with %s" %(' '.join(_params)))
+    print (p.communicate()[0])
+    _rc = p.wait()
+    if _rc == 0:
+        print('Build was successful')
+        with open(".finished.build", "w") as f:
+            f.write("")
+    else:
+        print('Build failed')
+    sys.exit(_rc)
 
-if __name__=='__main__':
-  main()
+if __name__ == '__main__':
+    main()
 
 #essentially the following
 #dpkg -i packages
