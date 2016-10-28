@@ -15,6 +15,7 @@
 # permissions and limitations under the License.
 #
 
+import argparse
 import os
 import sys
 import subprocess
@@ -70,23 +71,19 @@ def apt_get_install(_keep_default_sources, __pkgs):
   print (p.communicate()[0])
 
 def main():
-  __params=[]
-  __dpkg_pkgs=[]
-  __apt_pkgs=[]
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--dpkg',
+                      nargs='*', dest='dpkg_pkgs', default=[], metavar='PKG')
+  parser.add_argument('--apt',
+                      nargs='*', dest='apt_pkgs', default=[], metavar='PKG')
+  parser.add_argument('--keep-def-sources',
+                      dest='keep_default_sources', action='store_true')
+  parser.add_argument('dir')
+  parser.add_argument('targets',
+                      nargs='+', metavar='target')
+  args = parser.parse_args()
 
-  __scripts=[]
-
-
-  if len(sys.argv) < 3:
-    print('Invalid params... ')
-    print('%s repo_path ' % (sys.argv[0]) )
-    print sys.argv
-    sys.exit(-1)
-
-  dir=sys.argv[1]
-
-  os.chdir(dir)
-  _args = sys.argv[2:]
+  os.chdir(args.dir)
 
   print('Building in %s' %(os.getcwd()))
   sys.stdout.flush()
@@ -94,47 +91,17 @@ def main():
     os.remove(".finished.build")
   except:
     pass
-  _use_apt = False
-  _keep_default_sources=False
 
-  __params = __dpkg_pkgs
+  if args.dpkg_pkgs:
+    dpkg_install(args.dpkg_pkgs)
 
-  for i in _args:
-    if i.find('--dpkg')!=-1:
-      __params = __dpkg_pkgs
-      continue
+  if args.apt_pkgs:
+    apt_get_install(args.keep_default_sources, args.apt_pkgs)
 
-    if i.find('--apt')!=-1:
-      __params = __apt_pkgs
-      continue
-
-    if i.find('--keep-def-sources')!=-1:
-      _keep_default_sources=True
-      continue
-
-    if i == '--':
-      __pkgs = __params
-      __params = []
-      continue
-    __params.append(i)
-
-  if len(__dpkg_pkgs) > 0:
-    dpkg_install(__dpkg_pkgs)
-
-  if len(__apt_pkgs) > 0:
-    apt_get_install(_keep_default_sources,__apt_pkgs)
-
-  __params = [ 'fakeroot', 'debian/rules' ] + __params
-  for i in __scripts:
-    print (i.split(' '))
-    p = subprocess.Popen([i])
-    print (p.communicate()[0])
-
-  sys.stdout.flush()
-
+  _params = [ 'fakeroot', 'debian/rules' ] + args.targets
   _local_env = os.environ.copy()
-  p = subprocess.Popen(__params,env=_local_env)
-  print ("Building with %s" %(' '.join(__params)))
+  p = subprocess.Popen(_params,env=_local_env)
+  print ("Building with %s" %(' '.join(_params)))
   print (p.communicate()[0])
   _rc = p.wait()
   if (_rc==0):
