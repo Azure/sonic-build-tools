@@ -9,7 +9,7 @@ RUN echo "deb-src http://debian-archive.trafficmanager.net/debian-security/ jess
 
 RUN apt-get clean && apt-get update && apt-get install -y  apt-utils default-jre-headless openssh-server curl wget unzip git build-essential libtool lintian
 
-RUN apt-get update && apt-get install -y sudo dh-make dh-exec kmod libtinyxml2-2 libboost-program-options1.55-dev libtinyxml2-dev python python-pip libnl-3-dev libnl-route-3-dev libncurses5-dev texinfo dh-autoreconf
+RUN apt-get update && apt-get install -y sudo dh-make dh-exec kmod libtinyxml2-2 libboost-program-options1.55-dev libtinyxml2-dev python python-pip libncurses5-dev texinfo dh-autoreconf
 RUN apt-get update && apt-get install -y doxygen devscripts git-buildpackage perl-modules libswitch-perl dh-systemd
 
 # For quagga build
@@ -20,9 +20,6 @@ RUN apt-get install -y cdbs
 
 # For SAI meta build
 RUN apt-get update && apt-get install -y libxml-simple-perl
-
-# For sswsdk build
-RUN apt-get update && apt-get install -y libhiredis-dev
 
 # For linux build
 RUN apt-get update && apt-get install -y bc fakeroot build-essential devscripts quilt stgit
@@ -47,7 +44,7 @@ RUN apt-get update && apt-get install -y cpio squashfs-tools zip
 RUN apt-get update && apt-get install -y linux-compiler-gcc-4.8-x86 linux-kbuild-3.16
 
 # teamd build
-RUN apt-get update && apt-get install -y libdaemon-dev libdbus-1-dev libjansson-dev libnl-cli-3-dev libnl-genl-3-dev
+RUN apt-get update && apt-get install -y libdaemon-dev libdbus-1-dev libjansson-dev
 
 # For cavium sdk build
 RUN apt-get update && apt-get install -y libpcap-dev dnsutils libusb-dev
