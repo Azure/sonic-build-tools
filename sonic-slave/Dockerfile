@@ -63,7 +63,7 @@ RUN apt-get update && apt-get install -y libjemalloc-dev
 RUN apt-get update && apt-get install -y dkms
 
 # For python3.5 build
-RUN apt-get update && apt-get install -y sharutils libncursesw5-dev libbz2-dev liblzma-dev libgdbm-dev tk-dev blt-dev libmpdec-dev libbluetooth-dev locales libsqlite3-dev libgpm2 time net-tools xvfb python-sphinx
+RUN apt-get update && apt-get install -y sharutils libncursesw5-dev libbz2-dev liblzma-dev libgdbm-dev tk-dev blt-dev libmpdec-dev libbluetooth-dev locales libsqlite3-dev libgpm2 time net-tools xvfb python-sphinx python3-sphinx
 
 RUN useradd -d /var/build -m -s /bin/bash build
 COPY sonic-jenkins-id_rsa.pub /var/build/.ssh/authorized_keys2
