@@ -9,7 +9,7 @@ RUN echo "deb-src http://debian-archive.trafficmanager.net/debian-security/ jess
 
 RUN apt-get clean && apt-get update && apt-get install -y  apt-utils default-jre-headless openssh-server curl wget unzip git build-essential libtool lintian
 
-RUN apt-get update && apt-get install -y sudo dh-make dh-exec kmod libtinyxml2-2 libboost-program-options1.55-dev libtinyxml2-dev python python-pip libncurses5-dev texinfo dh-autoreconf
+RUN apt-get update && apt-get install -y sudo dh-make dh-exec kmod libtinyxml2-2 libboost-program-options1.55-dev libtinyxml2-dev python python-pip python3-pip libncurses5-dev texinfo dh-autoreconf
 RUN apt-get update && apt-get install -y doxygen devscripts git-buildpackage perl-modules libswitch-perl dh-systemd
 
 # For quagga build
