@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y sudo dh-make dh-exec kmod libtinyxml2-2
 RUN apt-get update && apt-get install -y doxygen devscripts git-buildpackage perl-modules libswitch-perl dh-systemd
 
 # For quagga build
-RUN apt-get update && apt-get install -y libreadline-dev texlive-latex-base texlive-generic-recommended texlive-fonts-recommended libpam0g-dev libpam-dev libcap-dev imagemagick ghostscript groff libpcre3-dev gawk chrpath libsnmp-dev
+RUN apt-get update && apt-get install -y libreadline-dev texlive-latex-base texlive-generic-recommended texlive-fonts-recommended libpam0g-dev libpam-dev libcap-dev imagemagick ghostscript groff libpcre3-dev gawk chrpath
 
 # For libnl3 (local) build
 RUN apt-get install -y cdbs
