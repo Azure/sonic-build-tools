@@ -65,6 +65,9 @@ RUN apt-get update && apt-get install -y dkms
 # For python3.5 build
 RUN apt-get update && apt-get install -y sharutils libncursesw5-dev libbz2-dev liblzma-dev libgdbm-dev tk-dev blt-dev libmpdec-dev libbluetooth-dev locales libsqlite3-dev libgpm2 time net-tools xvfb python-sphinx python3-sphinx
 
+# For snmpd build
+RUN apt-get update && apt-get install -y libmysqlclient-dev libmysqld-dev libperl-dev libpci-dev libpci3 libsensors4 libsensors4-dev libwrap0-dev
+
 RUN useradd -d /var/build -m -s /bin/bash build
 COPY sonic-jenkins-id_rsa.pub /var/build/.ssh/authorized_keys2
 RUN chown build.build ~build/.ssh -R
