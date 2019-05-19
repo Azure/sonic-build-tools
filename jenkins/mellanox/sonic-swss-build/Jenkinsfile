@@ -1,0 +1,88 @@
+pipeline {
+    agent { node { label 'sonic-slave' } }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-swss']]])
+                copyArtifacts(projectName: 'common/hiredis-build', filter: '**/*.deb', target: 'hiredis', flatten: true)
+                copyArtifacts(projectName: 'common/sonic-swss-common-build', filter: '**/*.deb', target: 'swss-common', flatten: true)
+                copyArtifacts(projectName: 'common/libnl3', filter: '**/*.deb', target: 'libnl3', flatten: true)
+                copyArtifacts(projectName: 'buildimage-mlnx-all', filter: 'target/debs/*.deb', target: 'mlnx', flatten: true)
+                copyArtifacts(projectName: 'sonic-sairedis-build', filter: '**/*.deb', excludes: '**/*-rpc*.deb', target: 'sairedis', flatten: true)
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''
+#!/bin/bash -x
+
+set -e
+
+# Make apt-get non-interactive
+DEBIAN_FRONTEND=noninteractive
+
+# Install libnl3
+sudo dpkg -i libnl3/libnl-3-200_*.deb
+sudo dpkg -i libnl3/libnl-3-dev_*.deb
+sudo dpkg -i libnl3/libnl-genl-3-200_*.deb
+sudo dpkg -i libnl3/libnl-genl-3-dev_*.deb
+sudo dpkg -i libnl3/libnl-route-3-200_*.deb
+sudo dpkg -i libnl3/libnl-route-3-dev_*.deb
+
+# Install SDK debs
+sudo dpkg -i mlnx/sx-complib_*.deb
+sudo dpkg -i mlnx/sx-gen-utils_*.deb
+sudo dpkg -i mlnx/sxd-libs_*.deb
+sudo dpkg -i mlnx/applibs_*.deb
+
+# Install SAI-MLNX
+sudo dpkg -i mlnx/mlnx-sai_*.deb
+
+# Install REDIS
+sudo apt-get install -y libjemalloc-dev redis-server libjemalloc1 redis-tools
+
+# Install HIREDIS
+sudo dpkg -i hiredis/*.deb
+
+# Install SAI-Redis
+sudo dpkg -i sairedis/libsaimetadata_*.deb
+sudo dpkg -i sairedis/libsaimetadata-dev_*.deb
+sudo dpkg -i sairedis/libsairedis_*.deb
+sudo dpkg -i sairedis/libsairedis-dev_*.deb
+sudo dpkg -i sairedis/syncd_*.deb
+
+# Install SWSS-common
+sudo dpkg -i swss-common/*.deb
+
+ls -lrt
+
+./autogen.sh
+fakeroot debian/rules binary
+
+find debian
+
+mkdir target
+cp ../*.deb target/
+
+# Copy executable binaries
+cp debian/swss/usr/bin/* target/
+'''
+            }
+        }
+
+    }
+    post {
+
+        success {
+            archiveArtifacts(artifacts: 'target/*')
+        }
+        fixed {
+            slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        regression {
+            slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+    }
+}
