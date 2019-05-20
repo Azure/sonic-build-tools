@@ -1,0 +1,69 @@
+pipeline {
+    agent { node { label 'sonic-slave' } }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                checkout([$class: 'GitSCM', 
+                          branches: [[name: 'refs/heads/master']], 
+                          extensions: [[$class: 'SubmoduleOption',
+                                        disableSubmodules: false,
+                                        parentCredentials: false,
+                                        recursiveSubmodules: true,
+                                        reference: '',
+                                        trackingSubmodules: false]],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-sairedis']]])
+                copyArtifacts(projectName: 'buildimage-vs-all', filter: '**/*.deb', target: 'buildimage', flatten: false)
+                copyArtifacts(projectName: 'common/sonic-swss-common-build', filter: '**/*.deb', target: 'swss-common', flatten: true)
+ 
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''
+#!/bin/bash -xe
+
+# Install REDIS
+sudo dpkg -i buildimage/target/debs/stretch/redis-tools_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/redis-server_*.deb
+sudo sed -ri 's/^# unixsocket/unixsocket/' /etc/redis/redis.conf
+sudo sed -ri 's/^unixsocketperm .../unixsocketperm 777/' /etc/redis/redis.conf 
+sudo service redis-server start
+
+# Install hiredis
+sudo dpkg -i buildimage/target/debs/stretch/libhiredis*.deb
+
+# Install libnl3
+sudo dpkg -i buildimage/target/debs/stretch/libnl-3-200_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/libnl-genl-3-200_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/libnl-route-3-200_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/libnl-3-dev_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/libnl-genl-3-dev_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/libnl-route-3-dev_*.deb
+
+# Install SWSS-common
+sudo dpkg -i swss-common/*.deb
+
+./autogen.sh
+dpkg-buildpackage -rfakeroot -b -us -uc --as-root -Tbinary-syncd-vs
+
+mkdir target
+cp ../*.deb target/
+'''
+            }
+        }
+    }
+    post {
+
+        success {
+            archiveArtifacts(artifacts: 'target/*.deb, **/*.log, target/var/log/*')
+        }
+        fixed {
+            slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        regression {
+            slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+    }
+}
