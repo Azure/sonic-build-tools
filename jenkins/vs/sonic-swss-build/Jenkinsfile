@@ -66,7 +66,7 @@ sudo dpkg -i buildimage/target/debs/stretch/libteam-dev_*.deb
 # Install SWSS-common
 sudo dpkg -i swss-common/*.deb
 
-pushd sonic-swss
+cd sonic-swss
 ./autogen.sh
 dpkg-buildpackage -us -uc -b
 EOF
@@ -78,15 +78,15 @@ docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonic-slave-stre
 cp swss_*.deb buildimage/target/debs/stretch/
 cp swss-dbg_*.deb buildimage/target/debs/stretch/
 
-pushd sairedis
+cd sairedis
 cp *.deb ../buildimage/target/debs/stretch/
-popd
+cd ../
 
-pushd swss-common
+cd swss-common
 cp *.deb ../buildimage/target/debs/stretch/
-popd
+cd ../
 
-pushd buildimage/platform/vs
+cd buildimage/platform/vs
 mkdir -p docker-sonic-vs/debs
 mkdir -p docker-sonic-vs/files
 mkdir -p docker-sonic-vs/python-debs
@@ -101,11 +101,11 @@ sudo umount docker-sonic-vs/debs
 sudo umount docker-sonic-vs/files
 sudo umount docker-sonic-vs/python-debs
 sudo umount docker-sonic-vs/python-wheels
-popd
+cd ../../../
 
 docker save docker-sonic-vs | gzip -c > buildimage/target/docker-sonic-vs.gz
 	
-pushd sonic-swss/tests
+cd sonic-swss/tests
 sudo py.test -v
 '''
             }
