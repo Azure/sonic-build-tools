@@ -1,0 +1,126 @@
+pipeline {
+    agent { node { label 'jenkins-vstest-workers' } }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                step([$class: 'WsCleanup'])
+                checkout([$class: 'GitSCM',
+                          branches: [[name: '*/master']],
+                          doGenerateSubmoduleConfigurations: false,
+                          extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'sonic-swss']],
+                          submoduleCfg: [],
+                          userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-swss']]])
+                copyArtifacts(projectName: 'common/sonic-swss-common-build', filter: '**/*.deb', target: 'swss-common', flatten: true)
+                copyArtifacts(projectName: 'common/hiredis-build', filter: '**/*.deb', target: 'hiredis', flatten: true)
+                copyArtifacts(projectName: 'common/sonic-utilities-build', filter: '**/*.whl', target: 'sonic-utilities', flatten: true)
+                copyArtifacts(projectName: 'common/libnl3', filter: '**/*.deb', target: 'libnl3', flatten: true)
+                copyArtifacts(projectName: 'sonic-sairedis-build', filter: '**/*.deb', target: 'sairedis', flatten: true)
+                copyArtifacts(projectName: 'buildimage-vs-all', filter: '**/*', target: 'buildimage', flatten: false)
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''
+#!/bin/bash -xe
+
+set -e
+
+# Copy latest utility artifacts
+cp sonic-utilities/*.whl buildimage/target/python-wheels
+
+cat <<EOF > build_swss.sh
+#!/bin/bash -xe
+ls -lrt
+
+# Install HIREDIS
+sudo dpkg -i hiredis/*.deb
+
+# Install SAIVS
+sudo dpkg -i sairedis/libsaivs_*.deb
+sudo dpkg -i sairedis/libsaivs-dev_*.deb
+sudo dpkg -i sairedis/libsairedis_*.deb
+sudo dpkg -i sairedis/libsairedis-dev_*.deb
+sudo dpkg -i sairedis/libsaimetadata_*.deb
+sudo dpkg -i sairedis/libsaimetadata-dev_*.deb
+sudo dpkg -i sairedis/syncd-vs_*.deb
+
+# Install libnl3
+sudo dpkg -i libnl3/libnl-3-200_*.deb
+sudo dpkg -i libnl3/libnl-3-dev_*.deb
+sudo dpkg -i libnl3/libnl-genl-3-200_*.deb
+sudo dpkg -i libnl3/libnl-genl-3-dev_*.deb 
+sudo dpkg -i libnl3/libnl-route-3-200_*.deb
+sudo dpkg -i libnl3/libnl-route-3-dev_*.deb
+sudo dpkg -i libnl3/libnl-nf-3-200_*.deb
+sudo dpkg -i libnl3/libnl-cli-3-200_*.deb
+
+# Install libteam
+sudo apt-get install -y libdbus-1-3
+sudo dpkg -i buildimage/target/debs/stretch/libteam5_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/libteamdctl0_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/libteam-utils_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/libteam-dev_*.deb
+
+# Install SWSS-common
+sudo dpkg -i swss-common/*.deb
+
+pushd sonic-swss
+./autogen.sh
+dpkg-buildpackage -us -uc -b
+EOF
+
+chmod 755 build_swss.sh
+
+# build swss
+docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonic-slave-stretch-johnar ./build_swss.sh
+cp swss_*.deb buildimage/target/debs/stretch/
+cp swss-dbg_*.deb buildimage/target/debs/stretch/
+
+pushd sairedis
+cp *.deb ../buildimage/target/debs/stretch/
+popd
+
+pushd swss-common
+cp *.deb ../buildimage/target/debs/stretch/
+popd
+
+pushd buildimage/platform/vs
+mkdir -p docker-sonic-vs/debs
+mkdir -p docker-sonic-vs/files
+mkdir -p docker-sonic-vs/python-debs
+mkdir -p docker-sonic-vs/python-wheels
+sudo mount --bind ../../target/debs/stretch docker-sonic-vs/debs
+sudo mount --bind ../../target/files/stretch docker-sonic-vs/files
+sudo mount --bind ../../target/python-debs docker-sonic-vs/python-debs
+sudo mount --bind ../../target/python-wheels docker-sonic-vs/python-wheels
+docker load < ../../target/docker-config-engine-stretch.gz
+docker build --squash --no-cache -t docker-sonic-vs docker-sonic-vs
+sudo umount docker-sonic-vs/debs
+sudo umount docker-sonic-vs/files
+sudo umount docker-sonic-vs/python-debs
+sudo umount docker-sonic-vs/python-wheels
+popd
+
+docker save docker-sonic-vs | gzip -c > buildimage/target/docker-sonic-vs.gz
+	
+pushd sonic-swss/tests
+sudo py.test -v
+'''
+            }
+        }
+    }
+    post {
+
+        success {
+            archiveArtifacts(artifacts: 'buildimage/target/docker-sonic-vs.gz, sonic-swss/tests/log/**, swss_*.deb, swss-dbg_*.deb, sonic-swss/tests/*.py')
+        }
+        fixed {
+            slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        regression {
+            slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+    }
+}
