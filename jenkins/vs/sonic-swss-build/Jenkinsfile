@@ -112,8 +112,7 @@ sudo py.test -v
         }
     }
     post {
-
-        success {
+        always {
             archiveArtifacts(artifacts: 'buildimage/target/docker-sonic-vs.gz, sonic-swss/tests/log/**, swss_*.deb, swss-dbg_*.deb, sonic-swss/tests/*.py')
         }
         fixed {
