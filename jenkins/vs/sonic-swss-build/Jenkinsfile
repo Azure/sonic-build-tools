@@ -4,7 +4,6 @@ pipeline {
     stages {
         stage('Prepare') {
             steps {
-                step([$class: 'WsCleanup'])
                 checkout([$class: 'GitSCM',
                           branches: [[name: '*/master']],
                           doGenerateSubmoduleConfigurations: false,
@@ -114,6 +113,7 @@ sudo py.test -v
     post {
         always {
             archiveArtifacts(artifacts: 'buildimage/target/docker-sonic-vs.gz, sonic-swss/tests/log/**, swss_*.deb, swss-dbg_*.deb, sonic-swss/tests/*.py')
+            cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
         }
         fixed {
             slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
