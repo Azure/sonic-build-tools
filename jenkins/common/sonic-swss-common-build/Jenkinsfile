@@ -1,0 +1,79 @@
+pipeline {
+    agent { node { label 'sonic-slave' } }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                checkout([$class: 'GitSCM', 
+                          branches: [[name: 'refs/heads/master']], 
+                          extensions: [[$class: 'SubmoduleOption',
+                                        disableSubmodules: false,
+                                        parentCredentials: false,
+                                        recursiveSubmodules: false,
+                                        reference: '',
+                                        trackingSubmodules: false]],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-swss-common']]])
+                copyArtifacts(projectName: 'vs/buildimage-vs-all', filter: '**/*.deb', target: 'buildimage', flatten: false)
+ 
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''
+#!/bin/bash -x
+
+# Install swig3.0
+sudo dpkg -i buildimage/target/debs/stretch/swig3.0_*.deb
+
+# Install REDIS
+sudo dpkg -i buildimage/target/debs/stretch/redis-tools_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/redis-server_*.deb
+sudo sed -i 's/notify-keyspace-events ""/notify-keyspace-events AKE/' /etc/redis/redis.conf
+sudo service redis-server start
+
+# Install HIREDIS
+sudo dpkg -i buildimage/target/debs/stretch/libhiredis*.deb
+
+# Install libnl3
+sudo dpkg -i buildimage/target/debs/stretch/libnl-3-200_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/libnl-3-dev_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/libnl-genl-3-200_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/libnl-genl-3-dev_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/libnl-route-3-200_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/libnl-route-3-dev_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/libnl-nf-3-200_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/libnl-nf-3-dev_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/libnl-cli-3-200_*.deb
+sudo dpkg -i buildimage/target/debs/stretch/libnl-cli-3-dev_*.deb
+
+./autogen.sh
+fakeroot debian/rules binary
+
+mkdir target
+cp ../*.deb target/
+
+# Test
+sudo dpkg -i ../libswsscommon_*.deb
+sudo dpkg -i ../python-swsscommon_*.deb
+sudo ./tests/tests
+
+redis-cli FLUSHALL
+py.test tests
+'''
+            }
+        }
+    }
+    post {
+
+        success {
+            archiveArtifacts(artifacts: 'target/*.deb')
+        }
+        fixed {
+            slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        regression {
+            slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+    }
+}
