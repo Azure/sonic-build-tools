@@ -1,0 +1,50 @@
+pipeline {
+    agent { node { label 'jenkins-workers-slow' } }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                step([$class: 'WsCleanup'])
+                checkout([$class: 'GitSCM', 
+                          branches: [[name: 'refs/heads/master']],
+                          extensions: [[$class: 'SubmoduleOption',
+                                        disableSubmodules: false,
+                                        parentCredentials: false,
+                                        recursiveSubmodules: true,
+                                        reference: '',
+                                        trackingSubmodules: false]],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage']]])
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''
+#!/bin/bash -x
+
+git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
+
+make configure PLATFORM=generic
+
+make SONIC_CONFIG_BUILD_JOBS=1 target/files/stretch/ixgbe.ko \
+                               target/debs/libnl-3-200_3.2.27-2_amd64.deb \
+                               target/debs/libhiredis0.13_0.13.3-2_amd64.deb \
+                               target/debs/redis-server_3.2.4-1~bpo8+1_amd64.deb
+'''
+            }
+        }
+
+    }
+    post {
+
+        success {
+            archiveArtifacts(artifacts: 'target/**')
+        }
+        fixed {
+            slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        regression {
+            slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+    }
+}
