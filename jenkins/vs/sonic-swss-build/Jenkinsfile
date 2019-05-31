@@ -12,7 +12,7 @@ pipeline {
                           userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-swss']]])
                 copyArtifacts(projectName: 'common/sonic-swss-common-build', filter: '**/*.deb', target: 'swss-common', flatten: true)
                 copyArtifacts(projectName: 'common/hiredis-build', filter: '**/*.deb', target: 'hiredis', flatten: true)
-                copyArtifacts(projectName: 'common/sonic-utilities-build', filter: '**/*.deb', target: 'sonic-utilities', flatten: true)
+                copyArtifacts(projectName: 'common/sonic-utilities', filter: '**/*.deb', target: 'sonic-utilities', flatten: true)
                 copyArtifacts(projectName: 'common/libnl3', filter: '**/*.deb', target: 'libnl3', flatten: true)
                 copyArtifacts(projectName: 'sonic-sairedis-build', filter: '**/*.deb', target: 'sairedis', flatten: true)
                 copyArtifacts(projectName: 'buildimage-vs-all', filter: '**/*', target: 'buildimage', flatten: false)
