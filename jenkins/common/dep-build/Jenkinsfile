@@ -4,6 +4,10 @@ pipeline {
     stages {
         stage('Prepare') {
             steps {
+                //enable remote triggers
+                script {
+                    properties([pipelineTriggers([pollSCM('H * * * *')])])
+                }
                 checkout([$class: 'GitSCM', 
                           branches: [[name: 'refs/heads/master']],
                           extensions: [[$class: 'SubmoduleOption',
