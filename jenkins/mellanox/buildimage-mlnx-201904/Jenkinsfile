@@ -4,7 +4,10 @@ pipeline {
     stages {
         stage('Prepare') {
             steps {
-                step([$class: 'WsCleanup'])
+                //enable remote triggers
+                script {
+                    properties([pipelineTriggers([pollSCM('H * * * *')])])
+                }
                 checkout([$class: 'GitSCM', 
                           branches: [[name: 'refs/heads/201904']], 
                           extensions: [[$class: 'SubmoduleOption',
@@ -35,6 +38,7 @@ make SONIC_CONFIG_BUILD_JOBS=1 ENABLE_DHCP_GRAPH_SERVICE=y target/sonic-mellanox
 
         success {
             archiveArtifacts(artifacts: 'target/**')
+            cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
         }
         fixed {
             slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
