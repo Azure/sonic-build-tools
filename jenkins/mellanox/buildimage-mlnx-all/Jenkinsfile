@@ -1,6 +1,16 @@
 pipeline {
     agent { node { label 'jenkins-workers-slow' } }
 
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
+
+    }
+
+    triggers {
+        pollSCM('@midnight')
+    }
+
+
     stages {
         stage('Prepare') {
             steps {
@@ -36,6 +46,7 @@ ENABLE_SYNCD_RPC=y make SONIC_CONFIG_BUILD_JOBS=1 target/docker-syncd-mlnx-rpc.g
 
         success {
             archiveArtifacts(artifacts: 'target/**')
+            cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
         }
         fixed {
             slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
