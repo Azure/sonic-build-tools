@@ -52,7 +52,14 @@ make SONIC_CONFIG_BUILD_JOBS=1 target/files/stretch/ixgbe.ko \
                                target/debs/stretch/fancontrol_3.4.0-4_all.deb \
                                target/debs/stretch/sensord_3.4.0-4_amd64.deb \
                                target/debs/stretch/smartmontools_6.6-1_amd64.deb \
-                               target/debs/stretch/radvd_2.17-2~bpo9+1_amd64.deb
+                               target/debs/stretch/radvd_2.17-2~bpo9+1_amd64.deb \
+                               target/debs/stretch/python3.6-minimal_3.6.0-1_amd64.deb \
+                               target/debs/stretch/libmpdec2_2.4.2-2_amd64.deb \
+                               target/debs/stretch/libpython3.6-stdlib_3.6.0-1_amd64.deb \
+                               target/debs/stretch/python3.6_3.6.0-1_amd64.deb \
+                               target/debs/stretch/libpython3.6_3.6.0-1_amd64.deb \
+                               target/debs/stretch/libpython3.6-dev_3.6.0-1_amd64.deb \
+                               target/debs/stretch/isc-dhcp-relay_4.3.5-2_amd64.deb
 '''
             }
         }
