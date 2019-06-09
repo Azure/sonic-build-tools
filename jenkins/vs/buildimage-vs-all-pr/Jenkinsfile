@@ -40,7 +40,7 @@ make SONIC_CONFIG_BUILD_JOBS=1 target/docker-sonic-vs.gz
 
 docker load < target/docker-sonic-vs.gz
 
-pushd platform/vs/tests
+cd platform/vs/tests
 sudo py.test -v
 # pavelsh added -s to see output from the pytest
 '''
