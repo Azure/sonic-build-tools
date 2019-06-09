@@ -1,0 +1,61 @@
+pipeline {
+    agent { node { label 'jenkins-vstest-workers' } }
+
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
+
+    }
+
+    triggers {
+        pollSCM('@midnight')
+    }
+
+
+    stages {
+        stage('Prepare') {
+            steps {
+                checkout([$class: 'GitSCM', 
+                          branches: [[name: 'refs/heads/master']],
+                          extensions: [[$class: 'SubmoduleOption',
+                                        disableSubmodules: false,
+                                        parentCredentials: false,
+                                        recursiveSubmodules: true,
+                                        reference: '',
+                                        trackingSubmodules: false]],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage']]])
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''
+#!/bin/bash -xe
+
+git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
+
+make configure PLATFORM=vs
+make SONIC_CONFIG_BUILD_JOBS=1 target/docker-sonic-vs.gz
+
+docker load < target/docker-sonic-vs.gz
+
+cd platform/vs/tests
+sudo py.test -v
+'''
+            }
+        }
+
+    }
+    post {
+
+        success {
+            archiveArtifacts(artifacts: 'target/**')
+            cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
+        }
+        fixed {
+            slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        regression {
+            slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+    }
+}
