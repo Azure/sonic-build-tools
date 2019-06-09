@@ -1,6 +1,11 @@
 pipeline {
     agent { node { label 'jenkins-workers' } }
 
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '60'))
+
+    }
+
     stages {
         stage('Prepare') {
             steps {
@@ -15,7 +20,8 @@ pipeline {
                                         trackingSubmodules: false]],
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage',
                                                refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
-                copyArtifacts(projectName: 'common/dep-build', filter: '**/*.deb', target: 'target/debs/stretch', flatten: true)
+
+                copyArtifacts(projectName: 'common/dep-build', filter: 'target/debs/stretch/*.deb', target: './', flatten: false)
             }
         }
 
@@ -28,7 +34,6 @@ git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --rel
 
 make configure PLATFORM=broadcom
 
-touch target/debs/*.deb
 touch target/debs/stretch/*.deb
 
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-broadcom.bin
