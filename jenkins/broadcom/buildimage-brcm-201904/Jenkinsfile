@@ -1,13 +1,19 @@
 pipeline {
     agent { node { label 'jenkins-workers-slow' } }
 
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
+
+    }
+
+    triggers {
+        pollSCM('@midnight')
+    }
+
+
     stages {
         stage('Prepare') {
             steps {
-                //enable remote triggers
-                script {
-                    properties([pipelineTriggers([pollSCM('H * * * *')])])
-                }
                 checkout([$class: 'GitSCM', 
                           branches: [[name: 'refs/heads/201904']], 
                           extensions: [[$class: 'SubmoduleOption',
