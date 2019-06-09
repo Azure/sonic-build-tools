@@ -1,6 +1,15 @@
 pipeline {
     agent { node { label 'sonic-slave' } }
 
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
+
+    }
+
+    triggers {
+        pollSCM('H/10 * * * *')
+    }
+
     stages {
         stage('Prepare') {
             steps {
