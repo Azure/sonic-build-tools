@@ -48,7 +48,7 @@ sudo py.test -v
     post {
 
         success {
-            archiveArtifacts(artifacts: 'target/**')
+            archiveArtifacts(artifacts: 'target/**, platform/vs/**')
             cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
         }
         fixed {
