@@ -3,10 +3,6 @@
 # Install SWIG
 sudo dpkg -i buildimage/target/debs/stretch/swig3.0_*.deb
 
-# Install Redis
-sudo dpkg -i buildimage/target/debs/stretch/redis-tools_*.deb
-sudo dpkg -i buildimage/target/debs/stretch/redis-server_*.deb
-
 # Install HIREDIS
 sudo dpkg -i buildimage/target/debs/stretch/libhiredis*.deb
 
