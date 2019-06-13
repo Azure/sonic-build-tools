@@ -22,7 +22,7 @@ pipeline {
                                         reference: '',
                                         trackingSubmodules: false]],
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-telemetry']]])
-                copyArtifacts(projectName: 'vs/buildimage-vs-all', filter: '**/*.deb', target: 'buildimage', flatten: false)
+                copyArtifacts(projectName: '../vs/buildimage-vs-all', filter: '**/*.deb', target: 'buildimage', flatten: false)
  
             }
         }
