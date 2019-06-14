@@ -4,116 +4,34 @@ pipeline {
     stages {
         stage('Prepare') {
             steps {
-                checkout([$class: 'GitSCM',
-                          branches: [[name: '${sha1}']],
-                          doGenerateSubmoduleConfigurations: false,
-                          extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'sonic-swss']],
-                          submoduleCfg: [],
-                          userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-swss',
-                                               refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
-                copyArtifacts(projectName: 'common/sonic-swss-common-build', filter: '**/*.deb', target: 'swss-common', flatten: true)
-                copyArtifacts(projectName: 'common/hiredis-build', filter: '**/*.deb', target: 'hiredis', flatten: true)
-                copyArtifacts(projectName: 'common/sonic-utilities-build', filter: '**/*.deb', target: 'sonic-utilities', flatten: true)
-                copyArtifacts(projectName: 'common/libnl3', filter: '**/*.deb', target: 'libnl3', flatten: true)
+                dir('swss') {
+                    checkout([$class: 'GitSCM',
+                              branches: [[name: '${sha1}']],
+                              userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-swss',
+                                                   refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
+                }
                 copyArtifacts(projectName: 'sonic-sairedis-build', filter: '**/*.deb', target: 'sairedis', flatten: true)
+                copyArtifacts(projectName: 'common/sonic-swss-common-build', filter: '**/*.deb', target: 'common', flatten: true)
+                copyArtifacts(projectName: 'common/sonic-utilities-build', filter: '**/*.deb', target: 'utilities', flatten: true)
                 copyArtifacts(projectName: 'buildimage-vs-all', filter: '**/*', target: 'buildimage', flatten: false)
             }
         }
 
         stage('Build') {
             steps {
-                sh '''
-#!/bin/bash -xe
+                sh './scripts/vs/sonic-swss-build/build.sh'
+            }
+        }
 
-set -e
-
-# Copy latest utility artifacts
-cp sonic-utilities/*.deb buildimage/target/python-debs
-
-cat <<EOF > build_swss.sh
-#!/bin/bash -xe
-ls -lrt
-
-# Install HIREDIS
-sudo dpkg -i hiredis/*.deb
-
-# Install SAIVS
-sudo dpkg -i sairedis/libsaivs_*.deb
-sudo dpkg -i sairedis/libsaivs-dev_*.deb
-sudo dpkg -i sairedis/libsairedis_*.deb
-sudo dpkg -i sairedis/libsairedis-dev_*.deb
-sudo dpkg -i sairedis/libsaimetadata_*.deb
-sudo dpkg -i sairedis/libsaimetadata-dev_*.deb
-sudo dpkg -i sairedis/syncd-vs_*.deb
-
-# Install libnl3
-sudo dpkg -i libnl3/libnl-3-200_*.deb
-sudo dpkg -i libnl3/libnl-3-dev_*.deb
-sudo dpkg -i libnl3/libnl-genl-3-200_*.deb
-sudo dpkg -i libnl3/libnl-genl-3-dev_*.deb 
-sudo dpkg -i libnl3/libnl-route-3-200_*.deb
-sudo dpkg -i libnl3/libnl-route-3-dev_*.deb
-sudo dpkg -i libnl3/libnl-nf-3-200_*.deb
-sudo dpkg -i libnl3/libnl-cli-3-200_*.deb
-
-# Install libteam
-sudo apt-get install -y libdbus-1-3
-sudo dpkg -i buildimage/target/debs/stretch/libteam5_*.deb
-sudo dpkg -i buildimage/target/debs/stretch/libteamdctl0_*.deb
-sudo dpkg -i buildimage/target/debs/stretch/libteam-utils_*.deb
-sudo dpkg -i buildimage/target/debs/stretch/libteam-dev_*.deb
-
-# Install SWSS-common
-sudo dpkg -i swss-common/*.deb
-
-cd sonic-swss
-./autogen.sh
-dpkg-buildpackage -us -uc -b
-EOF
-
-chmod 755 build_swss.sh
-
-# build swss
-docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonic-slave-stretch-johnar ./build_swss.sh
-cp swss_*.deb buildimage/target/debs/stretch/
-cp swss-dbg_*.deb buildimage/target/debs/stretch/
-
-cd sairedis
-cp *.deb ../buildimage/target/debs/stretch/
-cd ../
-
-cd swss-common
-cp *.deb ../buildimage/target/debs/stretch/
-cd ../
-
-cd buildimage/platform/vs
-mkdir -p docker-sonic-vs/debs
-mkdir -p docker-sonic-vs/files
-mkdir -p docker-sonic-vs/python-debs
-mkdir -p docker-sonic-vs/python-wheels
-sudo mount --bind ../../target/debs/stretch docker-sonic-vs/debs
-sudo mount --bind ../../target/files/stretch docker-sonic-vs/files
-sudo mount --bind ../../target/python-debs docker-sonic-vs/python-debs
-sudo mount --bind ../../target/python-wheels docker-sonic-vs/python-wheels
-docker load < ../../target/docker-config-engine-stretch.gz
-docker build --squash --no-cache -t docker-sonic-vs docker-sonic-vs
-sudo umount docker-sonic-vs/debs
-sudo umount docker-sonic-vs/files
-sudo umount docker-sonic-vs/python-debs
-sudo umount docker-sonic-vs/python-wheels
-cd ../../../
-
-docker save docker-sonic-vs | gzip -c > buildimage/target/docker-sonic-vs.gz
-	
-cd sonic-swss/tests
-sudo py.test -v
-'''
+        stage('Test') {
+            steps {
+                sh './scripts/vs/sonic-swss-build/test.sh'
             }
         }
     }
     post {
         always {
-            archiveArtifacts(artifacts: 'buildimage/target/docker-sonic-vs.gz, sonic-swss/tests/log/**, swss_*.deb, swss-dbg_*.deb, sonic-swss/tests/*.py')
+            archiveArtifacts(artifacts: 'buildimage/target/docker-sonic-vs.gz, swss/tests/log/**, swss_*.deb, swss-dbg_*.deb, swss/tests/*.py')
             cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
         }
         fixed {
