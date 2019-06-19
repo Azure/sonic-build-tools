@@ -1,0 +1,51 @@
+pipeline {
+    agent { node { label 'jenkins-workers' } }
+
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '60'))
+
+    }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                step([$class: 'WsCleanup'])
+                checkout([$class: 'GitSCM', 
+                          branches: [[name: '${sha1}']],
+                          extensions: [[$class: 'SubmoduleOption',
+                                        disableSubmodules: false,
+                                        parentCredentials: false,
+                                        recursiveSubmodules: true,
+                                        reference: '',
+                                        trackingSubmodules: false]],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage',
+                                               refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
+
+                copyArtifacts(projectName: 'common/dep-build', filter: 'target/debs/stretch/*.deb', target: './', flatten: false)
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''
+#!/bin/bash -xe
+
+git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
+
+make configure PLATFORM=generic
+
+touch target/debs/stretch/*.deb
+
+make SONIC_CONFIG_BUILD_JOBS=1 target/docker-ptf.gz target/sonic-generic.bin target/sonic-aboot-generic.swi
+'''
+            }
+        }
+
+    }
+    post {
+
+        success {
+            archiveArtifacts(artifacts: 'target/**')
+        }
+    }
+}
