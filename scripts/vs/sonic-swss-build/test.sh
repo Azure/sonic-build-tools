@@ -26,3 +26,4 @@ docker save docker-sonic-vs | gzip -c > buildimage/target/docker-sonic-vs.gz
 
 pushd swss/tests
 sudo py.test -v
+sudo ip -all netns delete
