@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash -ex
 
 # Install HIREDIS
 sudo dpkg -i buildimage/target/debs/stretch/libhiredis*.deb

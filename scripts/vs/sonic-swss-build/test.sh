@@ -1,4 +1,8 @@
-#!/bin/bash -x
+#!/bin/bash -ex
+
+cleanup() {
+    sudo ip -all netns delete
+}
 
 cp *.deb buildimage/target/debs/stretch/
 cp sairedis/*.deb buildimage/target/debs/stretch/
@@ -24,6 +28,7 @@ popd
 
 docker save docker-sonic-vs | gzip -c > buildimage/target/docker-sonic-vs.gz
 
+trap cleanup ERR
+
 pushd swss/tests
 sudo py.test -v
-sudo ip -all netns delete
