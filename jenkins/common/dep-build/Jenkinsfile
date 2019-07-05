@@ -37,8 +37,8 @@ make configure PLATFORM=generic
 
 make SONIC_CONFIG_BUILD_JOBS=1 target/files/stretch/ixgbe.ko \
                                target/debs/stretch/libnl-3-200_3.2.27-2_amd64.deb \
-                               target/debs/stretch/libhiredis0.13_0.13.3-2_amd64.deb \
-                               target/debs/stretch/redis-server_3.2.4-1~bpo8+1_amd64.deb \
+                               target/debs/stretch/libhiredis0.14_0.14.0-3~bpo9+1_amd64.deb \
+                               target/debs/stretch/redis-tools_5.0.3-3~bpo9+2_amd64.deb \
                                target/debs/stretch/libthrift-0.11.0_0.11.0-4_amd64.deb \
                                target/debs/stretch/python3.6_3.6.0-1_amd64.deb \
                                target/debs/stretch/swig3.0_3.0.12-2_amd64.deb \
