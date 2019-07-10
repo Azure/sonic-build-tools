@@ -9,11 +9,6 @@ sudo service redis-server start
 sudo dpkg -i libswsscommon_*.deb
 sudo dpkg -i python-swsscommon_*.deb
 
-pushd sonic-swss-common
+cd sonic-swss-common
 
-sudo ./tests/tests
-
-redis-cli FLUSHALL
-py.test tests
-
-popd
+sudo ./tests/tests && redis-cli FLUSHALL && pytest
