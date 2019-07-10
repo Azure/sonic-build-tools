@@ -23,7 +23,9 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh './scripts/vs/sonic-sairedis-build/build.sh'
+                wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+                    sh './scripts/vs/sonic-sairedis-build/build.sh'
+                }
             }
         }
     }
