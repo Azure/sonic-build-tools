@@ -35,6 +35,8 @@ pipeline {
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
 make configure PLATFORM=mellanox
+make SONIC_CONFIG_BUILD_JOBS=1 ENABLE_DHCP_GRAPH_SERVICE=y INSTALL_DEBUG_TOOLS=y target/sonic-mellanox.bin
+mv target/sonic-mellanox.bin target/sonic-mellanox-dbg.bin
 make SONIC_CONFIG_BUILD_JOBS=1 ENABLE_DHCP_GRAPH_SERVICE=y target/sonic-mellanox.bin
 ENABLE_SYNCD_RPC=y make SONIC_CONFIG_BUILD_JOBS=1 target/docker-syncd-mlnx-rpc.gz target/docker-ptf-mlnx.gz
 '''
