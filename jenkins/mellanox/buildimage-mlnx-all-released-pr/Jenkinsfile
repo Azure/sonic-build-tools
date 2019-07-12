@@ -40,6 +40,8 @@ make SONIC_CONFIG_BUILD_JOBS=1 all
 
         success {
             archiveArtifacts(artifacts: 'target/**')
+        }
+        always {
             cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
         }
     }

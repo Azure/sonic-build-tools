@@ -70,13 +70,15 @@ make SONIC_CONFIG_BUILD_JOBS=1 target/files/stretch/ixgbe.ko \
 
         success {
             archiveArtifacts(artifacts: 'target/**')
-            cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
         }
         fixed {
             slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
         }
         regression {
             slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        always {
+            cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
         }
     }
 }
