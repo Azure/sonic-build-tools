@@ -42,7 +42,7 @@ sudo pip install pytest-runner==4.4
 cd sonic-utilities
 
 # Test building the Debian package
-sudo python setup.py --command-packages=stdeb.command bdist_deb
+sudo python setup.py --command-packages=stdeb.command bdist_deb; sudo chown $USER: -R .
 
 EOF
 
