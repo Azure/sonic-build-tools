@@ -45,7 +45,7 @@ make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-vs.img.gz
         success {
             archiveArtifacts(artifacts: 'target/**')
         }
-        always {
+        cleanup {
             cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
         }
     }

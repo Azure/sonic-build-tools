@@ -56,7 +56,7 @@ make SONIC_CONFIG_BUILD_JOBS=1 target/docker-syncd-brcm-rpc.gz target/docker-ptf
         regression {
             slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
         }
-        always {
+        cleanup {
             cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
         }
     }
