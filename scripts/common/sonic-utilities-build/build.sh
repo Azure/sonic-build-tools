@@ -25,7 +25,8 @@ EOF
 chmod 755 build_sonic_utilities.sh
 
 # Build sonic-utilities and copy resulting Debian package
-docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonic-slave-johnar ./build_sonic_utilities.sh
+docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonic-slave-stretch-johnar ./build_sonic_utilities.sh
+
 cp sonic-utilities/deb_dist/python-sonic-utilities_*.deb buildimage/target/python-debs/
 
 cd sairedis

@@ -4,14 +4,12 @@ pipeline {
     stages {
         stage('Prepare') {
             steps {
-                step([$class: 'WsCleanup'])
-                checkout([$class: 'GitSCM',
+                dir('sonic-utilities') {
+                    checkout([$class: 'GitSCM',
                           branches: [[name: '${sha1}']],
-                          doGenerateSubmoduleConfigurations: false,
-                          extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'sonic-utilities']],
-                          submoduleCfg: [],
                           userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-utilities',
                                                refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
+                }
                 copyArtifacts(projectName: 'sonic-swss-common-build', filter: '**/*.deb', target: 'swss-common', flatten: true)
                 copyArtifacts(projectName: '../vs/sonic-swss-build', filter: '**/*.deb', target: 'swss', flatten: true)
                 copyArtifacts(projectName: '../vs/sonic-sairedis-build', filter: '**/*.deb', target: 'sairedis', flatten: true)
