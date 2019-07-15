@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash -ex
 
 # Install Redis
 sudo dpkg -i buildimage/target/debs/stretch/redis-tools_*.deb
