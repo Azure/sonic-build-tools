@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash -ex
 
 # Install SWIG
 sudo dpkg -i buildimage/target/debs/stretch/swig3.0_*.deb
