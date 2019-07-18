@@ -24,7 +24,9 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh './scripts/vs/sonic-swss-build/test.sh'
+                wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+                    sh './scripts/vs/sonic-swss-build/test.sh'
+                }
             }
         }
     }
