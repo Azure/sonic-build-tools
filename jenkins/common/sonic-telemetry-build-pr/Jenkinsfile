@@ -4,47 +4,23 @@ pipeline {
     stages {
         stage('Prepare') {
             steps {
-                checkout([$class: 'GitSCM', 
-                          branches: [[name: '${sha1}']], 
-                          extensions: [[$class: 'SubmoduleOption',
-                                        disableSubmodules: false,
-                                        parentCredentials: false,
-                                        recursiveSubmodules: false,
-                                        reference: '',
-                                        trackingSubmodules: false]],
+                dir('sonic-telemetry') {
+                    checkout([$class: 'GitSCM',
+                          branches: [[name: '${sha1}']],
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-telemetry',
                                                refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
+                }
                 copyArtifacts(projectName: 'vs/buildimage-vs-all', filter: '**/*.deb', target: 'buildimage', flatten: false)
- 
             }
         }
 
         stage('Build') {
             steps {
-                sh '''
-#!/bin/bash -ex
-
-# Install hiredis
-sudo dpkg -i buildimage/target/debs/stretch/libhiredis0.14_*.deb
-sudo dpkg -i buildimage/target/debs/stretch/libhiredis-dev_*.deb
-
-# Install REDIS
-sudo dpkg -i buildimage/target/debs/stretch/redis-tools_*.deb
-sudo dpkg -i buildimage/target/debs/stretch/redis-server_*.deb
-sudo sed -i 's/notify-keyspace-events ""/notify-keyspace-events AKE/' /etc/redis/redis.conf
-sudo sed -ri 's/redis-server.sock/redis.sock/' /etc/redis/redis.conf
-sudo service redis-server start
-
-dpkg-buildpackage -rfakeroot -b -us -uc
-
-mkdir target
-cp ../*.deb target/
-'''
+                sh './scripts/common/sonic-telemetry-build/build.sh'
             }
         }
     }
     post {
-
         success {
             archiveArtifacts(artifacts: 'target/*.deb')
         }
