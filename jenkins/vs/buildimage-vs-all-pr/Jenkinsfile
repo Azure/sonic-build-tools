@@ -41,7 +41,7 @@ make SONIC_CONFIG_BUILD_JOBS=1 target/docker-sonic-vs.gz
 docker load < target/docker-sonic-vs.gz
 
 cd platform/vs/tests
-sudo py.test -v
+sudo py.test -v --junitxml=tr.xml
 # pavelsh added -s to see output from the pytest
 '''
             }
@@ -49,7 +49,9 @@ sudo py.test -v
 
     }
     post {
-
+        always {
+            junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'swss/tests/tr.xml')
+        }
         success {
             archiveArtifacts(artifacts: 'target/**')
         }
@@ -58,6 +60,9 @@ sudo py.test -v
         }
         regression {
             slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        cleanup {
+            cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
         }
     }
 }

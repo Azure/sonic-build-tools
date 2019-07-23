@@ -33,6 +33,7 @@ pipeline {
     post {
         always {
             archiveArtifacts(artifacts: 'buildimage/target/docker-sonic-vs.gz, swss/tests/log/**, swss_*.deb, swss-dbg_*.deb, swss/tests/*.py')
+            junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'swss/tests/tr.xml')
             cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
         }
         fixed {
