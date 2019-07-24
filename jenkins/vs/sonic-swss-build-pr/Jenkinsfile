@@ -1,6 +1,10 @@
 pipeline {
     agent { node { label 'jenkins-vstest-workers' } }
 
+    options {
+        lock(resource: "vstest_${env.NODE_NAME}")
+    }
+
     stages {
         stage('Prepare') {
             steps {
