@@ -46,7 +46,7 @@ make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-vs.img.gz
     }
     post {
 
-        success {
+        always {
             archiveArtifacts(artifacts: 'target/**')
         }
         fixed {
