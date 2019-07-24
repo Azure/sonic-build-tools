@@ -1,10 +1,6 @@
 pipeline {
     agent { node { label 'jenkins-vstest-workers' } }
 
-    options {
-        lock(resource: "vstest_${env.NODE_NAME}")
-    }
-
     stages {
         stage('Prepare') {
             steps {
@@ -29,7 +25,9 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh './scripts/vs/sonic-swss-build/test.sh'
+                lock(resource: "vstest_${env.NODE_NAME}") {
+                    sh './scripts/vs/sonic-swss-build/test.sh'
+                }
             }
         }
     }
