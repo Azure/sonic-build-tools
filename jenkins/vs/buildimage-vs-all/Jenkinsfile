@@ -36,11 +36,24 @@ git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --rel
 make configure PLATFORM=vs
 make SONIC_CONFIG_BUILD_JOBS=1 target/docker-sonic-vs.gz
 
+'''
+            }
+        }
+
+        stage('Test') {
+            steps {
+                wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+                    lock(resource: "vstest_${env.NODE_NAME}") {
+                        sh '''
+#!/bin/bash -xe
+
 docker load < target/docker-sonic-vs.gz
 
 cd platform/vs/tests
 sudo py.test -v --junitxml=tr.xml
 '''
+                    }
+                }
             }
         }
 
