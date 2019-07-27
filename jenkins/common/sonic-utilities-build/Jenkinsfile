@@ -18,7 +18,9 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh './scripts/common/sonic-utilities-build/build.sh'
+                withCredentials([usernamePassword(credentialsId: 'sonicdev-cr', usernameVariable: 'REGISTRY_USERNAME', passwordVariable: 'REGISTRY_PASSWD')]) {
+                    sh './scripts/common/sonic-utilities-build/build.sh'
+                }
             }
         }
 
