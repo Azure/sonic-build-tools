@@ -27,9 +27,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                lock(resource: "vstest_${env.NODE_NAME}") {
-                    sh './scripts/vs/sonic-swss-build/test.sh'
-                }
+                sh './scripts/vs/sonic-swss-build/test.sh'
             }
         }
     }

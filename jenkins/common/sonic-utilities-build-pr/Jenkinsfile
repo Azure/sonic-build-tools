@@ -29,9 +29,7 @@ pipeline {
         stage('Test') {
             steps {
                 wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
-                    lock(resource: "vstest_${env.NODE_NAME}") {
-                        sh './scripts/common/sonic-utilities-build/test.sh'
-                    }
+                    sh './scripts/common/sonic-utilities-build/test.sh'
                 }
             }
         }

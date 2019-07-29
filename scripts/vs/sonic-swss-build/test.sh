@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 
 cleanup() {
-    sudo ip -all netns delete
+    docker rmi docker-sonic-vs:${JOB_NAME##*/}.${BUILD_NUMBER}
 }
 
 trap cleanup ERR
