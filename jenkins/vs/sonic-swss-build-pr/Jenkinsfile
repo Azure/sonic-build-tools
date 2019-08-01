@@ -25,6 +25,15 @@ pipeline {
             }
         }
 
+        stage('Cleanup') {
+            steps {
+                wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+                    sh './scripts/lib/cleanup_vsdocker.sh'
+                }
+            }
+        }
+
+
         stage('Test') {
             steps {
                 sh './scripts/vs/sonic-swss-build/test.sh'
