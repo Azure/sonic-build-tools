@@ -31,11 +31,5 @@ pipeline {
         success {
             archiveArtifacts(artifacts: 'target/*.deb')
         }
-        fixed {
-            slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
-        }
-        regression {
-            slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
-        }
     }
 }

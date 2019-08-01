@@ -49,11 +49,5 @@ make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-aboot-broadcom.swi
         success {
             archiveArtifacts(artifacts: 'target/**')
         }
-        fixed {
-            slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
-        }
-        regression {
-            slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
-        }
     }
 }
