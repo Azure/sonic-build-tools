@@ -63,7 +63,7 @@ fakeroot debian/rules binary
 
 find debian
 
-mkdir target
+mkdir -p target
 cp ../*.deb target/
 
 # Copy executable binaries

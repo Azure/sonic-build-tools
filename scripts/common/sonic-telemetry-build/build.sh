@@ -17,6 +17,6 @@ dpkg-buildpackage -rfakeroot -b -us -uc
 
 popd
 
-mkdir target
+mkdir -p target
 cp *.deb target/
 

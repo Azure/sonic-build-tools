@@ -42,5 +42,5 @@ fakeroot debian/rules binary
 
 popd
 
-mkdir target
+mkdir -p target
 cp *.deb target/

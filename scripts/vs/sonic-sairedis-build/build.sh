@@ -34,5 +34,5 @@ fakeroot debian/rules binary-syncd-vs
 
 popd
 
-mkdir target
+mkdir -p target
 cp *.deb target/
