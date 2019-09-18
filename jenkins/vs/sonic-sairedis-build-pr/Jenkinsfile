@@ -28,8 +28,8 @@ pipeline {
         }
     }
     post {
-        success {
-            archiveArtifacts(artifacts: 'target/*.deb, **/*.log, target/var/log/*')
+        always {
+            archiveArtifacts(artifacts: 'target/*.deb, **/*.log, target/syslog')
         }
     }
 }
