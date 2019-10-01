@@ -17,7 +17,7 @@ docker load < buildimage/target/docker-sonic-vs.gz
 pushd scripts/vs/sonic-swss-build
 mkdir -p docker-sonic-vs/debs
 sudo mount --bind debs docker-sonic-vs/debs
-docker build --squash --no-cache -t docker-sonic-vs:${JOB_NAME##*/}.${BUILD_NUMBER} docker-sonic-vs
+docker build --no-cache -t docker-sonic-vs:${JOB_NAME##*/}.${BUILD_NUMBER} docker-sonic-vs
 sudo umount docker-sonic-vs/debs
 popd
 

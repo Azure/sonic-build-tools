@@ -64,5 +64,5 @@ sudo mount --bind ../../target/files/stretch docker-sonic-vs/files
 sudo mount --bind ../../target/python-debs docker-sonic-vs/python-debs
 sudo mount --bind ../../target/python-wheels docker-sonic-vs/python-wheels
 docker load < ../../target/docker-config-engine-stretch.gz
-docker build --squash --no-cache -t docker-sonic-vs:${JOB_NAME##*/}.${BUILD_NUMBER} docker-sonic-vs
+docker build --no-cache -t docker-sonic-vs:${JOB_NAME##*/}.${BUILD_NUMBER} docker-sonic-vs
 docker save docker-sonic-vs:${JOB_NAME##*/}.${BUILD_NUMBER} | gzip -c > ../../target/docker-sonic-vs.gz
