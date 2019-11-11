@@ -6,9 +6,9 @@ ls -l
 
 cat $PRIVATE_KEY > pkey.txt
 
-gzip -d target/sonic-vs.img.gz
 mkdir -p $HOME/sonic-vm/images
-mv target/sonic-vs.img $HOME/sonic-vm/images/
+cp target/sonic-vs.img.gz $HOME/sonic-vm/images/
+gzip -d $HOME/sonic-vm/images/sonic-vs.img.gz
 
 ls -l $HOME/sonic-vm/images
 
