@@ -1,5 +1,5 @@
 pipeline {
-    agent { node { label 'jenkins-kvm-workers' } }
+    agent { node { label 'jenkins-kvmtest-workers' } }
 
     options {
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
@@ -14,7 +14,14 @@ pipeline {
     stages {
         stage('Prepare') {
             steps {
-                checkout([$class: 'GitSCM', 
+                dir('sonic-mgmt') {
+                    checkout([$class: 'GitSCM',
+                              branches: [[name: '*/master']],
+                              userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-mgmt']]])
+                }
+
+                dir('sonic-buildimage') {
+                    checkout([$class: 'GitSCM',
                           branches: [[name: 'refs/heads/master']],
                           extensions: [[$class: 'SubmoduleOption',
                                         disableSubmodules: false,
@@ -23,6 +30,7 @@ pipeline {
                                         reference: '',
                                         trackingSubmodules: false]],
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage']]])
+                }
             }
         }
 
@@ -30,6 +38,8 @@ pipeline {
             steps {
                 sh '''
 #!/bin/bash -xe
+
+cd sonic-buildimage
 
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
@@ -42,10 +52,19 @@ mv target/sonic-vs.bin target/sonic-vs-dbg.bin
 mv target/sonic-vs.img.gz target/sonic-vs-dbg.img.gz
 mv target/sonic-vs.img.gz.log target/sonic-vs-dbg.img.gz.log
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-vs.img.gz
+
+mv target ../
 '''
             }
         }
 
+        stage('Test') {
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: '2b6b6afe-4892-41d1-967c-d683e7773727', keyFileVariable: 'PRIVATE_KEY')]) {
+                    sh './scripts/vs/buildimage-vs-image/test.sh'
+				}
+            }
+        }
     }
     post {
 
