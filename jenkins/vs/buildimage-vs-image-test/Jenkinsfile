@@ -1,0 +1,48 @@
+pipeline {
+    agent { node { label 'jenkins-kvmtest-workers' } }
+
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
+
+    }
+
+    triggers {
+        pollSCM('@midnight')
+    }
+
+
+    stages {
+        stage('Prepare') {
+            steps {
+                dir('sonic-mgmt') {
+                    checkout([$class: 'GitSCM',
+                              branches: [[name: '*/master']],
+                              userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-mgmt']]])
+                }
+
+                copyArtifacts(projectName: 'vs/buildimage-vs-image', filter: 'target/sonic-vs.img.gz', target: './', flatten: false)
+            }
+        }
+
+        stage('Test') {
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: '2b6b6afe-4892-41d1-967c-d683e7773727', keyFileVariable: 'PRIVATE_KEY')]) {
+                    sh './scripts/vs/buildimage-vs-image/test.sh'
+				}
+            }
+        }
+
+    }
+    post {
+
+        fixed {
+            slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        regression {
+            slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        cleanup {
+            cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
+        }
+    }
+}
