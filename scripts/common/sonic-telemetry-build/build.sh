@@ -4,6 +4,7 @@
 sudo dpkg -i buildimage/target/debs/stretch/libhiredis*.deb
 
 # Install REDIS
+sudo apt-get install -y liblua5.1-0 lua-bitop lua-cjson
 sudo dpkg -i buildimage/target/debs/stretch/redis-tools_*.deb
 sudo dpkg -i buildimage/target/debs/stretch/redis-server_*.deb
 sudo sed -ri 's/^# unixsocket/unixsocket/' /etc/redis/redis.conf
