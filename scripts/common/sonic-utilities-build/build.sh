@@ -7,7 +7,7 @@ cat <<EOF > build_sonic_utilities.sh
 ls -lrt
 
 sudo pip install click
-sudo pip install click-default-group
+sudo pip install click-default-group==1.2
 sudo pip install tabulate
 sudo pip install natsort
 sudo pip install buildimage/target/python-wheels/sonic_config_engine-1.0-py2-none-any.whl
