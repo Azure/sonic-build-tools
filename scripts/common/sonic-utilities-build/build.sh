@@ -6,7 +6,8 @@ cat <<EOF > build_sonic_utilities.sh
 #!/bin/bash -xe
 ls -lrt
 
-sudo pip install click
+sudo apt-get -y purge python-click
+sudo pip install "click>=7.0"
 sudo pip install click-default-group==1.2
 sudo pip install tabulate
 sudo pip install natsort
