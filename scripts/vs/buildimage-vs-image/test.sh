@@ -14,6 +14,6 @@ ls -l $HOME/sonic-vm/images
 
 cd sonic-mgmt/ansible
 sed -i s:use_own_value:johnar: veos.vtb
-touch password.txt
+echo abc > password.txt
 cd ../../
 docker run --rm=true -v $(pwd):/data -w /data -i docker-sonic-mgmt ./scripts/vs/buildimage-vs-image/runtest.sh
