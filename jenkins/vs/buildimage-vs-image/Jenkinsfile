@@ -62,7 +62,8 @@ mv target ../
             steps {
                 wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
                     lock(resource: "kvmtest_${env.NODE_NAME}") {
-                        withCredentials([sshUserPrivateKey(credentialsId: '2b6b6afe-4892-41d1-967c-d683e7773727', keyFileVariable: 'PRIVATE_KEY')]) {
+                        withCredentials([sshUserPrivateKey(credentialsId: '2b6b6afe-4892-41d1-967c-d683e7773727', keyFileVariable: 'PRIVATE_KEY'), \
+                                         usernamePassword(credentialsId: 'sonicdev-cr', usernameVariable: 'REGISTRY_USERNAME', passwordVariable: 'REGISTRY_PASSWD')]) {
                             sh './scripts/vs/buildimage-vs-image/test.sh'
 				        }
                     }
@@ -71,6 +72,10 @@ mv target ../
         }
     }
     post {
+
+        always {
+            junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/tr.xml')
+        }
 
         success {
             archiveArtifacts(artifacts: 'target/**')
