@@ -39,6 +39,10 @@ pipeline {
     }
     post {
 
+        always {
+            junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/tr.xml')
+        }
+
         fixed {
             slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
         }

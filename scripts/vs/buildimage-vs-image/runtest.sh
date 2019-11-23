@@ -11,4 +11,7 @@ sleep 3
 sleep 180
 export ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible/library/
 cd /data/sonic-mgmt/tests
-py.test --inventory veos.vtb --host-pattern all --user admin -vvv --show-capture stdout --testbed vms-kvm-t0 --testbed_file vtestbed.csv test_bgp_fact.py
+
+tests="test_bgp_fact.py test_lldp.py test_bgp_speaker.py"
+
+py.test --inventory veos.vtb --host-pattern all --user admin -vvv --show-capture stdout --testbed vms-kvm-t0 --testbed_file vtestbed.csv --disable_loganalyzer --junitxml=tr.xml $tests
