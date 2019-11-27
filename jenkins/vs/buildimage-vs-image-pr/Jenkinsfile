@@ -49,6 +49,7 @@ sudo bash -c "echo 1 > /proc/sys/vm/compact_memory"
 
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-vs.img.gz
 
+rm -rf ../target
 mv target ../
 '''
             }
