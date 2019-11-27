@@ -21,6 +21,7 @@ pipeline {
                 dir('sonic-buildimage') {
                     checkout([$class: 'GitSCM',
                               branches: [[name: '*/master']],
+                              recursiveSubmodules: true,
                               userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-buildimage']]])
                 }
             }
