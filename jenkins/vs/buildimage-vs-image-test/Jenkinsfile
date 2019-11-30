@@ -1,6 +1,11 @@
 pipeline {
     agent { node { label 'jenkins-kvmtest-workers' } }
 
+    parameters {
+        string(name: 'PROJECT', defaultValue: 'vs/buildimage-vs-image', description: 'which project to test')
+        string(name: 'BUILD_NUM', defaultValue: '', description: 'which build to test')
+    }
+
     options {
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
 
@@ -19,8 +24,24 @@ pipeline {
                               branches: [[name: '*/master']],
                               userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-mgmt']]])
                 }
+            }
+        }
 
-                copyArtifacts(projectName: 'vs/buildimage-vs-image', filter: 'target/sonic-vs.img.gz', target: './', flatten: false)
+        stage('Download') {
+            when {
+                equals expected: '', actual: "${params.BUILD_NUM}"
+            }
+            steps {
+                copyArtifacts(projectName: "${params.PROJECT}", filter: 'target/sonic-vs.img.gz', target: './', flatten: false)
+            }
+        }
+
+        stage('Download2') {
+            when {
+                not { equals expected: '', actual: "${params.BUILD_NUM}" }
+            }
+            steps {
+                copyArtifacts(projectName: "${params.PROJECT}", filter: 'target/sonic-vs.img.gz', selector: specific("${params.BUILD_NUM}"), target: './', flatten: false)
             }
         }
 
