@@ -58,7 +58,7 @@ make SONIC_CONFIG_BUILD_JOBS=1 target/files/stretch/ixgbe.ko \
                                target/debs/stretch/libpython3.6_3.6.0-1_amd64.deb \
                                target/debs/stretch/libpython3.6-dev_3.6.0-1_amd64.deb \
                                target/debs/stretch/isc-dhcp-relay_4.3.5-2_amd64.deb \
-                               target/debs/stretch/libyang0.16_0.16.105-1_amd64.deb
+                               target/debs/stretch/libyang_1.0.73_amd64.deb
 '''
             }
         }
