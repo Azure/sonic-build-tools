@@ -28,7 +28,7 @@ pipeline {
                                                refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
                 }
 
-                copyArtifacts(projectName: 'common/dep-build', filter: 'target/debs/stretch/*.deb', target: './', flatten: false)
+                copyArtifacts(projectName: 'common/dep-build', filter: 'target/debs/stretch/*.deb', target: './sonic-buildimage/', flatten: false)
             }
         }
 
