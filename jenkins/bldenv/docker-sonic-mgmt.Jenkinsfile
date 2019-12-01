@@ -9,6 +9,7 @@ pipeline {
     environment {
         DOCKER_IMAGE_FILE = 'docker-sonic-mgmt.gz'
         DOCKER_IMAGE_TAG  = 'latest'
+        DOCKER_IMAGE_FILE_DIR = 'sonic-buildimage/target'
     }
 
     triggers {

@@ -3,6 +3,7 @@
 REGISTRY_PORT=443
 REGISTRY_SERVER=sonicdev-microsoft.azurecr.io
 
+echo $DOCKER_IMAGE_FILE_DIR
 echo $DOCKER_IMAGE_FILE
 echo $DOCKER_IMAGE_TAG
 echo $BUILD_NUMBER
@@ -17,6 +18,9 @@ remote_image_name=$REGISTRY_SERVER:$REGISTRY_PORT/$docker_image_name:$DOCKER_IMA
 timestamp="$(date -u +%Y%m%d)"
 build_version="${timestamp}.bld-$BUILD_NUMBER"
 build_remote_image_name=$REGISTRY_SERVER:$REGISTRY_PORT/$docker_image_name:$build_version
+
+## Load docker image
+docker load -i $DOCKER_IMAGE_FILE_DIR/$DOCKER_IMAGE_FILE
 
 ## Add registry information as tag, so will push as latest
 ## Add additional tag with build information
