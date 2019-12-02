@@ -56,7 +56,7 @@ make SONIC_CONFIG_BUILD_JOBS=1 target/docker-sonic-mgmt.gz
     post {
 
         success {
-            archiveArtifacts(artifacts: 'target/docker-sonic-mgmt.gz')
+            archiveArtifacts(artifacts: 'sonic-buildimage/target/docker-sonic-mgmt.gz')
         }
         fixed {
             slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
