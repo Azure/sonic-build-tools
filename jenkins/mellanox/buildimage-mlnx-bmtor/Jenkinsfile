@@ -33,7 +33,7 @@ pipeline {
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
 make configure PLATFORM=mellanox
-make ENABLE_DHCP_GRAPH_SERVICE=y target/sonic-mellanox.bin
+make target/sonic-mellanox.bin
 '''
             }
         }
