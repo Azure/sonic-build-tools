@@ -76,11 +76,9 @@ mv target ../
 
         always {
             junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/tr.xml')
-        }
-
-        success {
             archiveArtifacts(artifacts: 'target/**')
         }
+
         fixed {
             slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
         }
