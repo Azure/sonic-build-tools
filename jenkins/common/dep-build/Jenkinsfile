@@ -36,7 +36,7 @@ git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --rel
 make configure PLATFORM=generic
 
 make SONIC_CONFIG_BUILD_JOBS=1 target/files/stretch/ixgbe.ko \
-                               target/debs/stretch/libnl-3-200_3.2.27-2_amd64.deb \
+                               target/debs/stretch/libnl-3-200_3.5.0-1_amd64.deb \
                                target/debs/stretch/libhiredis0.14_0.14.0-3~bpo9+1_amd64.deb \
                                target/debs/stretch/redis-tools_5.0.3-3~bpo9+2_amd64.deb \
                                target/debs/stretch/libthrift-0.11.0_0.11.0-4_amd64.deb \
@@ -49,6 +49,7 @@ make SONIC_CONFIG_BUILD_JOBS=1 target/files/stretch/ixgbe.ko \
                                target/debs/stretch/libsensors4_3.4.0-4_amd64.deb \
                                target/debs/stretch/fancontrol_3.4.0-4_all.deb \
                                target/debs/stretch/sensord_3.4.0-4_amd64.deb \
+                               target/debs/stretch/libsensors4-dev_3.4.0-4_amd64.deb \
                                target/debs/stretch/smartmontools_6.6-1_amd64.deb \
                                target/debs/stretch/radvd_2.17-2~bpo9+1_amd64.deb \
                                target/debs/stretch/python3.6-minimal_3.6.0-1_amd64.deb \
