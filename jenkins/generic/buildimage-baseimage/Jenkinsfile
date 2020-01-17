@@ -6,6 +6,12 @@ pipeline {
 
     }
 
+    environment {
+        DOCKER_IMAGE_FILE = 'docker-ptf.gz'
+        DOCKER_IMAGE_TAG  = 'latest'
+        DOCKER_IMAGE_FILE_DIR = 'sonic-buildimage/target'
+    }
+
     triggers {
         pollSCM('@midnight')
     }
@@ -13,8 +19,8 @@ pipeline {
     stages {
         stage('Prepare') {
             steps {
-                step([$class: 'WsCleanup'])
-                checkout([$class: 'GitSCM', 
+                dir('sonic-buildimage') {
+                    checkout([$class: 'GitSCM',
                           branches: [[name: 'refs/heads/master']],
                           extensions: [[$class: 'SubmoduleOption',
                                         disableSubmodules: false,
@@ -23,6 +29,7 @@ pipeline {
                                         reference: '',
                                         trackingSubmodules: false]],
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage']]])
+                }
             }
         }
 
@@ -31,6 +38,8 @@ pipeline {
                 sh '''
 #!/bin/bash -xe
 
+ls -l
+cd sonic-buildimage
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
 make configure PLATFORM=generic
@@ -39,11 +48,18 @@ make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-generic.bin target/sonic-aboot-gener
             }
         }
 
+        stage('Upload') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'sonicdev-cr', usernameVariable: 'REGISTRY_USERNAME', passwordVariable: 'REGISTRY_PASSWD')]) {
+                    sh './scripts/lib/docker-upload.sh'
+                }
+            }
+        }
     }
     post {
 
         success {
-            archiveArtifacts(artifacts: 'target/**')
+            archiveArtifacts(artifacts: 'sonic-buildimage/target/**')
         }
         fixed {
             slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
