@@ -1,0 +1,73 @@
+pipeline {
+    agent { node { label 'sonic-slave' } }
+
+    options {
+	    timestamps()
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
+    }
+    
+    triggers {
+        upstream 'python-swssdk-build'
+        pollSCM 'H * * * *'
+   }
+
+
+    stages {
+        stage('Prepare') {
+            steps {
+                checkout([$class: 'GitSCM',
+                          branches: [[name: 'refs/heads/master']], 
+                          doGenerateSubmoduleConfigurations: false,
+                          extensions: [[$class: 'SubmoduleOption', disableSubmodules: false, parentCredentials: false, recursiveSubmodules: true, reference: '', trackingSubmodules: false]],
+                          submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-snmpagent']]])
+
+                copyArtifacts filter: 'target/python-wheels/*-py3-*.whl', fingerprintArtifacts: true, flatten: true, projectName: 'python-swssdk-build', target: 'target/python-wheels/'
+                copyArtifacts filter: 'target/debs/stretch/*.deb', fingerprintArtifacts: true, flatten: true, projectName: 'dep-build', target: 'target/debs/'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''
+#!/bin/bash -x -e
+## Install python3.6
+sudo apt-get -y purge python3-setuptools python3-wheel
+ls -l target/debs/
+## sudo dpkg -i target/debs/{libmpdec2_*_amd64.deb,libpython3.6-minimal_3.6.0-1_amd64.deb,libpython3.6-stdlib_3.6.0-1_amd64.deb,python3.6-minimal_3.6.0-1_amd64.deb,libpython3.6_3.6.0-1_amd64.deb,python3.6_3.6.0-1_amd64.deb,libpython3.6-dev_3.6.0-1_amd64.deb}
+sudo dpkg -i target/debs/libmpdec2_*_amd64.deb
+sudo dpkg -i target/debs/libpython3.6-minimal_3.6.0-1_amd64.deb
+sudo dpkg -i target/debs/libpython3.6-stdlib_3.6.0-1_amd64.deb
+sudo dpkg -i target/debs/python3.6-minimal_3.6.0-1_amd64.deb
+sudo dpkg -i target/debs/libpython3.6_3.6.0-1_amd64.deb
+sudo dpkg -i target/debs/python3.6_3.6.0-1_amd64.deb
+sudo dpkg -i target/debs/libpython3.6-dev_3.6.0-1_amd64.deb
+curl https://bootstrap.pypa.io/get-pip.py | sudo python3.6
+
+## Build
+sudo python3.6 -m pip install target/python-wheels/swsssdk*-py3-*.whl
+python3.6 setup.py bdist_wheel
+'''
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh '''
+#!/bin/bash -x -e
+## Run unit test
+## TODO: add pytest as test requirement, and remove below line
+sudo python3.6 -m pip install pytest>=3.0.5 mockredispy>=2.9.3 mock>=2.0.0
+sudo python3.6 -m pip install dist/asyncsnmp-2.1.0-py3-none-any.whl
+##sudo python3.6 -m pip install -e ".[testing]"
+python3.6 -m pytest -s
+'''
+            }
+        }
+    }
+    post {
+
+        success {
+            archiveArtifacts 'target/python-wheels/*.whl,dist/*.whl'
+        }
+    }
+}
