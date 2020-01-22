@@ -12,6 +12,15 @@ sleep 180
 export ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible/library/
 cd /data/sonic-mgmt/tests
 
-tests="test_interfaces.py test_bgp_fact.py test_lldp.py test_bgp_speaker.py snmp/test_snmp_cpu.py snmp/test_snmp_interfaces.py snmp/test_snmp_lldp.py snmp/test_snmp_pfc_counters.py snmp/test_snmp_queue.py"
+tests="test_interfaces.py \
+      test_bgp_fact.py \
+      test_lldp.py \
+      test_bgp_speaker.py \
+      test_dhcp_relay.py \
+      snmp/test_snmp_cpu.py \
+      snmp/test_snmp_interfaces.py \
+      snmp/test_snmp_lldp.py \
+      snmp/test_snmp_pfc_counters.py \
+      snmp/test_snmp_queue.py"
 
 py.test --inventory veos.vtb --host-pattern all --user admin -vvv --show-capture stdout --testbed vms-kvm-t0 --testbed_file vtestbed.csv --disable_loganalyzer --junitxml=tr.xml $tests
