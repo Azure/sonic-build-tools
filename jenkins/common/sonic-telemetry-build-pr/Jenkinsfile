@@ -11,6 +11,7 @@ pipeline {
                                                refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
                 }
                 copyArtifacts(projectName: 'vs/buildimage-vs-all', filter: '**/*.deb', target: 'buildimage', flatten: false)
+                copyArtifacts(projectName: 'sonic-mgmt-framework', filter: '**/*.deb', target: 'mgmt-framework', flatten: false)
             }
         }
 
