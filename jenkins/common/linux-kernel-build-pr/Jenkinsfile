@@ -1,0 +1,30 @@
+pipeline {
+    agent { node { label 'sonic-slave' } }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                checkout([$class: 'GitSCM',
+                          branches: [[name: '${sha1}']],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-linux-kernel',
+                                               refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''
+#!/bin/bash -x
+
+export kernel_procure_method=build
+make
+'''
+            }
+        }
+    }
+    post {
+        success {
+            archiveArtifacts(artifacts: '*.deb')
+        }
+    }
+}
