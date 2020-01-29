@@ -1,0 +1,78 @@
+pipeline {
+    agent { node { label 'jenkins-kvmtest-workers' } }
+
+    parameters {
+        string(name: 'PROJECT', defaultValue: 'vs/buildimage-vs-image-201911', description: 'which project to test')
+        string(name: 'BUILD_NUM', defaultValue: '', description: 'which build to test')
+    }
+
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
+
+    }
+
+    triggers {
+        pollSCM('@midnight')
+    }
+
+
+    stages {
+        stage('Prepare') {
+            steps {
+                dir('sonic-mgmt') {
+                    checkout([$class: 'GitSCM',
+                              branches: [[name: '*/master']],
+                              userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-mgmt']]])
+                }
+            }
+        }
+
+        stage('Download') {
+            when {
+                equals expected: '', actual: "${params.BUILD_NUM}"
+            }
+            steps {
+                copyArtifacts(projectName: "${params.PROJECT}", filter: 'target/sonic-vs.img.gz', target: './', flatten: false)
+            }
+        }
+
+        stage('Download2') {
+            when {
+                not { equals expected: '', actual: "${params.BUILD_NUM}" }
+            }
+            steps {
+                copyArtifacts(projectName: "${params.PROJECT}", filter: 'target/sonic-vs.img.gz', selector: specific("${params.BUILD_NUM}"), target: './', flatten: false)
+            }
+        }
+
+        stage('Test') {
+            steps {
+                wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+                    lock(resource: "kvmtest_${env.NODE_NAME}") {
+                        withCredentials([sshUserPrivateKey(credentialsId: '2b6b6afe-4892-41d1-967c-d683e7773727', keyFileVariable: 'PRIVATE_KEY'), \
+                                         usernamePassword(credentialsId: 'sonicdev-cr', usernameVariable: 'REGISTRY_USERNAME', passwordVariable: 'REGISTRY_PASSWD')]) {
+                            sh './scripts/vs/buildimage-vs-image/test.sh'
+                        }
+                    }
+				}
+            }
+        }
+
+    }
+    post {
+
+        always {
+            junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/tr.xml')
+        }
+
+        fixed {
+            slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        regression {
+            slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        cleanup {
+            cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
+        }
+    }
+}
