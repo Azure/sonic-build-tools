@@ -10,3 +10,4 @@ trap cleanup ERR
 
 cd sonic-swss-tests/tests
 sudo py.test -v --force-flaky --junitxml=tr.xml --imgname=docker-sonic-vs:${JOB_NAME##*/}.${BUILD_NUMBER}
+cleanup
