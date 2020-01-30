@@ -25,3 +25,12 @@ tests="test_interfaces.py \
       snmp/test_snmp_queue.py"
 
 py.test --inventory veos.vtb --host-pattern all --user admin -vvv --show-capture stdout --testbed vms-kvm-t0 --testbed_file vtestbed.csv --disable_loganalyzer --junitxml=tr.xml $tests
+
+cd /data/sonic-mgmt/ansible
+./testbed-cli.sh -m veos.vtb -t vtestbed.csv deploy-mg vms-kvm-t0 lab password.txt -e vlan_config=two_vlan_a
+sleep 180
+cd /data/sonic-mgmt/tests
+
+tests_2vlans="test_dhcp_relay.py"
+
+py.test --inventory veos.vtb --host-pattern all --user admin -vvv --show-capture stdout --testbed vms-kvm-t0 --testbed_file vtestbed.csv --disable_loganalyzer --junitxml=tr.xml $tests_2vlans
