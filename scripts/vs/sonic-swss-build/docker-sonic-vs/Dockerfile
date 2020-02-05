@@ -14,8 +14,7 @@ RUN md5sum /debs/swss_1.0.0_amd64.deb
 RUN md5sum /usr/bin/buffermgrd
 RUN md5sum /usr/bin/orchagent
 
-RUN dpkg -r swss
-RUN dpkg -i /debs/swss_1.0.0_amd64.deb
+RUN dpkg -i --force-all /debs/swss_1.0.0_amd64.deb
 
 RUN md5sum /debs/swss_1.0.0_amd64.deb
 RUN md5sum /usr/bin/buffermgrd
