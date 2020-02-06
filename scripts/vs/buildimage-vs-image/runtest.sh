@@ -15,8 +15,6 @@ cd /data/sonic-mgmt/tests
 tests="test_interfaces.py \
       test_bgp_fact.py \
       test_lldp.py \
-      test_bgp_speaker.py \
-      test_dhcp_relay.py \
       snmp/test_snmp_cpu.py \
       snmp/test_snmp_interfaces.py \
       snmp/test_snmp_lldp.py \
