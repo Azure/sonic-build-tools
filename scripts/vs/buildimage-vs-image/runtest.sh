@@ -21,7 +21,7 @@ ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible/library/ \
             --testbed_file vtestbed.csv --disable_loganalyzer --junitxml=tr.xml test_announce_routes.py
 
 # Tests to run using one vlan configuration
-tests_1vlans="\
+tests_1vlan="\
     test_interfaces.py \
     test_bgp_fact.py \
     test_lldp.py \
@@ -33,10 +33,10 @@ tests_1vlans="\
     snmp/test_snmp_queue.py \
 "
 
-# Run tests_1vlans on vlab-01 virtual switch
+# Run tests_1vlan on vlab-01 virtual switch
 ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible/library/ \
     py.test --inventory veos.vtb --host-pattern all --user admin -vvv --show-capture stdout --testbed vms-kvm-t0 \
-            --testbed_file vtestbed.csv --disable_loganalyzer --junitxml=tr.xml $tests_1vlans
+            --testbed_file vtestbed.csv --disable_loganalyzer --junitxml=tr.xml $tests_1vlan
 
 # Create and deploy two vlan configuration (two_vlan_a) to the virtual switch
 cd /data/sonic-mgmt/ansible
