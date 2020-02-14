@@ -12,6 +12,9 @@ sleep 180
 export ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible/library/
 cd /data/sonic-mgmt/tests
 
+# Run anounce route test case in order to populate BGP route
+py.test --inventory veos.vtb --host-pattern all --user admin -vvv --show-capture stdout --testbed vms-kvm-t0 --testbed_file vtestbed.csv --disable_loganalyzer --junitxml=tr.xml test_announce_routes.py
+
 tests="test_interfaces.py \
       test_bgp_fact.py \
       test_lldp.py \
