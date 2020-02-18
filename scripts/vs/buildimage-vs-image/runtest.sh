@@ -36,7 +36,7 @@ tests_1vlan="\
 # Run tests_1vlan on vlab-01 virtual switch
 ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible/library/ \
     py.test --inventory veos.vtb --host-pattern all --user admin -vvv --show-capture stdout --testbed vms-kvm-t0 \
-            --testbed_file vtestbed.csv --disable_loganalyzer --junitxml=tr.xml $tests_1vlan
+            --testbed_file vtestbed.csv --disable_loganalyzer --junitxml=tr_1vlan.xml $tests_1vlan
 
 # Create and deploy two vlan configuration (two_vlan_a) to the virtual switch
 cd /data/sonic-mgmt/ansible
@@ -52,4 +52,4 @@ cd /data/sonic-mgmt/tests
 # Run tests_2vlans on vlab-01 virtual switch
 ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible/library/ \
     py.test --inventory veos.vtb --host-pattern all --user admin -vvv --show-capture stdout --testbed vms-kvm-t0 \
-            --testbed_file vtestbed.csv --disable_loganalyzer --junitxml=tr.xml $tests_2vlans
+            --testbed_file vtestbed.csv --disable_loganalyzer --junitxml=tr_2vlans.xml $tests_2vlans
