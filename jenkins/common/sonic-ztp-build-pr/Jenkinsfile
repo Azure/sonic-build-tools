@@ -1,0 +1,27 @@
+pipeline {
+    agent { node { label 'sonic-slave' } }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                dir('sonic-ztp') {
+                    checkout([$class: 'GitSCM',
+                          branches: [[name: '${sha1}']],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-ztp',
+                                               refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh './scripts/common/sonic-ztp/build.sh'
+            }
+        }
+    }
+    post {
+        success {
+            archiveArtifacts(artifacts: 'target/*.deb')
+        }
+    }
+}
