@@ -7,7 +7,7 @@ chmod 600 .ssh/id_rsa
 
 # Refresh virtual switch with vms-kvm-t0 topology
 cd /data/sonic-mgmt/ansible
-./testbed-cli.sh -m veos.vtb -t vtestbed.csv refresh-dut vms-kvm-t0 lab password.txt || true
+./testbed-cli.sh -m veos.vtb -t vtestbed.csv refresh-dut vms-kvm-t0 password.txt
 sleep 120
 
 # Create and deploy default vlan configuration (one_vlan_a) to the virtual switch
