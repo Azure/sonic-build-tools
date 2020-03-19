@@ -15,7 +15,7 @@ pipeline {
             steps {
 
                 checkout([$class: 'GitSCM',
-                          branches: [[name: 'refs/heads/201904']],
+                          branches: [[name: 'refs/heads/201911']],
                           extensions: [[$class: 'SubmoduleOption',
                                         disableSubmodules: false,
                                         parentCredentials: false,
