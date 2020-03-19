@@ -41,6 +41,9 @@ make SONIC_CONFIG_BUILD_JOBS=1 all
     }
     post {
 
+        failure {
+            archiveArtifacts(artifacts: 'target/**/*.log')
+        }
         success {
             archiveArtifacts(artifacts: 'target/**')
         }
