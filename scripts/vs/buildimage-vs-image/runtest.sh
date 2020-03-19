@@ -38,8 +38,7 @@ tests_1vlan="\
     snmp/test_snmp_interfaces.py \
     snmp/test_snmp_lldp.py \
     snmp/test_snmp_pfc_counters.py \
-    snmp/test_snmp_queue.py \
-    vlan/test_vlan.py
+    snmp/test_snmp_queue.py
 "
 
 # Run tests_1vlan on vlab-01 virtual switch
