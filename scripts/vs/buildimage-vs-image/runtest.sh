@@ -34,6 +34,7 @@ tests_1vlan="\
     test_dhcp_relay.py \
     tacacs/test_rw_user.py \
     tacacs/test_ro_user.py \
+    ntp/test_ntp.py \
     snmp/test_snmp_cpu.py \
     snmp/test_snmp_interfaces.py \
     snmp/test_snmp_lldp.py \
