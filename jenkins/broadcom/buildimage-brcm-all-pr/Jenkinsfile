@@ -46,6 +46,9 @@ make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-aboot-broadcom.swi
     }
     post {
 
+        failure {
+            archiveArtifacts(artifacts: 'target/**/*.log')
+        }
         success {
             archiveArtifacts(artifacts: 'target/**')
         }

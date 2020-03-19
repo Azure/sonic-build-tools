@@ -83,6 +83,9 @@ cleanup
         }
     }
     post {
+        failure {
+            archiveArtifacts(artifacts: 'target/**/*.log')
+        }
         success {
             archiveArtifacts(artifacts: 'target/**')
         }
