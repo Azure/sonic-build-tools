@@ -1,26 +1,28 @@
 pipeline {
-    agent { node { label 'jenkins-workers' } }
+    agent { node { label 'jenkins-workers-slow' } }
 
     options {
-        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '60'))
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
+
+    }
+
+    triggers {
+        pollSCM('@midnight')
     }
 
     stages {
         stage('Prepare') {
             steps {
-                step([$class: 'WsCleanup'])
-                checkout([$class: 'GitSCM', 
-                          branches: [[name: '${sha1}']], 
+
+                checkout([$class: 'GitSCM',
+                          branches: [[name: 'refs/heads/201911']],
                           extensions: [[$class: 'SubmoduleOption',
                                         disableSubmodules: false,
                                         parentCredentials: false,
                                         recursiveSubmodules: true,
                                         reference: '',
                                         trackingSubmodules: false]],
-                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage',
-                                               refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
-
-                copyArtifacts(projectName: 'common/dep-build', filter: 'target/debs/stretch/*.deb', target: './', flatten: false)
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage']]])
             }
         }
 
@@ -31,9 +33,9 @@ pipeline {
 
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
-make configure PLATFORM=mellanox
-touch target/debs/stretch/*.deb
-make SONIC_CONFIG_BUILD_JOBS=1 all
+make configure PLATFORM=barefoot
+make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-barefoot.bin
+make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-aboot-barefoot.swi
 '''
             }
         }
@@ -41,11 +43,14 @@ make SONIC_CONFIG_BUILD_JOBS=1 all
     }
     post {
 
-        failure {
-            archiveArtifacts(artifacts: 'target/**/*.log')
-        }
         success {
             archiveArtifacts(artifacts: 'target/**')
+        }
+        fixed {
+            slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        regression {
+            slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
         }
         cleanup {
             cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)

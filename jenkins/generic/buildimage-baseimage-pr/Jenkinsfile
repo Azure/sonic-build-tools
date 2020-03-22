@@ -44,6 +44,9 @@ make SONIC_CONFIG_BUILD_JOBS=1 target/docker-ptf.gz target/sonic-generic.bin tar
     }
     post {
 
+        failure {
+            archiveArtifacts(artifacts: 'target/**/*.log')
+        }
         success {
             archiveArtifacts(artifacts: 'target/**')
         }

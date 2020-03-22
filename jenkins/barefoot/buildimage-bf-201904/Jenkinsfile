@@ -1,12 +1,21 @@
 pipeline {
     agent { node { label 'jenkins-workers-slow' } }
 
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
+
+    }
+
+    triggers {
+        pollSCM('@midnight')
+    }
+
     stages {
         stage('Prepare') {
             steps {
-                step([$class: 'WsCleanup'])
-                checkout([$class: 'GitSCM', 
-                          branches: [[name: 'refs/heads/201904']], 
+
+                checkout([$class: 'GitSCM',
+                          branches: [[name: 'refs/heads/201904']],
                           extensions: [[$class: 'SubmoduleOption',
                                         disableSubmodules: false,
                                         parentCredentials: false,
@@ -24,7 +33,7 @@ pipeline {
 
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
-make configure PLATFORM=mellanox
+make configure PLATFORM=barefoot
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-barefoot.bin
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-aboot-barefoot.swi
 '''
@@ -42,6 +51,9 @@ make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-aboot-barefoot.swi
         }
         regression {
             slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        cleanup {
+            cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
         }
     }
 }
