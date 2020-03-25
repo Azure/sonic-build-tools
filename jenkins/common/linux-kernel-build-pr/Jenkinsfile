@@ -14,7 +14,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
-#!/bin/bash -x
+#!/bin/bash -ex
 
 export kernel_procure_method=build
 make

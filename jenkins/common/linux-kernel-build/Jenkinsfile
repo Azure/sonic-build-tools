@@ -22,7 +22,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
-#!/bin/bash -x
+#!/bin/bash -ex
 
 make
 '''
