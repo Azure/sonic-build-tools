@@ -21,7 +21,7 @@ docker images
 
 mkdir -p target
 
-docker save sonic-slave-$DISTRO-$USER:latest | gzip -c > target/sonic-slave-$DISTRO.gz 
+docker save sonic-slave-$DISTRO-$USER:$SLAVE_TAG | gzip -c > target/sonic-slave-$DISTRO.gz
 
 REGISTRY_PORT=443
 REGISTRY_SERVER=sonicdev-microsoft.azurecr.io
