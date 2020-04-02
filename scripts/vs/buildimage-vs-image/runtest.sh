@@ -57,6 +57,7 @@ py.test $PYTEST_COMMON_OPTS --log-file logs/test_announce_routes.log --junitxml=
 tgname=1vlan
 tests="\
     test_interfaces \
+    pc/test_po_update \
     test_bgp_fact \
     test_lldp \
     test_bgp_speaker \
