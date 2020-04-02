@@ -37,7 +37,7 @@ make configure PLATFORM=nephos
 make SONIC_CONFIG_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y target/sonic-nephos.bin
 mv target/sonic-nephos.bin target/sonic-nephos-dbg.bin
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-nephos.bin
-make SONIC_CONFIG_BUILD_JOBS=1 target/docker-syncd-nps-rpc.gz target/docker-ptf-nps.gz
+make SONIC_CONFIG_BUILD_JOBS=1 target/docker-syncd-nephos-rpc.gz
 '''
             }
         }
