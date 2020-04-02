@@ -75,7 +75,7 @@ mv target ../
     post {
 
         always {
-            junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/results/tr*.xml')
+            junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/results/**/*.xml')
             archiveArtifacts(artifacts: 'target/**, sonic-mgmt/tests/results/**, sonic-mgmt/tests/logs/**')
         }
 

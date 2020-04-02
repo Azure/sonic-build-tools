@@ -13,8 +13,9 @@ run_pytest()
         tdir=$(dirname $tn)
         if [ $tdir != "." ]; then
             mkdir -p logs/$tgname/$tdir
+            mkdir -p results/$tgname/$tdir
         fi
-        py.test $PYTEST_COMMON_OPTS --log-file logs/$tgname/$tn.log --junitxml=results/tr_$tn-$tgname.xml $tn.py
+        py.test $PYTEST_COMMON_OPTS --log-file logs/$tgname/$tn.log --junitxml=results/$tgname/$tn.xml $tn.py
     done
 }
 
