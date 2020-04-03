@@ -46,6 +46,7 @@ PYTEST_COMMON_OPTS="--inventory veos.vtb \
 
 # Check testbed health
 cd /data/sonic-mgmt/tests
+rm -rf logs results
 mkdir -p logs
 mkdir -p results
 py.test $PYTEST_COMMON_OPTS --log-file logs/test_nbr_health.log --junitxml=results/tr.xml test_nbr_health.py
