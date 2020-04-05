@@ -6,22 +6,25 @@ pipeline {
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
     }
 
+    environment {
+        SONIC_TEAM_WEBHOOK = credentials('public-jenkins-builder')
+    }
+
     triggers {
         upstream 'python-swssdk-build'
         pollSCM 'H * * * *'
-   }
-
+    }
 
     stages {
         stage('Prepare') {
             steps {
                 dir('sonic-snmpagent') {
                     checkout([$class: 'GitSCM',
-                              branches: [[name: 'refs/heads/master']], 
+                              branches: [[name: 'refs/heads/master']],
                               doGenerateSubmoduleConfigurations: false,
                               extensions: [[$class: 'SubmoduleOption', disableSubmodules: false, parentCredentials: false, recursiveSubmodules: true, reference: '', trackingSubmodules: false]],
                               submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-snmpagent']]])
-                
+
                     copyArtifacts filter: 'target/python-wheels/*-py3-*.whl', fingerprintArtifacts: true, flatten: true, projectName: 'python-swssdk-build', target: 'target/python-wheels/'
                     copyArtifacts filter: 'target/debs/stretch/*.deb', fingerprintArtifacts: true, flatten: true, projectName: 'dep-build', target: 'target/debs/'
                 }
@@ -46,6 +49,15 @@ pipeline {
             dir('sonic-snmpagent') {
                 archiveArtifacts 'target/python-wheels/*.whl,dist/*.whl'
             }
+        }
+
+        fixed {
+            slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_WEBHOOK}")
+        }
+        regression {
+            slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_WEBHOOK}")
         }
     }
 }

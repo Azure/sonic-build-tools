@@ -8,7 +8,10 @@ pipeline {
 
     options {
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
+    }
 
+    environment {
+        SONIC_TEAM_TEST_WEBHOOK = credentials('sonic_team_test_webhook')
     }
 
     triggers {
@@ -68,9 +71,11 @@ pipeline {
 
         fixed {
             slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_TEST_WEBHOOK}")
         }
         regression {
             slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_TEST_WEBHOOK}")
         }
         cleanup {
             cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
