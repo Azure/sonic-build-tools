@@ -1,6 +1,10 @@
 pipeline {
     agent { node { label 'sonic-slave' } }
 
+    environment {
+        SONIC_TEAM_WEBHOOK = credentials('public-jenkins-builder')
+    }
+
     stages {
         stage('Prepare') {
             steps {
@@ -35,9 +39,11 @@ pipeline {
         }
         fixed {
             slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_WEBHOOK}")
         }
         regression {
             slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_WEBHOOK}")
         }
     }
 }
