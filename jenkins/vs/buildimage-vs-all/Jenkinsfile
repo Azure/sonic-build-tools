@@ -37,8 +37,9 @@ echo ${JOB_NAME##*/}.${BUILD_NUMBER}
 
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
+CACHE_OPTIONS="SONIC_DPKG_CACHE_METHOD=wcache SONIC_DPKG_CACHE_SOURCE=/nfs/dpkg_cache/vs"
 make configure PLATFORM=vs
-make SONIC_CONFIG_BUILD_JOBS=1 target/docker-sonic-vs.gz
+make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/docker-sonic-vs.gz
 sudo cp target/docker-sonic-vs.gz /nfs/jenkins/docker-sonic-vs.${JOB_NAME##*/}.${BUILD_NUMBER}.gz
 '''
             }
