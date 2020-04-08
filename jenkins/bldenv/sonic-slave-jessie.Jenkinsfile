@@ -6,11 +6,8 @@ pipeline {
     }
 
     environment {
-        SONIC_TEAM_WEBHOOK = credentials('public-jenkins-builder')
-    }
-
-    environment {
         DISTRO = 'jessie'
+        SONIC_TEAM_WEBHOOK = credentials('public-jenkins-builder')
     }
 
     triggers {
