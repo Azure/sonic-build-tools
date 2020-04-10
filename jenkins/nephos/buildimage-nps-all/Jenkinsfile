@@ -16,7 +16,6 @@ pipeline {
     stages {
         stage('Prepare') {
             steps {
-                step([$class: 'WsCleanup'])
                 checkout([$class: 'GitSCM',
                           branches: [[name: 'refs/heads/master']],
                           extensions: [[$class: 'SubmoduleOption',
