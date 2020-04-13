@@ -1,0 +1,42 @@
+pipeline {
+    agent { node { label 'sonic-slave' } }
+
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
+
+    }
+
+    triggers {
+        pollSCM('H/10 * * * *')
+    }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                dir('sonic-stp') {
+                    checkout([$class: 'GitSCM',
+                          branches: [[name: 'refs/heads/master']],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-stp']]])
+                }
+                copyArtifacts(projectName: '../vs/buildimage-vs-all', filter: '**/*.deb', target: 'buildimage', flatten: false)
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh './scripts/common/sonic-stp-build/build.sh'
+            }
+        }
+    }
+    post {
+        success {
+            archiveArtifacts(artifacts: 'target/*.deb')
+        }
+        fixed {
+            slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        regression {
+            slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+    }
+}
