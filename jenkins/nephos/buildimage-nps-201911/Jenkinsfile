@@ -23,7 +23,9 @@ pipeline {
                                         parentCredentials: false,
                                         recursiveSubmodules: true,
                                         reference: '',
-                                        trackingSubmodules: false]],
+                                        trackingSubmodules: false],
+                                       [$class: 'LocalBranch',
+                                        localBranch: "**"]],
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage']]])
             }
         }
