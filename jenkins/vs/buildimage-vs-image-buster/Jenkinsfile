@@ -52,7 +52,8 @@ make configure PLATFORM=vs
 
 sudo bash -c "echo 1 > /proc/sys/vm/compact_memory"
 
-make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-vs.img.gz
+CACHE_OPTIONS="SONIC_DPKG_CACHE_METHOD=rwcache SONIC_DPKG_CACHE_SOURCE=/nfs/dpkg_cache/vs"
+make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/sonic-vs.img.gz
 
 rm -rf ../target
 mv target ../
