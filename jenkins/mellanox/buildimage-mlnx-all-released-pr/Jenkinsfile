@@ -29,8 +29,9 @@ pipeline {
 
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
+CACHE_OPTIONS="SONIC_DPKG_CACHE_METHOD=rcache SONIC_DPKG_CACHE_SOURCE=/nfs/dpkg_cache/mellanox"
 make configure PLATFORM=mellanox
-make SONIC_CONFIG_BUILD_JOBS=1 all
+make SONIC_CONFIG_BUILD_JOBS=1 CACHE_OPTIONS all
 '''
             }
         }
