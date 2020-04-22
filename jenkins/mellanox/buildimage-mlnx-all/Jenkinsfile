@@ -40,10 +40,10 @@ git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --rel
 
 CACHE_OPTIONS="SONIC_DPKG_CACHE_METHOD=wcache SONIC_DPKG_CACHE_SOURCE=/nfs/dpkg_cache/mellanox"
 make configure PLATFORM=mellanox
-make SONIC_CONFIG_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y CACHE_OPTIONS target/sonic-mellanox.bin
+make SONIC_CONFIG_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y $CACHE_OPTIONS target/sonic-mellanox.bin
 mv target/sonic-mellanox.bin target/sonic-mellanox-dbg.bin
-make SONIC_CONFIG_BUILD_JOBS=1 CACHE_OPTIONS target/sonic-mellanox.bin
-ENABLE_SYNCD_RPC=y make SONIC_CONFIG_BUILD_JOBS=1 CACHE_OPTIONS target/docker-syncd-mlnx-rpc.gz target/docker-ptf-mlnx.gz
+make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/sonic-mellanox.bin
+ENABLE_SYNCD_RPC=y make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/docker-syncd-mlnx-rpc.gz target/docker-ptf-mlnx.gz
 '''
             }
         }

@@ -34,7 +34,7 @@ git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --rel
 CACHE_OPTIONS="SONIC_DPKG_CACHE_METHOD=rcache SONIC_DPKG_CACHE_SOURCE=/nfs/dpkg_cache/mellanox"
 make configure PLATFORM=mellanox
 touch target/debs/stretch/*.deb
-make SONIC_CONFIG_BUILD_JOBS=1 CACHE_OPTIONS all
+make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS all
 '''
             }
         }
