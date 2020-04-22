@@ -61,6 +61,7 @@ tests="\
     pc/test_po_update \
     test_bgp_fact \
     test_lldp \
+    route/test_default_route \
     test_bgp_speaker \
     test_dhcp_relay \
     tacacs/test_rw_user \
