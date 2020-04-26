@@ -59,11 +59,11 @@ tgname=1vlan
 tests="\
     test_interfaces \
     pc/test_po_update \
-    test_bgp_fact \
-    test_lldp \
+    bgp/test_bgp_fact \
+    lldp/test_lldp \
     route/test_default_route \
-    test_bgp_speaker \
-    test_dhcp_relay \
+    bgp/test_bgp_speaker \
+    dhcp_relay/test_dhcp_relay \
     tacacs/test_rw_user \
     tacacs/test_ro_user \
     ntp/test_ntp \
@@ -87,7 +87,7 @@ sleep 180
 # Tests to run using two vlan configuration
 tgname=2vlans
 tests="\
-    test_dhcp_relay \
+    dhcp_relay/test_dhcp_relay \
 "
 
 # Run tests_2vlans on vlab-01 virtual switch
