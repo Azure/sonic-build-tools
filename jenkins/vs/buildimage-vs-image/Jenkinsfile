@@ -63,6 +63,7 @@ read -r -d '' SONIC_RUN_CMDS << EOM
     qemu-img convert target/sonic-vs.img -O vhdx -o subformat=dynamic target/sonic-vs.vhdx
     rm target/sonic-vs.img
 EOM
+declare -x SONIC_RUN_CMDS
 BLDENV=buster make -f Makefile.work sonic-slave-run
 
 rm -rf ../target
