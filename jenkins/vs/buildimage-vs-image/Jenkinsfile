@@ -41,8 +41,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh '''
-#!/bin/bash -xe
+                sh '''#!/bin/bash -xe
 
 cd sonic-buildimage
 
@@ -58,7 +57,8 @@ mv target/sonic-vs.bin target/sonic-vs-dbg.bin
 mv target/sonic-vs.img.gz target/sonic-vs-dbg.img.gz
 mv target/sonic-vs.img.gz.log target/sonic-vs-dbg.img.gz.log
 make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/sonic-vs.img.gz
-read -r -d '' SONIC_RUN_CMDS << EOM
+# Note: expected return value of read command is 1
+read -r -d '' SONIC_RUN_CMDS << EOM || [[ $? == 1 ]]
     gzip -d -c target/sonic-vs.img.gz > target/sonic-vs.img
     qemu-img convert target/sonic-vs.img -O vhdx -o subformat=dynamic target/sonic-vs.vhdx
     rm target/sonic-vs.img
