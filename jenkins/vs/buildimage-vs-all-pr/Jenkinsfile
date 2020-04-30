@@ -48,14 +48,15 @@ sudo cp target/docker-sonic-vs.gz /nfs/jenkins/docker-sonic-vs.${JOB_NAME##*/}.$
             steps {
 
                 checkout([$class: 'GitSCM',
-                          branches: [[name: 'refs/heads/master']],
+                          branches: [[name: '${sha1}']],
                           extensions: [[$class: 'SubmoduleOption',
                                         disableSubmodules: false,
                                         parentCredentials: false,
                                         recursiveSubmodules: true,
                                         reference: '',
                                         trackingSubmodules: false]],
-                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage']]])
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage',
+                                               refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
 
                 wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
                     lock(resource: "vstest_${env.NODE_NAME}") {
