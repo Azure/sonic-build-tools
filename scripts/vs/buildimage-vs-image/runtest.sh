@@ -63,6 +63,7 @@ tests="\
     lldp/test_lldp \
     route/test_default_route \
     bgp/test_bgp_speaker \
+    bgp/test_bgp_gr_helper \
     dhcp_relay/test_dhcp_relay \
     tacacs/test_rw_user \
     tacacs/test_ro_user \
