@@ -35,6 +35,9 @@ sleep 180
 
 export ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible/library/
 
+# workaround for issue https://github.com/Azure/sonic-mgmt/issues/1659
+export export ANSIBLE_KEEP_REMOTE_FILES=1
+
 PYTEST_COMMON_OPTS="--inventory veos.vtb \
                     --host-pattern all \
                     --user admin \
