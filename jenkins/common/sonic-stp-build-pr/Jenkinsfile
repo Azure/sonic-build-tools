@@ -1,0 +1,28 @@
+pipeline {
+    agent { node { label 'sonic-slave' } }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                dir('sonic-stp') {
+                    checkout([$class: 'GitSCM',
+                          branches: [[name: '${sha1}']],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-stp',
+                                               refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
+                }
+                copyArtifacts(projectName: 'vs/buildimage-vs-all', filter: '**/*.deb', target: 'buildimage', flatten: false)
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh './scripts/common/sonic-stp-build/build.sh'
+            }
+        }
+    }
+    post {
+        success {
+            archiveArtifacts(artifacts: 'target/*.deb')
+        }
+    }
+}
