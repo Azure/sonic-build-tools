@@ -1,5 +1,5 @@
 pipeline {
-    agent { node { label 'sonic-slave' } }
+    agent { node { label 'sonic-slave-buster' } }
 
     options {
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
@@ -21,7 +21,7 @@ pipeline {
                           branches: [[name: 'refs/heads/master']],
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-mgmt-framework']]])
                 }
-                copyArtifacts(projectName: '../vs/buildimage-vs-all', filter: '**/*.deb', target: 'buildimage', flatten: false)
+                copyArtifacts(projectName: '../vs/buildimage-vs-image', filter: '**/*.deb', target: 'buildimage', flatten: false)
             }
         }
 
