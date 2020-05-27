@@ -1,6 +1,7 @@
 #!/bin/bash -ex
 
 # Install Redis
+sudo pip install Pympler==0.8
 sudo apt-get install -y liblua5.1-0 lua-bitop lua-cjson
 sudo dpkg -i buildimage/target/debs/stretch/redis-tools_*.deb
 sudo dpkg -i buildimage/target/debs/stretch/redis-server_*.deb
