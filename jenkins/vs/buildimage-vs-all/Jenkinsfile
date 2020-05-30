@@ -81,6 +81,7 @@ cleanup
                     }
                 }
             }
+
             post {
                 always {
                     junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'platform/vs/tests/tr.xml')

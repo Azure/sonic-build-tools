@@ -17,12 +17,6 @@ pipeline {
     stages {
         stage('Prepare') {
             steps {
-                dir('sonic-mgmt') {
-                    checkout([$class: 'GitSCM',
-                              branches: [[name: '*/master']],
-                              userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-mgmt']]])
-                }
-
                 dir('sonic-buildimage') {
                     checkout([$class: 'GitSCM',
                           branches: [[name: 'refs/heads/master']],
@@ -68,12 +62,23 @@ BLDENV=buster make -f Makefile.work sonic-slave-run
 
 rm -rf ../target
 mv target ../
+
+# copy image to scratchpad
+sudo cp ../target/sonic-vs.img.gz /nfs/jenkins/sonic-vs-${JOB_NAME##*/}.${BUILD_NUMBER}.img.gz
 '''
             }
         }
 
         stage('Test') {
+            agent { node { label 'jenkins-vstest-workers' } }
+
             steps {
+                dir('sonic-mgmt') {
+                    checkout([$class: 'GitSCM',
+                              branches: [[name: '*/master']],
+                              userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-mgmt']]])
+                }
+
                 wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
                     lock(resource: "kvmtest_${env.NODE_NAME}") {
                         withCredentials([sshUserPrivateKey(credentialsId: '2b6b6afe-4892-41d1-967c-d683e7773727', keyFileVariable: 'PRIVATE_KEY'), \
@@ -83,13 +88,21 @@ mv target ../
                     }
                 }
             }
+
+            post {
+                always {
+                    junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/results/**/*.xml')
+                    archiveArtifacts(artifacts: 'sonic-mgmt/tests/results/**, sonic-mgmt/tests/logs/**')
+                }
+            }
+
         }
     }
+
     post {
 
         always {
-            junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/results/**/*.xml')
-            archiveArtifacts(artifacts: 'target/**, sonic-mgmt/tests/results/**, sonic-mgmt/tests/logs/**')
+            archiveArtifacts(artifacts: 'target/**')
         }
 
         fixed {
