@@ -45,7 +45,8 @@ PYTEST_COMMON_OPTS="--inventory veos.vtb \
                     --show-capture stdout \
                     --testbed vms-kvm-t0 \
                     --testbed_file vtestbed.csv \
-                    --disable_loganalyzer"
+                    --disable_loganalyzer \
+                    --log-file-level debug"
 
 # Check testbed health
 cd /data/sonic-mgmt/tests
