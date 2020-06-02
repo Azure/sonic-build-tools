@@ -84,7 +84,7 @@ cleanup
     }
     post {
         failure {
-            archiveArtifacts(artifacts: 'target/**/*.log')
+            archiveArtifacts(artifacts: 'target/**/*.log, target/*')
         }
         success {
             archiveArtifacts(artifacts: 'target/**')
