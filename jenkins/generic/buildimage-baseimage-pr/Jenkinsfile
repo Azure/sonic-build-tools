@@ -10,7 +10,7 @@ pipeline {
         stage('Prepare') {
             steps {
                 step([$class: 'WsCleanup'])
-                checkout([$class: 'GitSCM', 
+                checkout([$class: 'GitSCM',
                           branches: [[name: '${sha1}']],
                           extensions: [[$class: 'SubmoduleOption',
                                         disableSubmodules: false,
@@ -20,8 +20,6 @@ pipeline {
                                         trackingSubmodules: false]],
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage',
                                                refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
-
-                copyArtifacts(projectName: 'common/dep-build', filter: 'target/debs/stretch/*.deb', target: './', flatten: false)
             }
         }
 
@@ -33,8 +31,6 @@ pipeline {
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
 make configure PLATFORM=generic
-
-touch target/debs/stretch/*.deb
 
 make SONIC_CONFIG_BUILD_JOBS=1 target/docker-ptf.gz target/sonic-generic.bin target/sonic-aboot-generic.swi
 '''
