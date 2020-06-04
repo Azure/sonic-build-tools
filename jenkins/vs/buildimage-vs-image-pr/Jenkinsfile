@@ -9,12 +9,6 @@ pipeline {
     stages {
         stage('Prepare') {
             steps {
-                dir('sonic-mgmt') {
-                    checkout([$class: 'GitSCM',
-                              branches: [[name: '*/master']],
-                              userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-mgmt']]])
-                }
-
                 dir('sonic-buildimage') {
                     checkout([$class: 'GitSCM',
                           branches: [[name: '${sha1}']],
@@ -27,8 +21,6 @@ pipeline {
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage',
                                                refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
                 }
-
-                copyArtifacts(projectName: 'common/dep-build', filter: 'target/debs/stretch/*.deb', target: './sonic-buildimage/', flatten: false)
             }
         }
 
@@ -41,37 +33,68 @@ cd sonic-buildimage
 
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
+CACHE_OPTIONS="SONIC_DPKG_CACHE_METHOD=rcache SONIC_DPKG_CACHE_SOURCE=/nfs/dpkg_cache/vs"
 make configure PLATFORM=vs
-
-touch target/debs/stretch/*.deb
 
 sudo bash -c "echo 1 > /proc/sys/vm/compact_memory"
 
-make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-vs.img.gz
+make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/sonic-vs.bin
 
 rm -rf ../target
 mv target ../
+
+# copy image to scratchpad
+sudo cp ../target/sonic-vs.bin /nfs/jenkins/sonic-vs-${JOB_NAME##*/}.${BUILD_NUMBER}.bin
 '''
             }
         }
 
         stage('Test') {
+            agent { node { label 'jenkins-vstest-workers' } }
+
             steps {
+                dir('sonic-mgmt') {
+                    checkout([$class: 'GitSCM',
+                              branches: [[name: '*/master']],
+                              userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-mgmt']]])
+                }
+
+                dir('sonic-buildimage') {
+                    checkout([$class: 'GitSCM',
+                          branches: [[name: '${sha1}']],
+                          extensions: [[$class: 'SubmoduleOption',
+                                        disableSubmodules: false,
+                                        parentCredentials: false,
+                                        recursiveSubmodules: false,
+                                        reference: '',
+                                        trackingSubmodules: false]],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage',
+                                               refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
+                }
+
                 wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
                     lock(resource: "kvmtest_${env.NODE_NAME}") {
                         withCredentials([sshUserPrivateKey(credentialsId: '2b6b6afe-4892-41d1-967c-d683e7773727', keyFileVariable: 'PRIVATE_KEY'), \
                                          usernamePassword(credentialsId: 'sonicdev-cr', usernameVariable: 'REGISTRY_USERNAME', passwordVariable: 'REGISTRY_PASSWD')]) {
+                            sh './scripts/vs/buildimage-vs-image/build_kvm_image.sh'
                             sh './scripts/vs/buildimage-vs-image/test.sh'
 				        }
                     }
                 }
             }
+
+            post {
+                always {
+                    junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/results/**/*.xml')
+                    archiveArtifacts(artifacts: 'target/**, sonic-mgmt/tests/results/**, sonic-mgmt/tests/logs/**')
+                }
+            }
         }
     }
+
     post {
 
         always {
-            junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/tr*.xml')
             archiveArtifacts(artifacts: 'target/**')
         }
     }

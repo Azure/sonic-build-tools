@@ -1,5 +1,5 @@
 pipeline {
-    agent { node { label 'jenkins-kvmtest-workers' } }
+    agent { node { label 'jenkins-vstest-workers' } }
 
     parameters {
         string(name: 'PROJECT', defaultValue: 'vs/buildimage-vs-image-201911', description: 'which project to test')
@@ -8,7 +8,10 @@ pipeline {
 
     options {
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
+    }
 
+    environment {
+        SONIC_TEAM_TEST_WEBHOOK = credentials('sonic_team_test_webhook')
     }
 
     triggers {
@@ -62,14 +65,17 @@ pipeline {
     post {
 
         always {
-            junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/tr*.xml')
+            junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/results/**/*.xml')
+            archiveArtifacts(artifacts: 'sonic-mgmt/tests/results/**, sonic-mgmt/tests/logs/**')
         }
 
         fixed {
             slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_TEST_WEBHOOK}")
         }
         regression {
             slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_TEST_WEBHOOK}")
         }
         cleanup {
             cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)

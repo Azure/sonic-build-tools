@@ -3,16 +3,66 @@ pipeline {
 
     options {
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
+    }
 
+    environment {
+        SONIC_TEAM_WEBHOOK = credentials('public-jenkins-builder')
     }
 
     triggers {
         pollSCM('@midnight')
     }
 
-
     stages {
         stage('Prepare') {
+            steps {
+                dir('sonic-buildimage') {
+                    checkout([$class: 'GitSCM',
+                          branches: [[name: 'refs/heads/master']],
+                          extensions: [[$class: 'SubmoduleOption',
+                                        disableSubmodules: false,
+                                        parentCredentials: false,
+                                        recursiveSubmodules: true,
+                                        reference: '',
+                                        trackingSubmodules: false],
+                                       [$class: 'LocalBranch',
+                                        localBranch: "**"]],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage']]])
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''#!/bin/bash -xe
+
+cd sonic-buildimage
+
+git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
+
+CACHE_OPTIONS="SONIC_DPKG_CACHE_METHOD=wcache SONIC_DPKG_CACHE_SOURCE=/nfs/dpkg_cache/vs"
+make configure PLATFORM=vs
+
+sudo bash -c "echo 1 > /proc/sys/vm/compact_memory"
+
+make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS INSTALL_DEBUG_TOOLS=y target/sonic-vs.bin
+mv target/sonic-vs.bin target/sonic-vs-dbg.bin
+mv target/sonic-vs.bin.log target/sonic-vs-dbg.bin.log
+make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/sonic-vs.bin
+
+rm -rf ../target
+mv target ../
+
+# copy image to scratchpad
+sudo cp ../target/sonic-vs.bin /nfs/jenkins/sonic-vs-${JOB_NAME##*/}.${BUILD_NUMBER}.bin
+sudo cp ../target/sonic-vs-dbg.bin /nfs/jenkins/sonic-vs-dbg-${JOB_NAME##*/}.${BUILD_NUMBER}.bin
+'''
+            }
+        }
+
+        stage('Test') {
+            agent { node { label 'jenkins-vstest-workers' } }
+
             steps {
                 dir('sonic-mgmt') {
                     checkout([$class: 'GitSCM',
@@ -28,62 +78,46 @@ pipeline {
                                         parentCredentials: false,
                                         recursiveSubmodules: true,
                                         reference: '',
-                                        trackingSubmodules: false]],
+                                        trackingSubmodules: false],
+                                       [$class: 'LocalBranch',
+                                        localBranch: "**"]],
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage']]])
                 }
-            }
-        }
 
-        stage('Build') {
-            steps {
-                sh '''
-#!/bin/bash -xe
-
-cd sonic-buildimage
-
-git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
-
-make configure PLATFORM=vs
-
-sudo bash -c "echo 1 > /proc/sys/vm/compact_memory"
-
-make SONIC_CONFIG_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y target/sonic-vs.img.gz
-mv target/sonic-vs.bin target/sonic-vs-dbg.bin
-mv target/sonic-vs.img.gz target/sonic-vs-dbg.img.gz
-mv target/sonic-vs.img.gz.log target/sonic-vs-dbg.img.gz.log
-make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-vs.img.gz
-
-rm -rf ../target
-mv target ../
-'''
-            }
-        }
-
-        stage('Test') {
-            steps {
                 wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
                     lock(resource: "kvmtest_${env.NODE_NAME}") {
                         withCredentials([sshUserPrivateKey(credentialsId: '2b6b6afe-4892-41d1-967c-d683e7773727', keyFileVariable: 'PRIVATE_KEY'), \
                                          usernamePassword(credentialsId: 'sonicdev-cr', usernameVariable: 'REGISTRY_USERNAME', passwordVariable: 'REGISTRY_PASSWD')]) {
+                            sh './scripts/vs/buildimage-vs-image/build_kvm_image.sh'
                             sh './scripts/vs/buildimage-vs-image/test.sh'
 				        }
                     }
                 }
             }
+
+            post {
+                always {
+                    junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/results/**/*.xml')
+                    archiveArtifacts(artifacts: 'target/**, sonic-mgmt/tests/results/**, sonic-mgmt/tests/logs/**')
+                }
+            }
+
         }
     }
+
     post {
 
         always {
-            junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/tr*.xml')
             archiveArtifacts(artifacts: 'target/**')
         }
 
         fixed {
             slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_WEBHOOK}")
         }
         regression {
             slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_WEBHOOK}")
         }
         cleanup {
             cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)

@@ -3,26 +3,30 @@ pipeline {
 
     options {
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
+    }
 
+    environment {
+        SONIC_TEAM_WEBHOOK = credentials('public-jenkins-builder')
     }
 
     triggers {
         pollSCM('@midnight')
     }
 
-
     stages {
         stage('Prepare') {
             steps {
                 step([$class: 'WsCleanup'])
-                checkout([$class: 'GitSCM', 
-                          branches: [[name: 'refs/heads/master']], 
+                checkout([$class: 'GitSCM',
+                          branches: [[name: 'refs/heads/master']],
                           extensions: [[$class: 'SubmoduleOption',
                                         disableSubmodules: false,
                                         parentCredentials: false,
                                         recursiveSubmodules: true,
                                         reference: '',
-                                        trackingSubmodules: false]],
+                                        trackingSubmodules: false],
+                                       [$class: 'LocalBranch',
+                                        localBranch: "**"]],
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage']]])
             }
         }
@@ -34,11 +38,12 @@ pipeline {
 
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
+CACHE_OPTIONS="SONIC_DPKG_CACHE_METHOD=wcache SONIC_DPKG_CACHE_SOURCE=/nfs/dpkg_cache/mellanox"
 make configure PLATFORM=mellanox
-make SONIC_CONFIG_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y target/sonic-mellanox.bin
+make SONIC_CONFIG_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y $CACHE_OPTIONS target/sonic-mellanox.bin
 mv target/sonic-mellanox.bin target/sonic-mellanox-dbg.bin
-make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-mellanox.bin
-ENABLE_SYNCD_RPC=y make SONIC_CONFIG_BUILD_JOBS=1 target/docker-syncd-mlnx-rpc.gz target/docker-ptf-mlnx.gz
+make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/sonic-mellanox.bin
+ENABLE_SYNCD_RPC=y make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/docker-syncd-mlnx-rpc.gz target/docker-ptf-mlnx.gz
 '''
             }
         }
@@ -51,9 +56,11 @@ ENABLE_SYNCD_RPC=y make SONIC_CONFIG_BUILD_JOBS=1 target/docker-syncd-mlnx-rpc.g
         }
         fixed {
             slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_WEBHOOK}")
         }
         regression {
             slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_WEBHOOK}")
         }
         cleanup {
             cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)

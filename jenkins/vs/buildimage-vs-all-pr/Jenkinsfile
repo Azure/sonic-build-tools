@@ -10,7 +10,7 @@ pipeline {
         stage('Prepare') {
             steps {
                 step([$class: 'WsCleanup'])
-                checkout([$class: 'GitSCM', 
+                checkout([$class: 'GitSCM',
                           branches: [[name: '${sha1}']],
                           extensions: [[$class: 'SubmoduleOption',
                                         disableSubmodules: false,
@@ -20,8 +20,6 @@ pipeline {
                                         trackingSubmodules: false]],
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage',
                                                refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
-
-                copyArtifacts(projectName: 'common/dep-build', filter: 'target/debs/stretch/*.deb', target: './', flatten: false)
             }
         }
 
@@ -32,34 +30,61 @@ pipeline {
 
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
-make configure PLATFORM=vs
-make SONIC_CONFIG_BUILD_JOBS=1 target/docker-sonic-vs.gz
+echo ${JOB_NAME##*/}.${BUILD_NUMBER}
 
+CACHE_OPTIONS="SONIC_DPKG_CACHE_METHOD=rcache SONIC_DPKG_CACHE_SOURCE=/nfs/dpkg_cache/vs"
+make configure PLATFORM=vs
+make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/docker-sonic-vs.gz
+sudo cp target/docker-sonic-vs.gz /nfs/jenkins/docker-sonic-vs.${JOB_NAME##*/}.${BUILD_NUMBER}.gz
 '''
             }
         }
 
         stage('Test') {
+            agent { node { label 'jenkins-vstest-workers' } }
+
             steps {
+
+                checkout([$class: 'GitSCM',
+                          branches: [[name: '${sha1}']],
+                          extensions: [[$class: 'SubmoduleOption',
+                                        disableSubmodules: false,
+                                        parentCredentials: false,
+                                        recursiveSubmodules: true,
+                                        reference: '',
+                                        trackingSubmodules: false]],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage',
+                                               refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
+
                 wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
                     lock(resource: "vstest_${env.NODE_NAME}") {
                         sh '''
 #!/bin/bash -xe
 
-docker load < target/docker-sonic-vs.gz
+cleanup() {
+    docker rmi docker-sonic-vs:${JOB_NAME##*/}.${BUILD_NUMBER}
+}
+sudo docker load -i /nfs/jenkins/docker-sonic-vs.${JOB_NAME##*/}.${BUILD_NUMBER}.gz
+docker tag docker-sonic-vs:latest docker-sonic-vs:${JOB_NAME##*/}.${BUILD_NUMBER}
+sudo rm /nfs/jenkins/docker-sonic-vs.${JOB_NAME##*/}.${BUILD_NUMBER}.gz
 
 cd platform/vs/tests
-sudo py.test -v --junitxml=tr.xml
+sudo py.test -v --junitxml=tr.xml --imgname=docker-sonic-vs:${JOB_NAME##*/}.${BUILD_NUMBER}
+cleanup
 '''
                     }
                 }
             }
+            post {
+                always {
+                    junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'platform/vs/tests/tr.xml')
+                }
+            }
         }
-
     }
     post {
-        always {
-            junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'swss/tests/tr.xml')
+        failure {
+            archiveArtifacts(artifacts: 'target/**/*.log, target/*')
         }
         success {
             archiveArtifacts(artifacts: 'target/**')

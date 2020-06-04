@@ -12,6 +12,12 @@ sudo sed -ri 's/^unixsocketperm .../unixsocketperm 777/' /etc/redis/redis.conf
 sudo sed -ri 's/redis-server.sock/redis.sock/' /etc/redis/redis.conf
 sudo service redis-server start
 
+# Install libyang
+sudo dpkg -i buildimage/target/debs/stretch/libyang*.deb
+
+# Clone sonic-mgmt-framework repository
+git clone https://github.com/Azure/sonic-mgmt-framework
+
 pushd sonic-telemetry
 
 dpkg-buildpackage -rfakeroot -b -us -uc

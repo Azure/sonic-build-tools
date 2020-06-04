@@ -9,8 +9,8 @@ pipeline {
         stage('Prepare') {
             steps {
                 step([$class: 'WsCleanup'])
-                checkout([$class: 'GitSCM', 
-                          branches: [[name: '${sha1}']], 
+                checkout([$class: 'GitSCM',
+                          branches: [[name: '${sha1}']],
                           extensions: [[$class: 'SubmoduleOption',
                                         disableSubmodules: false,
                                         parentCredentials: false,
@@ -19,8 +19,6 @@ pipeline {
                                         trackingSubmodules: false]],
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage',
                                                refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
-
-                copyArtifacts(projectName: 'common/dep-build', filter: 'target/debs/stretch/*.deb', target: './', flatten: false)
             }
         }
 
@@ -31,10 +29,10 @@ pipeline {
 
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
+CACHE_OPTIONS="SONIC_DPKG_CACHE_METHOD=rcache SONIC_DPKG_CACHE_SOURCE=/nfs/dpkg_cache/mellanox"
 make configure PLATFORM=mellanox
-touch target/debs/stretch/*.deb
-make SONIC_CONFIG_BUILD_JOBS=1 ENABLE_SYNCD_RPC=y all
-make SONIC_CONFIG_BUILD_JOBS=1 all
+make SONIC_CONFIG_BUILD_JOBS=1 ENABLE_SYNCD_RPC=y $CACHE_OPTIONS all
+make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS all
 '''
             }
         }
@@ -42,6 +40,9 @@ make SONIC_CONFIG_BUILD_JOBS=1 all
     }
     post {
 
+        failure {
+            archiveArtifacts(artifacts: 'target/**/*.log')
+        }
         success {
             archiveArtifacts(artifacts: 'target/**')
         }

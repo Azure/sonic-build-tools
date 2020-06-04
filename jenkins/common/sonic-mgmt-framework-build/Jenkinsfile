@@ -1,9 +1,12 @@
 pipeline {
-    agent { node { label 'sonic-slave' } }
+    agent { node { label 'sonic-slave-buster' } }
 
     options {
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
+    }
 
+    environment {
+        SONIC_TEAM_WEBHOOK = credentials('public-jenkins-builder')
     }
 
     triggers {
@@ -18,7 +21,7 @@ pipeline {
                           branches: [[name: 'refs/heads/master']],
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-mgmt-framework']]])
                 }
-                copyArtifacts(projectName: '../vs/buildimage-vs-all', filter: '**/*.deb', target: 'buildimage', flatten: false)
+                copyArtifacts(projectName: '../vs/buildimage-vs-image', filter: '**/*.deb', target: 'buildimage', flatten: false)
             }
         }
 
@@ -34,9 +37,11 @@ pipeline {
         }
         fixed {
             slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_WEBHOOK}")
         }
         regression {
             slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_WEBHOOK}")
         }
     }
 }

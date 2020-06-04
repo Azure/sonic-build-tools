@@ -3,7 +3,10 @@ pipeline {
 
     options {
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
+    }
 
+    environment {
+        SONIC_TEAM_WEBHOOK = credentials('public-jenkins-builder')
     }
 
     triggers {
@@ -14,14 +17,16 @@ pipeline {
         stage('Prepare') {
             steps {
                 step([$class: 'WsCleanup'])
-                checkout([$class: 'GitSCM', 
+                checkout([$class: 'GitSCM',
                           branches: [[name: 'refs/heads/buster']],
                           extensions: [[$class: 'SubmoduleOption',
                                         disableSubmodules: false,
                                         parentCredentials: false,
                                         recursiveSubmodules: true,
                                         reference: '',
-                                        trackingSubmodules: false]],
+                                        trackingSubmodules: false],
+                                       [$class: 'LocalBranch',
+                                        localBranch: "**"]],
                           userRemoteConfigs: [[url: 'http://github.com/lguohan/sonic-buildimage']]])
             }
         }
@@ -34,7 +39,8 @@ pipeline {
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
 make configure PLATFORM=broadcom
-make SONIC_CONFIG_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y target/sonic-broadcom.bin
+CACHE_OPTIONS="SONIC_DPKG_CACHE_METHOD=rwcache SONIC_DPKG_CACHE_SOURCE=/nfs/dpkg_cache/broadcom"
+make SONIC_CONFIG_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y $CACHE_OPTIONS target/sonic-broadcom.bin
 # make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-aboot-broadcom.swi
 # make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-broadcom.raw
 # make SONIC_CONFIG_BUILD_JOBS=1 target/docker-syncd-brcm-rpc.gz target/docker-ptf-brcm.gz target/docker-saiserver-brcm.gz
@@ -50,9 +56,11 @@ make SONIC_CONFIG_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y target/sonic-broadcom.bin
         }
         fixed {
             slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_WEBHOOK}")
         }
         regression {
             slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_WEBHOOK}")
         }
         cleanup {
             cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)

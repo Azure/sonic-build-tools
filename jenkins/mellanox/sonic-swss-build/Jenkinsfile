@@ -16,9 +16,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
-#!/bin/bash -x
-
-set -e
+#!/bin/bash -ex
 
 # Make apt-get non-interactive
 DEBIAN_FRONTEND=noninteractive
