@@ -1,0 +1,53 @@
+pipeline {
+    agent { 
+        node { label 'jenkins-kvmtest-workers' } 
+    }
+
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
+    }
+
+    triggers {
+        pollSCM('@midnight')
+    }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                dir('sonic-mgmt') {
+                    checkout([$class: 'GitSCM',
+                              branches: [[name: '*/master']],
+                              userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-mgmt']]])
+                }
+                copyArtifacts(projectName: 'bldenv/docker-sonic-mgmt', filter: '**/docker-sonic-mgmt.gz', target: 'mgmt', flatten: true)
+                copyArtifacts(projectName: 'vs/buildimage-vs-image', filter: '**/sonic-vs.img.gz', target: 'vsimage', flatten: true)
+            }
+        }
+
+        stage('Test') {
+            steps {
+                wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+                    lock(resource: "kvmtest_${env.NODE_NAME}") {
+                        withCredentials([sshUserPrivateKey(credentialsId: '2b6b6afe-4892-41d1-967c-d683e7773727', keyFileVariable: 'PRIVATE_KEY'), \
+                                         usernamePassword(credentialsId: 'sonicdev-cr', usernameVariable: 'REGISTRY_USERNAME', passwordVariable: 'REGISTRY_PASSWD')]) {
+                            sh './scripts/mgmt/test.sh'
+				        }
+                    }
+                }
+            }
+
+            post {
+                always {
+                    junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/results/**/*.xml')
+                    archiveArtifacts(artifacts: 'sonic-mgmt/tests/results/**, sonic-mgmt/tests/logs/**')
+                }
+            }   
+        }
+    }
+
+    post {
+        cleanup {
+            cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
+        }
+    }
+}
