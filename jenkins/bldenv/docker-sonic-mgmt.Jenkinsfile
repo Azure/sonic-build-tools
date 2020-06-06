@@ -32,8 +32,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh '''
-#!/bin/bash -xe
+                sh '''#!/bin/bash -xe
 
 cd sonic-buildimage
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'

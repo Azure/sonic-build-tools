@@ -25,8 +25,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh '''
-#!/bin/bash -xe
+                sh '''#!/bin/bash -xe
 
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
@@ -58,8 +57,7 @@ sudo cp target/docker-sonic-vs.gz /nfs/jenkins/docker-sonic-vs.${JOB_NAME##*/}.$
 
                 wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
                     lock(resource: "vstest_${env.NODE_NAME}") {
-                        sh '''
-#!/bin/bash -xe
+                        sh '''#!/bin/bash -xe
 
 cleanup() {
     docker rmi docker-sonic-vs:${JOB_NAME##*/}.${BUILD_NUMBER}

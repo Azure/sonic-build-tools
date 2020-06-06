@@ -41,8 +41,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh '''
-#!/bin/bash -xe
+                sh '''#!/bin/bash -xe
 
 cd sonic-buildimage
 
