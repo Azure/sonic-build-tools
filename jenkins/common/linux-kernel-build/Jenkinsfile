@@ -24,8 +24,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh '''
-#!/bin/bash -ex
+                sh '''#!/bin/bash -ex
 
 make
 '''
