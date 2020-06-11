@@ -42,7 +42,7 @@ make configure PLATFORM=broadcom
 make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS INSTALL_DEBUG_TOOLS=y target/sonic-broadcom.bin
 mv target/sonic-broadcom.bin target/sonic-broadcom-dbg.bin
 make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/sonic-broadcom.bin
-make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/sonic-aboot-broadcom.swi
+make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS ENABLE_IMAGE_SIGNATURE=y target/sonic-aboot-broadcom.swi
 make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/sonic-broadcom.raw
 make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/docker-syncd-brcm-rpc.gz target/docker-ptf-brcm.gz target/docker-saiserver-brcm.gz
 '''

@@ -36,7 +36,7 @@ git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --rel
 
 make configure PLATFORM=broadcom
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-broadcom.bin
-make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-aboot-broadcom.swi
+make SONIC_CONFIG_BUILD_JOBS=1 ENABLE_IMAGE_SIGNATURE=y target/sonic-aboot-broadcom.swi
 '''
             }
         }
