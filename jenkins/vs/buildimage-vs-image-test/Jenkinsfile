@@ -1,5 +1,5 @@
 pipeline {
-    agent { node { label 'jenkins-vstest-workers' } }
+    agent { node { label 'jenkins-kvmtest-workers' } }
 
     parameters {
         string(name: 'PROJECT', defaultValue: 'vs/buildimage-vs-image', description: 'which project to test')
