@@ -1,6 +1,6 @@
 pipeline {
-    agent { 
-        node { label 'jenkins-vstest-workers' } 
+    agent {
+        node { label 'jenkins-kvmtest-workers' }
     }
 
     options {
@@ -41,7 +41,7 @@ pipeline {
                     junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/results/**/*.xml')
                     archiveArtifacts(artifacts: 'sonic-mgmt/tests/results/**, sonic-mgmt/tests/logs/**')
                 }
-            }   
+            }
         }
     }
 
