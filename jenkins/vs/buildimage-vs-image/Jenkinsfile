@@ -1,5 +1,5 @@
 pipeline {
-    agent { node { label 'jenkins-kvmtest-workers' } }
+    agent { node { label 'jenkins-build-workers' } }
 
     options {
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
@@ -61,7 +61,7 @@ sudo cp ../target/sonic-vs-dbg.bin /nfs/jenkins/sonic-vs-dbg-${JOB_NAME##*/}.${B
         }
 
         stage('Test') {
-            agent { node { label 'jenkins-vstest-workers' } }
+            agent { node { label 'jenkins-kvmtest-workers' } }
 
             steps {
                 dir('sonic-mgmt') {
