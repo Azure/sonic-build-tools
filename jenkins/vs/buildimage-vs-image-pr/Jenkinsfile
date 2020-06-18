@@ -10,7 +10,7 @@ pipeline {
         stage('Prepare') {
             steps {
                 dir('sonic-buildimage') {
-                    sh 'git submodule foreach --recursive "git reset --hard"'
+                    sh 'git submodule foreach --recursive "git reset --hard" || true'
                     checkout([$class: 'GitSCM',
                           branches: [[name: '${sha1}']],
                           extensions: [[$class: 'SubmoduleOption',
