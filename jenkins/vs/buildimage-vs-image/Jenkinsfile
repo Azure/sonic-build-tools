@@ -98,7 +98,7 @@ sudo cp ../target/sonic-vs-dbg.bin /nfs/jenkins/sonic-vs-dbg-${JOB_NAME##*/}.${B
             post {
                 always {
                     junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/results/**/*.xml')
-                    archiveArtifacts(artifacts: 'target/**, sonic-mgmt/tests/results/**, sonic-mgmt/tests/logs/**')
+                    archiveArtifacts(artifacts: 'target/**, sonic-mgmt/tests/results/**, sonic-mgmt/tests/logs/**, kvmdump/**')
                 }
             }
 
