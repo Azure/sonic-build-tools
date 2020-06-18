@@ -1,5 +1,7 @@
 #!/bin/bash -xe
 
+tbname=$1
+
 run_pytest()
 {
     tgname=$1
@@ -24,13 +26,13 @@ mkdir -p .ssh
 cp /data/pkey.txt .ssh/id_rsa
 chmod 600 .ssh/id_rsa
 
-# Refresh virtual switch with vms-kvm-t0 topology
+# Refresh dut in the virtual switch topology
 cd /data/sonic-mgmt/ansible
-./testbed-cli.sh -m veos.vtb -t vtestbed.csv refresh-dut vms-kvm-t0 password.txt
+./testbed-cli.sh -m veos.vtb -t vtestbed.csv refresh-dut $tbname password.txt
 sleep 120
 
 # Create and deploy default vlan configuration (one_vlan_a) to the virtual switch
-./testbed-cli.sh -m veos.vtb -t vtestbed.csv deploy-mg vms-kvm-t0 lab password.txt
+./testbed-cli.sh -m veos.vtb -t vtestbed.csv deploy-mg $tbname lab password.txt
 sleep 180
 
 export ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible/library/
@@ -43,7 +45,7 @@ PYTEST_COMMON_OPTS="--inventory veos.vtb \
                     --user admin \
                     -vvv \
                     --show-capture stdout \
-                    --testbed vms-kvm-t0 \
+                    --testbed $tbname \
                     --testbed_file vtestbed.csv \
                     --disable_loganalyzer \
                     --log-file-level debug"
@@ -87,7 +89,7 @@ popd
 
 # Create and deploy two vlan configuration (two_vlan_a) to the virtual switch
 cd /data/sonic-mgmt/ansible
-./testbed-cli.sh -m veos.vtb -t vtestbed.csv deploy-mg vms-kvm-t0 lab password.txt -e vlan_config=two_vlan_a
+./testbed-cli.sh -m veos.vtb -t vtestbed.csv deploy-mg $tbname lab password.txt -e vlan_config=two_vlan_a
 sleep 180
 
 # Tests to run using two vlan configuration
