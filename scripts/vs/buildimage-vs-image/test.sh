@@ -3,7 +3,7 @@
 echo ${JOB_NAME##*/}.${BUILD_NUMBER}
 
 ls -l
-virsh list
+virsh -c qemu:///system list
 
 tbname=vms-kvm-t0
 dut=vlab-01
@@ -35,12 +35,13 @@ if [ $? != 0 ]; then
     if [ $virsh_version == "6.0.0" ]; then
         rm -rf kvmdump
         mkdir -p kvmdump
-        virsh list
-        virsh save $dut kvmdump/$dut.memdmp
-        virsh dumpxml $dut > kvmdump/$dut.xml
-        img=$(virsh domblklist $dut | grep vda | awk '{print $2}')
+        virsh -c qemu:///system list
+        virsh -c qemu:///system save $dut kvmdump/$dut.memdmp
+        virsh -c qemu:///system dumpxml $dut > kvmdump/$dut.xml
+        img=$(virsh -c qemu:///system domblklist $dut | grep vda | awk '{print $2}')
         cp $img kvmdump/$dut.img
-        virsh undefine $dut
+        sudo chown -R johnar.johnar kvmdump
+        virsh -c qemu:///system undefine $dut
     fi
     exit 2
 fi
