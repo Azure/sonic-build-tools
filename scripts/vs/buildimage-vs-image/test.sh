@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -x
 
 echo ${JOB_NAME##*/}.${BUILD_NUMBER}
 
@@ -40,4 +40,5 @@ if [ $? != 0 ]; then
         cp $img kvmdump/$dut.img
         virsh undefine $dut
     fi
+    exit 2
 fi
