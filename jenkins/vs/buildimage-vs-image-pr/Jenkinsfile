@@ -96,5 +96,8 @@ sudo cp ../target/sonic-vs.bin /nfs/jenkins/sonic-vs-${JOB_NAME##*/}.${BUILD_NUM
         always {
             archiveArtifacts(artifacts: 'target/**')
         }
+        cleanup {
+            cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
+        }
     }
 }
