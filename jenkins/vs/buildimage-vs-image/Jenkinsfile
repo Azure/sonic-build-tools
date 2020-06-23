@@ -89,7 +89,10 @@ sudo cp ../target/sonic-vs-dbg.bin /nfs/jenkins/sonic-vs-dbg-${JOB_NAME##*/}.${B
                         withCredentials([sshUserPrivateKey(credentialsId: '2b6b6afe-4892-41d1-967c-d683e7773727', keyFileVariable: 'VM_USER_PRIVATE_KEY'), \
                                          usernamePassword(credentialsId: 'sonicdev-cr', usernameVariable: 'REGISTRY_USERNAME', passwordVariable: 'REGISTRY_PASSWD')]) {
                             sh './scripts/vs/buildimage-vs-image/build_kvm_image.sh'
-                            sh './scripts/vs/buildimage-vs-image/test.sh'
+
+                            timeout(time: 2, unit: 'HOURS') {
+                                sh './scripts/vs/buildimage-vs-image/test.sh'
+                            }
 				        }
                     }
                 }
