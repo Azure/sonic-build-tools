@@ -9,6 +9,8 @@ pipeline {
     stages {
         stage('Prepare') {
             steps {
+                step([$class: 'WsCleanup'])
+
                 dir('sonic-buildimage') {
                     checkout([$class: 'GitSCM',
                           branches: [[name: '${sha1}']],
