@@ -16,8 +16,7 @@ pipeline {
                               userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-mgmt',
                                                    refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
                 }
-                copyArtifacts(projectName: 'bldenv/docker-sonic-mgmt', filter: '**/docker-sonic-mgmt.gz', target: 'mgmt', flatten: true)
-                copyArtifacts(projectName: 'vs/buildimage-vs-image', filter: '**/sonic-vs.img.gz', target: 'vsimage', flatten: true)
+                copyArtifacts(projectName: 'vs/buildimage-vs-image', filter: '**/sonic-vs.img.gz', target: 'target', flatten: true)
             }
         }
 
@@ -27,7 +26,7 @@ pipeline {
                     lock(resource: "kvmtest_${env.NODE_NAME}") {
                         withCredentials([sshUserPrivateKey(credentialsId: '2b6b6afe-4892-41d1-967c-d683e7773727', keyFileVariable: 'VM_USER_PRIVATE_KEY'), \
                                          usernamePassword(credentialsId: 'sonicdev-cr', usernameVariable: 'REGISTRY_USERNAME', passwordVariable: 'REGISTRY_PASSWD')]) {
-                            sh './scripts/mgmt/test.sh'
+                            sh './scripts/vs/buildimage-vs-image/test.sh'
 				        }
                     }
                 }

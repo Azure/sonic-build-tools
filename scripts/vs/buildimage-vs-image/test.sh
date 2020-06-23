@@ -11,7 +11,7 @@ dut=vlab-01
 docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWD sonicdev-microsoft.azurecr.io:443
 docker pull sonicdev-microsoft.azurecr.io:443/docker-sonic-mgmt:latest
 
-cat $PRIVATE_KEY > pkey.txt
+cat $VM_USER_PRIVATE_KEY > pkey.txt
 
 mkdir -p $HOME/sonic-vm/images
 if [ -e target/sonic-vs.img.gz ]; then
