@@ -19,6 +19,10 @@ sudo pip install netifaces==0.10.9
 sudo pip install --upgrade setuptools
 sudo pip install pytest-runner==4.4
 
+sudo dpkg -i buildimage/target/debs/stretch/libyang_1.0.73_amd64.deb
+sudo dpkg -i buildimage/target/debs/stretch/libyang-cpp_1.0.73_amd64.deb
+sudo dpkg -i buildimage/target/debs/stretch/python2-yang_1.0.73_amd64.deb
+
 cd sonic-utilities
 
 # Test building the Debian package
