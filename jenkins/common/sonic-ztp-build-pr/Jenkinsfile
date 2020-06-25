@@ -15,7 +15,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh './scripts/common/sonic-ztp/build.sh'
+                sh './scripts/common/sonic-ztp-build/build.sh'
             }
         }
     }
