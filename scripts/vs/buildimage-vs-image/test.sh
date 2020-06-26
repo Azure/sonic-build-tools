@@ -7,6 +7,7 @@ virsh -c qemu:///system list
 
 tbname=vms-kvm-t0
 dut=vlab-01
+ptf_name=ptf_vms6-1
 
 docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWD sonicdev-microsoft.azurecr.io:443
 docker pull sonicdev-microsoft.azurecr.io:443/docker-sonic-mgmt:latest
@@ -43,5 +44,9 @@ if [ $? != 0 ]; then
         sudo chown -R johnar.johnar kvmdump
         virsh -c qemu:///system undefine $dut
     fi
+
+    docker commit $ptf_name docker-ptf:${JOB_NAME##*/}.${BUILD_NUMBER}
+    docker save docker-ptf:${JOB_NAME##*/}.${BUILD_NUMBER} | gzip -c > docker-ptf-dump.gz
+
     exit 2
 fi
