@@ -2,9 +2,7 @@
 
 # Install Redis
 sudo pip install Pympler==0.8
-sudo apt-get install -y liblua5.1-0 lua-bitop lua-cjson
-sudo dpkg -i buildimage/target/debs/stretch/redis-tools_*.deb
-sudo dpkg -i buildimage/target/debs/stretch/redis-server_*.deb
+sudo apt-get install -y redis-server
 sudo sed -i 's/notify-keyspace-events ""/notify-keyspace-events AKE/' /etc/redis/redis.conf
 sudo service redis-server restart
 
