@@ -15,8 +15,18 @@ sudo service redis-server start
 # Install libyang
 sudo dpkg -i buildimage/target/debs/stretch/libyang*.deb
 
-# Clone sonic-mgmt-framework repository
-git clone https://github.com/Azure/sonic-mgmt-framework
+# Clone sonic-mgmt-common repository
+git clone https://github.com/Azure/sonic-mgmt-common.git
+
+# Build sonic-mgmt-common first
+
+pushd sonic-mgmt-common
+
+dpkg-buildpackage -rfakeroot -b -us -uc
+
+popd
+
+# Build sonic-telemetry
 
 pushd sonic-telemetry
 
