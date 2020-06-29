@@ -4,16 +4,11 @@ pipeline {
     stages {
         stage('Prepare') {
             steps {
-                dir('sonic-mgmt-framework') {
-                    checkout([$class: 'GitSCM',
-                          branches: [[name: '${sha1}']],
-                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-mgmt-framework',
-                                               refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
-                }
                 dir('sonic-mgmt-common') {
                     checkout([$class: 'GitSCM',
-                          branches: [[name: 'refs/heads/master']],
-                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-mgmt-common']]])
+                          branches: [[name: '${sha1}']],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-mgmt-common',
+                                               refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
                 }
                 copyArtifacts(projectName: 'vs/buildimage-vs-all', filter: '**/*.deb', target: 'buildimage', flatten: false)
             }
@@ -22,13 +17,12 @@ pipeline {
         stage('Build') {
             steps {
                 sh './scripts/common/sonic-mgmt-common-build/build.sh'
-                sh './scripts/common/sonic-mgmt-framework-build/build.sh'
             }
         }
 
         stage('Test') {
             steps {
-                sh './scripts/common/sonic-mgmt-framework-build/test.sh'
+                sh './scripts/common/sonic-mgmt-common-build/test.sh'
             }
         }
     }

@@ -16,11 +16,6 @@ pipeline {
     stages {
         stage('Prepare') {
             steps {
-                dir('sonic-mgmt-framework') {
-                    checkout([$class: 'GitSCM',
-                          branches: [[name: 'refs/heads/master']],
-                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-mgmt-framework']]])
-                }
                 dir('sonic-mgmt-common') {
                     checkout([$class: 'GitSCM',
                           branches: [[name: 'refs/heads/master']],
@@ -33,13 +28,12 @@ pipeline {
         stage('Build') {
             steps {
                 sh './scripts/common/sonic-mgmt-common-build/build.sh'
-                sh './scripts/common/sonic-mgmt-framework-build/build.sh'
             }
         }
 
         stage('Test') {
             steps {
-                sh './scripts/common/sonic-mgmt-framework-build/test.sh'
+                sh './scripts/common/sonic-mgmt-common-build/test.sh'
             }
         }
     }
