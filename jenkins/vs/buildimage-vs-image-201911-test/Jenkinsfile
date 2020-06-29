@@ -68,7 +68,7 @@ pipeline {
 
         always {
             junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/results/**/*.xml')
-            archiveArtifacts(artifacts: 'sonic-mgmt/tests/results/**, sonic-mgmt/tests/logs/**, kvmdump/**')
+            archiveArtifacts(artifacts: 'sonic-mgmt/tests/results/**, sonic-mgmt/tests/logs/**, kvmdump/**, ptfdump/**')
         }
 
         fixed {
