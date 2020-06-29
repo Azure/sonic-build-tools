@@ -45,8 +45,11 @@ if [ $? != 0 ]; then
         virsh -c qemu:///system undefine $dut
     fi
 
+    rm -rf ptfdump
+    mkdir -p ptfdump
     docker commit $ptf_name docker-ptf:${JOB_NAME##*/}.${BUILD_NUMBER}
-    docker save docker-ptf:${JOB_NAME##*/}.${BUILD_NUMBER} | gzip -c > docker-ptf-dump.gz
+    docker save docker-ptf:${JOB_NAME##*/}.${BUILD_NUMBER} | gzip -c > ptfdump/docker-ptf-dump.gz
+    docker rmi docker-ptf:${JOB_NAME##*/}.${BUILD_NUMBER}
 
     exit 2
 fi
