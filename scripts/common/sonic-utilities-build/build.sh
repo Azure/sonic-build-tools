@@ -6,6 +6,7 @@ cat <<EOF > build_sonic_utilities.sh
 #!/bin/bash -xe
 ls -lrt
 
+sudo apt-get install python-m2crypto
 sudo apt-get -y purge python-click
 sudo pip install "click>=7.0"
 sudo pip install click-default-group==1.2
