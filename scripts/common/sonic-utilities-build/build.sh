@@ -18,6 +18,7 @@ sudo pip install mockredispy==2.9.3
 sudo pip install netifaces==0.10.9
 sudo pip install --upgrade setuptools
 sudo pip install pytest-runner==4.4
+sudp pip install xmltodict==0.12.0
 sudp pip install jsondiff==1.2.0
 
 sudo dpkg -i buildimage/target/debs/stretch/libyang_1.0.73_amd64.deb
