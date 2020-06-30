@@ -10,12 +10,18 @@ pipeline {
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-telemetry',
                                                refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
                 }
+                dir('sonic-mgmt-common') {
+                    checkout([$class: 'GitSCM',
+                          branches: [[name: 'refs/heads/master']],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-mgmt-common']]])
+                }
                 copyArtifacts(projectName: 'vs/buildimage-vs-all', filter: '**/*.deb', target: 'buildimage', flatten: false)
             }
         }
 
         stage('Build') {
             steps {
+                sh 'NO_TEST_BINS=1 DISTRO=stretch ./scripts/common/sonic-mgmt-common-build/build.sh'
                 sh './scripts/common/sonic-telemetry-build/build.sh'
             }
         }

@@ -21,7 +21,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh './scripts/common/sonic-mgmt-common-build/build.sh'
+                sh 'NO_TEST_BINS=1 ./scripts/common/sonic-mgmt-common-build/build.sh'
                 sh './scripts/common/sonic-mgmt-framework-build/build.sh'
             }
         }
