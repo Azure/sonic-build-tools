@@ -21,6 +21,11 @@ pipeline {
                           branches: [[name: 'refs/heads/master']],
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-telemetry']]])
                 }
+                dir('sonic-mgmt-common') {
+                    checkout([$class: 'GitSCM',
+                          branches: [[name: 'refs/heads/master']],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-mgmt-common']]])
+                }
                 copyArtifacts(projectName: '../vs/buildimage-vs-all', filter: '**/*.deb', target: 'buildimage', flatten: false)
             }
         }

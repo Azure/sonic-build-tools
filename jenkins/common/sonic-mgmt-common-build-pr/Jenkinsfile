@@ -10,7 +10,7 @@ pipeline {
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-mgmt-common',
                                                refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
                 }
-                copyArtifacts(projectName: 'vs/buildimage-vs-all', filter: '**/*.deb', target: 'buildimage', flatten: false)
+                copyArtifacts(projectName: 'vs/buildimage-vs-image', filter: '**/*.deb', target: 'buildimage', flatten: false)
             }
         }
 

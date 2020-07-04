@@ -15,13 +15,12 @@ pipeline {
                           branches: [[name: 'refs/heads/master']],
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-mgmt-common']]])
                 }
-                copyArtifacts(projectName: 'vs/buildimage-vs-all', filter: '**/*.deb', target: 'buildimage', flatten: false)
+                copyArtifacts(projectName: 'vs/buildimage-vs-image', filter: '**/*.deb', target: 'buildimage', flatten: false)
             }
         }
 
         stage('Build') {
             steps {
-                sh './scripts/common/sonic-mgmt-common-build/build.sh'
                 sh './scripts/common/sonic-mgmt-framework-build/build.sh'
             }
         }
