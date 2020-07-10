@@ -74,7 +74,8 @@ tests="\
     tacacs/test_rw_user \
     tacacs/test_ro_user \
     ntp/test_ntp \
-    cacl/test_control_plane_acl \
+    cacl/test_cacl_application \
+    cacl/test_cacl_function \
     snmp/test_snmp_cpu \
     snmp/test_snmp_interfaces \
     snmp/test_snmp_lldp \
