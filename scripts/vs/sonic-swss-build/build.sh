@@ -3,8 +3,8 @@
 echo ${JOB_NAME##*/}.${BUILD_NUMBER}
 
 docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWD sonicdev-microsoft.azurecr.io:443
-docker pull sonicdev-microsoft.azurecr.io:443/sonic-slave-stretch:latest
-docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonicdev-microsoft.azurecr.io:443/sonic-slave-stretch:latest ./scripts/vs/sonic-swss-build/build_in_docker.sh
+docker pull sonicdev-microsoft.azurecr.io:443/sonic-slave-buster-johnar:latest
+docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonicdev-microsoft.azurecr.io:443/sonic-slave-buster-johnar:latest ./scripts/vs/sonic-swss-build/build_in_docker.sh
 
 mkdir -p scripts/vs/sonic-swss-build/debs
 cp *.deb scripts/vs/sonic-swss-build/debs
