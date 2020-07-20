@@ -39,8 +39,8 @@ chmod 755 build_sonic_utilities.sh
 
 # Build sonic-utilities and copy resulting Debian package
 docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWD sonicdev-microsoft.azurecr.io:443
-docker pull sonicdev-microsoft.azurecr.io:443/sonic-slave-buster:latest
-docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonicdev-microsoft.azurecr.io:443/sonic-slave-buster:latest ./build_sonic_utilities.sh
+docker pull sonicdev-microsoft.azurecr.io:443/sonic-slave-buster-johnar:latest
+docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonicdev-microsoft.azurecr.io:443/sonic-slave-buster-johnar ./build_sonic_utilities.sh
 
 cp sonic-utilities/deb_dist/python-sonic-utilities_*.deb buildimage/target/python-debs/
 
