@@ -24,9 +24,9 @@ sudo pip install jsondiff==1.2.0
 
 sudo pip3 install buildimage/target/python-wheels/sonic_yang_models-1.0-py3-none-any.whl
 
-sudo dpkg -i buildimage/target/debs/stretch/libyang_1.0.73_amd64.deb
-sudo dpkg -i buildimage/target/debs/stretch/libyang-cpp_1.0.73_amd64.deb
-sudo dpkg -i buildimage/target/debs/stretch/python2-yang_1.0.73_amd64.deb
+sudo dpkg -i buildimage/target/debs/buster/libyang_1.0.73_amd64.deb
+sudo dpkg -i buildimage/target/debs/buster/libyang-cpp_1.0.73_amd64.deb
+sudo dpkg -i buildimage/target/debs/buster/python2-yang_1.0.73_amd64.deb
 
 cd sonic-utilities
 
@@ -39,21 +39,21 @@ chmod 755 build_sonic_utilities.sh
 
 # Build sonic-utilities and copy resulting Debian package
 docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWD sonicdev-microsoft.azurecr.io:443
-docker pull sonicdev-microsoft.azurecr.io:443/sonic-slave-stretch:latest
-docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonicdev-microsoft.azurecr.io:443/sonic-slave-stretch:latest ./build_sonic_utilities.sh
+docker pull sonicdev-microsoft.azurecr.io:443/sonic-slave-buster:latest
+docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonicdev-microsoft.azurecr.io:443/sonic-slave-buster:latest ./build_sonic_utilities.sh
 
 cp sonic-utilities/deb_dist/python-sonic-utilities_*.deb buildimage/target/python-debs/
 
 cd sairedis
-cp *.deb ../buildimage/target/debs/stretch/
+cp *.deb ../buildimage/target/debs/buster/
 cd ../
 
 cd swss
-cp *.deb ../buildimage/target/debs/stretch/
+cp *.deb ../buildimage/target/debs/buster/
 cd ../
 
 cd swss-common
-cp *.deb ../buildimage/target/debs/stretch/
+cp *.deb ../buildimage/target/debs/buster/
 cd ../
 
 on_exit()
@@ -70,8 +70,8 @@ mkdir -p docker-sonic-vs/debs
 mkdir -p docker-sonic-vs/files
 mkdir -p docker-sonic-vs/python-debs
 mkdir -p docker-sonic-vs/python-wheels
-sudo mount --bind ../../target/debs/stretch docker-sonic-vs/debs
-sudo mount --bind ../../target/files/stretch docker-sonic-vs/files
+sudo mount --bind ../../target/debs/buster docker-sonic-vs/debs
+sudo mount --bind ../../target/files/buster docker-sonic-vs/files
 sudo mount --bind ../../target/python-debs docker-sonic-vs/python-debs
 sudo mount --bind ../../target/python-wheels docker-sonic-vs/python-wheels
 docker load < ../../target/docker-config-engine-buster.gz
