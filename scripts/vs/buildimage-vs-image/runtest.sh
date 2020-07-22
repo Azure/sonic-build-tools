@@ -71,6 +71,7 @@ tests="\
     bgp/test_bgp_speaker \
     bgp/test_bgp_gr_helper \
     dhcp_relay/test_dhcp_relay \
+    syslog/test_syslog \
     tacacs/test_rw_user \
     tacacs/test_ro_user \
     ntp/test_ntp \
