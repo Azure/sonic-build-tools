@@ -55,6 +55,13 @@ sudo dpkg -i ../syncd-vs_*.deb
 
 popd
 
+# Install libteam for swss build
+sudo apt-get install -y libdbus-1-3
+sudo dpkg -i buildimage/target/debs/buster/libteam5_*.deb
+sudo dpkg -i buildimage/target/debs/buster/libteamdctl0_*.deb
+sudo dpkg -i buildimage/target/debs/buster/libteam-utils_*.deb
+sudo dpkg -i buildimage/target/debs/buster/libteam-dev_*.deb
+
 # Re-build SWSS with the newly updated sairedis. This is important because swss is built against
 # sairedis, so two things can go wrong:
 #
