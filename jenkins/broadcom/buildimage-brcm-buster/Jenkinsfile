@@ -38,9 +38,11 @@ pipeline {
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
 make configure PLATFORM=broadcom
+
+. ../../../scripts/bldenv/common/build-config.sh
 CACHE_OPTIONS="SONIC_DPKG_CACHE_METHOD=rwcache SONIC_DPKG_CACHE_SOURCE=/nfs/dpkg_cache/broadcom"
 make SONIC_CONFIG_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y $CACHE_OPTIONS target/sonic-broadcom.bin
-# make SONIC_CONFIG_BUILD_JOBS=1 ENABLE_IMAGE_SIGNATURE=y target/sonic-aboot-broadcom.swi
+# make SONIC_CONFIG_BUILD_JOBS=1 ENABLE_IMAGE_SIGNATURE=y SONIC_OVERRIDE_BUILD_VARS="${SONIC_OVERRIDE_BUILD_VARS}" DOCKER_BUILDER_MOUNT="${DOCKER_BUILDER_MOUNT}" target/sonic-aboot-broadcom.swi
 # make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-broadcom.raw
 # make SONIC_CONFIG_BUILD_JOBS=1 target/docker-syncd-brcm-rpc.gz target/docker-ptf-brcm.gz target/docker-saiserver-brcm.gz
 '''

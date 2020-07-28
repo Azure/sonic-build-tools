@@ -35,8 +35,10 @@ pipeline {
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
 make configure PLATFORM=broadcom
+
+. ../../../scripts/bldenv/common/build-config.sh
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-broadcom.bin
-make SONIC_CONFIG_BUILD_JOBS=1 ENABLE_IMAGE_SIGNATURE=y target/sonic-aboot-broadcom.swi
+make SONIC_CONFIG_BUILD_JOBS=1 ENABLE_IMAGE_SIGNATURE=y SONIC_OVERRIDE_BUILD_VARS="${SONIC_OVERRIDE_BUILD_VARS}" DOCKER_BUILDER_MOUNT="${DOCKER_BUILDER_MOUNT}" target/sonic-aboot-broadcom.swi
 '''
             }
         }
