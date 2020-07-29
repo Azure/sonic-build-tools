@@ -77,6 +77,7 @@ tests="\
     ntp/test_ntp \
     cacl/test_cacl_application \
     cacl/test_cacl_function \
+    telemetry/test_telemetry \
     snmp/test_snmp_cpu \
     snmp/test_snmp_interfaces \
     snmp/test_snmp_lldp \
