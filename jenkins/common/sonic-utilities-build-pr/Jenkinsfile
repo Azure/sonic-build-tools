@@ -47,7 +47,7 @@ pipeline {
             junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-swss-tests/tests/tr.xml')
         }
         success {
-            archiveArtifacts(artifacts: 'sonic-utilities/deb_dist/python-sonic-utilities_1.2-1_all.deb,wheels/sonic_config_engine-1.0-py2-none-any.whl,wheels/swsssdk-2.0.1-py2-none-any.whl, sonic-swss-tests/tests/log/**')
+            archiveArtifacts(artifacts: 'sonic-utilities/deb_dist/python-sonic-utilities_1.2-1_all.deb,wheels/sonic_config_engine-1.0-py2-none-any.whl,wheels/swsssdk-2.0.1-py2-none-any.whl,wheels/sonic_py_common-1.0-py2-none-any.whl,wheels/sonic_py_common-1.0-py3-none-any.whl, sonic-swss-tests/tests/log/**')
         }
 
         cleanup {
