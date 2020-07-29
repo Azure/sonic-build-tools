@@ -37,8 +37,8 @@ pipeline {
 
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
-
-. ../../../scripts/bldenv/common/build-config.sh
+SONIC_OVERRIDE_BUILD_VARS="SIGNING_KEY=/tmp/certs/signing.key SIGNING_CERT=/tmp/certs/signing.cert CA_CERT=/tmp/certs/ca.cert"
+DOCKER_BUILDER_MOUNT="$(pwd):/sonic -v /nfs/build/test-certs:/tmp/certs"
 CACHE_OPTIONS="SONIC_DPKG_CACHE_METHOD=wcache SONIC_DPKG_CACHE_SOURCE=/nfs/dpkg_cache/broadcom"
 make configure PLATFORM=broadcom
 make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS INSTALL_DEBUG_TOOLS=y target/sonic-broadcom.bin

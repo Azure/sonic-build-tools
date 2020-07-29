@@ -36,7 +36,8 @@ git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --rel
 
 make configure PLATFORM=broadcom
 
-. ../../../scripts/bldenv/common/build-config.sh
+SONIC_OVERRIDE_BUILD_VARS="SIGNING_KEY=/tmp/certs/signing.key SIGNING_CERT=/tmp/certs/signing.cert CA_CERT=/tmp/certs/ca.cert"
+DOCKER_BUILDER_MOUNT="$(pwd):/sonic -v /nfs/build/test-certs:/tmp/certs"
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-broadcom.bin
 make SONIC_CONFIG_BUILD_JOBS=1 ENABLE_IMAGE_SIGNATURE=y SONIC_OVERRIDE_BUILD_VARS="${SONIC_OVERRIDE_BUILD_VARS}" DOCKER_BUILDER_MOUNT="${DOCKER_BUILDER_MOUNT}" target/sonic-aboot-broadcom.swi
 '''
