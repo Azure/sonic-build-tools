@@ -5,6 +5,9 @@ pipeline {
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '60'))
 
     }
+    environment {
+        TMP_PATH=sh(script: "mktemp -d", returnStdout: true).trim()
+    }
 
     stages {
         stage('Prepare') {
@@ -24,6 +27,9 @@ pipeline {
         }
 
         stage('Build') {
+            options {
+                azureKeyVault([[envVariable: 'PFX_FILE', name: 'sonic-signing-cert', secretType: 'Certificate']])
+            }
             steps {
                 sh '''#!/bin/bash -xe
 
@@ -31,8 +37,9 @@ git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --rel
 
 make configure PLATFORM=broadcom
 
+scripts/convert-pfx-cert-format.sh -p $PFX_FILE -k $TMP_PATH/signing.key -c $TMP_PATH/signing.cert -a $TMP_PATH/ca.cert
 SONIC_OVERRIDE_BUILD_VARS="SIGNING_KEY=/tmp/certs/signing.key SIGNING_CERT=/tmp/certs/signing.cert CA_CERT=/tmp/certs/ca.cert"
-DOCKER_BUILDER_MOUNT="$(pwd):/sonic -v /nfs/build/test-certs:/tmp/certs"
+DOCKER_BUILDER_MOUNT="$(pwd):/sonic -v $TMP_PATH:/tmp/certs"
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-broadcom.bin
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-broadcom.raw
 make SONIC_CONFIG_BUILD_JOBS=1 ENABLE_IMAGE_SIGNATURE=y SONIC_OVERRIDE_BUILD_VARS="${SONIC_OVERRIDE_BUILD_VARS}" DOCKER_BUILDER_MOUNT="${DOCKER_BUILDER_MOUNT}" target/sonic-aboot-broadcom.swi
@@ -45,6 +52,9 @@ make SONIC_CONFIG_BUILD_JOBS=1 ENABLE_IMAGE_SIGNATURE=y SONIC_OVERRIDE_BUILD_VAR
 
         success {
             archiveArtifacts(artifacts: 'target/**')
+        }
+        cleanup {
+            sh "[ -d $TMP_PATH ] && rm -rf $TMP_PATH"
         }
     }
 }
