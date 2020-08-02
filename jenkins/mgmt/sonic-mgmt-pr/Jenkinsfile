@@ -36,8 +36,8 @@ pipeline {
 
             post {
                 always {
-                    junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/logs/**/tr.xml')
-                    archiveArtifacts(artifacts: 'sonic-mgmt/tests/logs/**, kvmdump/**, ptfdump/**')
+                    junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/results/**/*.xml')
+                    archiveArtifacts(artifacts: 'sonic-mgmt/tests/results/**, sonic-mgmt/tests/logs/**, kvmdump/**, ptfdump/**')
                 }
             }
         }
