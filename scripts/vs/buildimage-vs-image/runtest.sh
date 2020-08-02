@@ -1,7 +1,25 @@
 #!/bin/bash -xe
 
 tbname=$1
-dut=$2
+
+run_pytest()
+{
+    tgname=$1
+    shift
+    tests=$@
+
+    echo "run tests: $tests"
+
+    mkdir -p logs/$tgname
+    for tn in ${tests}; do
+        tdir=$(dirname $tn)
+        if [ $tdir != "." ]; then
+            mkdir -p logs/$tgname/$tdir
+            mkdir -p results/$tgname/$tdir
+        fi
+        py.test $PYTEST_COMMON_OPTS --log-file logs/$tgname/$tn.log --junitxml=results/$tgname/$tn.xml $tn.py
+    done
+}
 
 cd $HOME
 mkdir -p .ssh
@@ -22,48 +40,54 @@ export ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible/library/
 # workaround for issue https://github.com/Azure/sonic-mgmt/issues/1659
 export export ANSIBLE_KEEP_REMOTE_FILES=1
 
-PYTEST_CLI_COMMON_OPTS="\
-    -i veos.vtb \
-    -d $dut \
-    -n $tbname \
-    -f vtestbed.csv \
-    -k debug \
-    -l warning \
-    -m group \
-    -e --disable_loganalyzer
-"
+PYTEST_COMMON_OPTS="--inventory veos.vtb \
+                    --host-pattern all \
+                    --user admin \
+                    -vvv \
+                    --show-capture stdout \
+                    --testbed $tbname \
+                    --testbed_file vtestbed.csv \
+                    --disable_loganalyzer \
+                    --log-file-level debug"
 
+# Check testbed health
 cd /data/sonic-mgmt/tests
-rm -rf logs
+rm -rf logs results
 mkdir -p logs
+mkdir -p results
+py.test $PYTEST_COMMON_OPTS --log-file logs/test_nbr_health.log --junitxml=results/tr.xml test_nbr_health.py
 
-# Run tests_1vlan on vlab-01 virtual switch
-# TODO: Use a marker to select these tests rather than providing a hard-coded list here.
+# Run anounce route test case in order to populate BGP route
+py.test $PYTEST_COMMON_OPTS --log-file logs/test_announce_routes.log --junitxml=results/tr.xml test_announce_routes.py
+
+# Tests to run using one vlan configuration
 tgname=1vlan
 tests="\
-test_interfaces.py \
-bgp/test_bgp_fact.py \
-bgp/test_bgp_gr_helper.py \
-bgp/test_bgp_speaker.py \
-cacl/test_cacl_application.py \
-cacl/test_cacl_function.py \
-dhcp_relay/test_dhcp_relay.py \
-lldp/test_lldp.py \
-ntp/test_ntp.py \
-pc/test_po_update.py \
-route/test_default_route.py \
-snmp/test_snmp_cpu.py \
-snmp/test_snmp_interfaces.py \
-snmp/test_snmp_lldp.py \
-snmp/test_snmp_pfc_counters.py \
-snmp/test_snmp_queue.py \
-syslog/test_syslog.py \
-tacacs/test_rw_user.py \
-tacacs/test_ro_user.py \
-telemetry/test_telemetry.py"
+    test_interfaces \
+    pc/test_po_update \
+    bgp/test_bgp_fact \
+    lldp/test_lldp \
+    route/test_default_route \
+    bgp/test_bgp_speaker \
+    bgp/test_bgp_gr_helper \
+    dhcp_relay/test_dhcp_relay \
+    syslog/test_syslog \
+    tacacs/test_rw_user \
+    tacacs/test_ro_user \
+    ntp/test_ntp \
+    cacl/test_cacl_application \
+    cacl/test_cacl_function \
+    telemetry/test_telemetry \
+    snmp/test_snmp_cpu \
+    snmp/test_snmp_interfaces \
+    snmp/test_snmp_lldp \
+    snmp/test_snmp_pfc_counters \
+    snmp/test_snmp_queue
+"
 
+# Run tests_1vlan on vlab-01 virtual switch
 pushd /data/sonic-mgmt/tests
-./run_tests.sh $PYTEST_CLI_COMMON_OPTS -c "$tests" -p logs/$tgname
+run_pytest $tgname $tests
 popd
 
 # Create and deploy two vlan configuration (two_vlan_a) to the virtual switch
@@ -71,10 +95,13 @@ cd /data/sonic-mgmt/ansible
 ./testbed-cli.sh -m veos.vtb -t vtestbed.csv deploy-mg $tbname lab password.txt -e vlan_config=two_vlan_a
 sleep 180
 
-# Run tests_2vlans on vlab-01 virtual switch
+# Tests to run using two vlan configuration
 tgname=2vlans
-tests="dhcp_relay/test_dhcp_relay.py"
+tests="\
+    dhcp_relay/test_dhcp_relay \
+"
 
+# Run tests_2vlans on vlab-01 virtual switch
 pushd /data/sonic-mgmt/tests
-./run_tests.sh $PYTEST_CLI_COMMON_OPTS -c "$tests" -p logs/$tgname
+run_pytest $tgname $tests
 popd
