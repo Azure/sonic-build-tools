@@ -1,51 +1,18 @@
 #!/bin/bash -ex
 
-# Install HIREDIS
-sudo apt-get install -y libhiredis0.14 libhiredis-dev
+echo ${JOB_NAME##*/}.${BUILD_NUMBER}
 
-# Install libnl3
-sudo dpkg -i buildimage/target/debs/buster/libnl-3-200_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libnl-3-dev_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libnl-genl-3-200_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libnl-genl-3-dev_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libnl-route-3-200_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libnl-route-3-dev_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libnl-nf-3-200_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libnl-nf-3-dev_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libnl-cli-3-200_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libnl-cli-3-dev_*.deb
+docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWD sonicdev-microsoft.azurecr.io:443
+docker pull sonicdev-microsoft.azurecr.io:443/sonic-slave-buster-johnar:latest
+docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonicdev-microsoft.azurecr.io:443/sonic-slave-buster-johnar:latest ./scripts/vs/sonic-sairedis-build/docker_build_script.sh
 
-# Install common library
-sudo dpkg -i common/libswsscommon_*.deb
-sudo dpkg -i common/libswsscommon-dev_*.deb
+mkdir -p scripts/vs/sonic-sairedis-build/docker-sonic-vs/debs
+cp *.deb scripts/vs/sonic-sairedis-build/docker-sonic-vs/debs
 
-# Install REDIS
-sudo apt-get install -y redis-server
-sudo sed -ri 's/^# unixsocket/unixsocket/' /etc/redis/redis.conf
-sudo sed -ri 's/^unixsocketperm .../unixsocketperm 777/' /etc/redis/redis.conf
-sudo sed -ri 's/redis-server.sock/redis.sock/' /etc/redis/redis.conf
-sudo service redis-server start
+docker load < buildimage/target/docker-sonic-vs.gz
 
-# Start rsyslog
-sudo apt-get install -y rsyslog
-sudo service rsyslog start
-
-cleanup() {
-    mkdir -p ../target
-    sudo cp /var/log/syslog ../target/
-    sudo chmod 644 ../target/syslog
-}
-
-trap cleanup ERR
-
-pushd sairedis
-
-./autogen.sh
-fakeroot debian/rules binary-syncd-vs
-
+pushd scripts/vs/sonic-sairedis-build
+docker build --no-cache -t docker-sonic-vs:${JOB_NAME##*/}.${BUILD_NUMBER} docker-sonic-vs
 popd
 
-mkdir -p target
-cp *.deb target/
-sudo cp /var/log/syslog target/
-sudo chmod 644 target/syslog
+docker save docker-sonic-vs:${JOB_NAME##*/}.${BUILD_NUMBER} | gzip -c > buildimage/target/docker-sonic-vs.gz

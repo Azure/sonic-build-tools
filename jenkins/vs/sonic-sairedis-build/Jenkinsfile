@@ -1,9 +1,5 @@
 pipeline {
-    agent { node { label 'sonic-slave-buster' } }
-
-    environment {
-        SONIC_TEAM_WEBHOOK = credentials('public-jenkins-builder')
-    }
+    agent { node { label 'jenkins-vstest-workers' } }
 
     stages {
         stage('Prepare') {
@@ -20,30 +16,35 @@ pipeline {
                               userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-sairedis']]])
 
                 }
+                dir('swss') {
+                    checkout([$class: 'GitSCM',
+                              branches: [[name: '*/master']],
+                              userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-swss']]])
+                }
                 copyArtifacts(projectName: 'common/sonic-swss-common-build', filter: '**/*.deb', target: 'common', flatten: true)
-                copyArtifacts(projectName: 'buildimage-vs-all', filter: '**/*.deb', target: 'buildimage', flatten: false)
+                copyArtifacts(projectName: 'vs/buildimage-vs-all', filter: '**/*.deb,**/docker-sonic-vs.gz', target: 'buildimage', flatten: false)
             }
         }
 
         stage('Build') {
             steps {
-                wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+                withCredentials([usernamePassword(credentialsId: 'sonicdev-cr', usernameVariable: 'REGISTRY_USERNAME', passwordVariable: 'REGISTRY_PASSWD')]) {
                     sh './scripts/vs/sonic-sairedis-build/build.sh'
                 }
             }
         }
+
+        stage('Test') {
+            steps {
+                sh './scripts/vs/sonic-swss-build/test.sh'
+            }
+        }
     }
     post {
-        success {
-            archiveArtifacts(artifacts: 'target/*.deb, **/*.log, target/var/log/*')
-        }
-        fixed {
-            slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
-            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_WEBHOOK}")
-        }
-        regression {
-            slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
-            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_WEBHOOK}")
+        always {
+            archiveArtifacts(artifacts: 'buildimage/target/docker-sonic-vs.gz, target/*.deb, **/*.log, target/var/log/*, swss/tests/log/**, swss/tests/tr.xml')
+            junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'swss/tests/tr.xml')
+            cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
         }
     }
 }
