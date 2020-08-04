@@ -23,7 +23,6 @@ sudo pip install pytest-runner==4.4
 sudo pip install xmltodict==0.12.0
 sudo pip install jsondiff==1.2.0
 
-sudo pip3 install buildimage/target/python-wheels/sonic_py_common-1.0-py3-none-any.whl
 sudo pip3 install buildimage/target/python-wheels/sonic_yang_models-1.0-py3-none-any.whl
 
 sudo dpkg -i buildimage/target/debs/buster/libyang_1.0.73_amd64.deb
