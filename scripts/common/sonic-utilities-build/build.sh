@@ -12,9 +12,9 @@ sudo pip install "click>=7.0"
 sudo pip install click-default-group==1.2
 sudo pip install tabulate
 sudo pip install natsort
-sudo pip install buildimage/target/python-wheels/sonic_config_engine-1.0-py2-none-any.whl
 sudo pip install buildimage/target/python-wheels/swsssdk-2.0.1-py2-none-any.whl
 sudo pip install buildimage/target/python-wheels/sonic_py_common-1.0-py2-none-any.whl
+sudo pip install buildimage/target/python-wheels/sonic_config_engine-1.0-py2-none-any.whl
 sudo pip install buildimage/target/python-wheels/sonic_yang_mgmt-1.0-py2-none-any.whl
 sudo pip install mockredispy==2.9.3
 sudo pip install netifaces==0.10.9
