@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 
 # Install HIREDIS
-sudo dpkg -i buildimage/target/debs/stretch/libhiredis*.deb
+sudo apt-get install -y libhiredis0.14 libhiredis-dev
 
 # Install REDIS
 sudo apt-get install -y redis-server
@@ -11,7 +11,7 @@ sudo sed -ri 's/redis-server.sock/redis.sock/' /etc/redis/redis.conf
 sudo service redis-server start
 
 # Install libyang
-sudo dpkg -i buildimage/target/debs/stretch/libyang*.deb
+sudo dpkg -i buildimage/target/debs/buster/libyang*.deb
 
 # Build sonic-mgmt-common first
 
