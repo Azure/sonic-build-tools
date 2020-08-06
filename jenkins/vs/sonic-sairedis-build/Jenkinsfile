@@ -1,6 +1,10 @@
 pipeline {
     agent { node { label 'jenkins-vstest-workers' } }
 
+    triggers {
+        cron('H H/12 * * *')
+    }
+
     stages {
         stage('Prepare') {
             steps {
