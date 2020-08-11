@@ -45,18 +45,6 @@ docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonicdev-microso
 
 cp sonic-utilities/deb_dist/python-sonic-utilities_*.deb buildimage/target/python-debs/
 
-cd sairedis
-cp *.deb ../buildimage/target/debs/buster/
-cd ../
-
-cd swss
-cp *.deb ../buildimage/target/debs/buster/
-cd ../
-
-cd swss-common
-cp *.deb ../buildimage/target/debs/buster/
-cd ../
-
 on_exit()
 {
     sudo umount docker-sonic-vs/debs
