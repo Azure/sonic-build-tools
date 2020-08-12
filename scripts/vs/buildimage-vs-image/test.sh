@@ -25,7 +25,7 @@ gzip -fd $HOME/sonic-vm/images/sonic-vs.img.gz
 ls -l $HOME/sonic-vm/images
 
 cd sonic-mgmt/ansible
-sed -i s:use_own_value:johnar: veos.vtb
+sed -i s:use_own_value:johnar: veos_vtb
 echo abc > password.txt
 cd ../../
 docker run --rm=true -v $(pwd):/data -w /data -i sonicdev-microsoft.azurecr.io:443/docker-sonic-mgmt ./scripts/vs/buildimage-vs-image/runtest.sh $tbname

@@ -28,11 +28,11 @@ chmod 600 .ssh/id_rsa
 
 # Refresh dut in the virtual switch topology
 cd /data/sonic-mgmt/ansible
-./testbed-cli.sh -m veos.vtb -t vtestbed.csv refresh-dut $tbname password.txt
+./testbed-cli.sh -m veos_vtb -t vtestbed.csv refresh-dut $tbname password.txt
 sleep 120
 
 # Create and deploy default vlan configuration (one_vlan_a) to the virtual switch
-./testbed-cli.sh -m veos.vtb -t vtestbed.csv deploy-mg $tbname lab password.txt
+./testbed-cli.sh -m veos_vtb -t vtestbed.csv deploy-mg $tbname lab password.txt
 sleep 180
 
 export ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible/library/
@@ -40,7 +40,7 @@ export ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible/library/
 # workaround for issue https://github.com/Azure/sonic-mgmt/issues/1659
 export export ANSIBLE_KEEP_REMOTE_FILES=1
 
-PYTEST_COMMON_OPTS="--inventory veos.vtb \
+PYTEST_COMMON_OPTS="--inventory veos_vtb \
                     --host-pattern all \
                     --user admin \
                     -vvv \
@@ -92,7 +92,7 @@ popd
 
 # Create and deploy two vlan configuration (two_vlan_a) to the virtual switch
 cd /data/sonic-mgmt/ansible
-./testbed-cli.sh -m veos.vtb -t vtestbed.csv deploy-mg $tbname lab password.txt -e vlan_config=two_vlan_a
+./testbed-cli.sh -m veos_vtb -t vtestbed.csv deploy-mg $tbname lab password.txt -e vlan_config=two_vlan_a
 sleep 180
 
 # Tests to run using two vlan configuration
