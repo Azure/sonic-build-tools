@@ -1,5 +1,9 @@
 pipeline {
-    agent { node { label 'sonic-slave-buster' } }
+    agent { node { label 'jenkins-vstest-workers' } }
+
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
+    }
 
     stages {
         stage('Prepare') {
@@ -10,7 +14,27 @@ pipeline {
                               userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-swss-common',
                                                    refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
                 }
-                copyArtifacts(projectName: 'vs/buildimage-vs-all', filter: '**/*.deb', target: 'buildimage', flatten: false)
+
+                dir('sairedis') {
+                    checkout([$class: 'GitSCM',
+                              branches: [[name: '*/master']],
+                              extensions: [[$class: 'SubmoduleOption',
+                                            disableSubmodules: false,
+                                            parentCredentials: false,
+                                            recursiveSubmodules: true,
+                                            reference: '',
+                                            trackingSubmodules: false]],
+                              userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-sairedis']]])
+
+                }
+
+                dir('swss') {
+                    checkout([$class: 'GitSCM',
+                              branches: [[name: '*/master']],
+                              userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-swss']]])
+                }
+
+                copyArtifacts(projectName: 'vs/buildimage-vs-all', filter: '**/*.deb,**/docker-sonic-vs.gz', target: 'buildimage', flatten: false)
             }
         }
 
@@ -20,16 +44,28 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('swsscommon Unit Tests') {
             steps {
                 sh './scripts/common/sonic-swss-common-build/test.sh'
             }
         }
-    }
-    post {
 
-        success {
-            archiveArtifacts(artifacts: 'target/*.deb')
+        stage('Virtual Switch Tests') {
+            steps {
+                sh './scripts/vs/sonic-swss-build/test.sh'
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts(artifacts: 'target/*swsscommon*.deb, swss/tests/tr.xml')
+            junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'swss/tests/tr.xml')
+            cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
+        }
+
+        failure {
+            archiveArtifacts(artifacts: 'buildimage/target/docker-sonic-vs.gz, **/*.log, target/var/log/*, swss/tests/log/**')
         }
     }
 }
