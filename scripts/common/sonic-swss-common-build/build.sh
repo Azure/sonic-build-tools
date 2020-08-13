@@ -10,7 +10,7 @@ cp *.deb scripts/common/sonic-swss-common-build/docker-sonic-vs/debs
 
 docker load < buildimage/target/docker-sonic-vs.gz
 
-pushd scripts/vs/sonic-swss-common-build
+pushd scripts/common/sonic-swss-common-build
 docker build --no-cache -t docker-sonic-vs:${JOB_NAME##*/}.${BUILD_NUMBER} docker-sonic-vs
 popd
 
