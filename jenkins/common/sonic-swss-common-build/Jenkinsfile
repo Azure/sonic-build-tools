@@ -55,7 +55,9 @@ pipeline {
 
         stage('Virtual Switch Tests') {
             steps {
-                sh './scripts/vs/sonic-swss-build/test.sh'
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    sh './scripts/vs/sonic-swss-build/test.sh'
+                }
             }
         }
     }
