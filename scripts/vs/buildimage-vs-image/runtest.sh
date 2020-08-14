@@ -33,6 +33,7 @@ PYTEST_CLI_COMMON_OPTS="\
 -l warning \
 -m individual \
 -q 1 \
+-a False \
 -e --disable_loganalyzer"
 
 cd /data/sonic-mgmt/tests
