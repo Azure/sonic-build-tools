@@ -86,7 +86,7 @@ sudo cp ../target/sonic-vs.bin /nfs/jenkins/sonic-vs-${JOB_NAME##*/}.${BUILD_NUM
 
             post {
                 always {
-                    junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/logs/**/tr.xml')
+                    junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/logs/**/*.xml')
                     archiveArtifacts(artifacts: 'sonic-mgmt/tests/logs/**')
                 }
 
