@@ -1,25 +1,9 @@
 #!/bin/bash -xe
 
 tbname=$1
-
-run_pytest()
-{
-    tgname=$1
-    shift
-    tests=$@
-
-    echo "run tests: $tests"
-
-    mkdir -p logs/$tgname
-    for tn in ${tests}; do
-        tdir=$(dirname $tn)
-        if [ $tdir != "." ]; then
-            mkdir -p logs/$tgname/$tdir
-            mkdir -p results/$tgname/$tdir
-        fi
-        py.test $PYTEST_COMMON_OPTS --log-file logs/$tgname/$tn.log --junitxml=results/$tgname/$tn.xml $tn.py
-    done
-}
+dut=$2
+inventory="veos_vtb"
+testbed_file="vtestbed.csv"
 
 cd $HOME
 mkdir -p .ssh
@@ -28,11 +12,11 @@ chmod 600 .ssh/id_rsa
 
 # Refresh dut in the virtual switch topology
 cd /data/sonic-mgmt/ansible
-./testbed-cli.sh -m veos_vtb -t vtestbed.csv refresh-dut $tbname password.txt
+./testbed-cli.sh -m $inventory -t $testbed_file refresh-dut $tbname password.txt
 sleep 120
 
 # Create and deploy default vlan configuration (one_vlan_a) to the virtual switch
-./testbed-cli.sh -m veos_vtb -t vtestbed.csv deploy-mg $tbname lab password.txt
+./testbed-cli.sh -m $inventory -t $testbed_file deploy-mg $tbname lab password.txt
 sleep 180
 
 export ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible/library/
@@ -40,68 +24,59 @@ export ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible/library/
 # workaround for issue https://github.com/Azure/sonic-mgmt/issues/1659
 export export ANSIBLE_KEEP_REMOTE_FILES=1
 
-PYTEST_COMMON_OPTS="--inventory veos_vtb \
-                    --host-pattern all \
-                    --user admin \
-                    -vvv \
-                    --show-capture stdout \
-                    --testbed $tbname \
-                    --testbed_file vtestbed.csv \
-                    --disable_loganalyzer \
-                    --log-file-level debug"
+PYTEST_CLI_COMMON_OPTS="\
+-i $inventory \
+-d $dut \
+-n $tbname \
+-f $testbed_file \
+-k debug \
+-l warning \
+-m individual \
+-q 1 \
+-e --disable_loganalyzer"
 
-# Check testbed health
 cd /data/sonic-mgmt/tests
-rm -rf logs results
+rm -rf logs
 mkdir -p logs
-mkdir -p results
-py.test $PYTEST_COMMON_OPTS --log-file logs/test_nbr_health.log --junitxml=results/tr.xml test_nbr_health.py
-
-# Run anounce route test case in order to populate BGP route
-py.test $PYTEST_COMMON_OPTS --log-file logs/test_announce_routes.log --junitxml=results/tr.xml test_announce_routes.py
-
-# Tests to run using one vlan configuration
-tgname=1vlan
-tests="\
-    test_interfaces \
-    pc/test_po_update \
-    bgp/test_bgp_fact \
-    lldp/test_lldp \
-    route/test_default_route \
-    bgp/test_bgp_speaker \
-    bgp/test_bgp_gr_helper \
-    dhcp_relay/test_dhcp_relay \
-    syslog/test_syslog \
-    tacacs/test_rw_user \
-    tacacs/test_ro_user \
-    ntp/test_ntp \
-    cacl/test_cacl_application \
-    cacl/test_cacl_function \
-    telemetry/test_telemetry \
-    snmp/test_snmp_cpu \
-    snmp/test_snmp_interfaces \
-    snmp/test_snmp_lldp \
-    snmp/test_snmp_pfc_counters \
-    snmp/test_snmp_queue
-"
 
 # Run tests_1vlan on vlab-01 virtual switch
+# TODO: Use a marker to select these tests rather than providing a hard-coded list here.
+tgname=1vlan
+tests="\
+test_interfaces.py \
+bgp/test_bgp_fact.py \
+bgp/test_bgp_gr_helper.py \
+bgp/test_bgp_speaker.py \
+cacl/test_cacl_application.py \
+cacl/test_cacl_function.py \
+dhcp_relay/test_dhcp_relay.py \
+lldp/test_lldp.py \
+ntp/test_ntp.py \
+pc/test_po_update.py \
+route/test_default_route.py \
+snmp/test_snmp_cpu.py \
+snmp/test_snmp_interfaces.py \
+snmp/test_snmp_lldp.py \
+snmp/test_snmp_pfc_counters.py \
+snmp/test_snmp_queue.py \
+syslog/test_syslog.py \
+tacacs/test_rw_user.py \
+tacacs/test_ro_user.py \
+telemetry/test_telemetry.py"
+
 pushd /data/sonic-mgmt/tests
-run_pytest $tgname $tests
+./run_tests.sh $PYTEST_CLI_COMMON_OPTS -c "$tests" -p logs/$tgname
 popd
 
 # Create and deploy two vlan configuration (two_vlan_a) to the virtual switch
 cd /data/sonic-mgmt/ansible
-./testbed-cli.sh -m veos_vtb -t vtestbed.csv deploy-mg $tbname lab password.txt -e vlan_config=two_vlan_a
+./testbed-cli.sh -m $inventory -t $testbed_file deploy-mg $tbname lab password.txt -e vlan_config=two_vlan_a
 sleep 180
 
-# Tests to run using two vlan configuration
-tgname=2vlans
-tests="\
-    dhcp_relay/test_dhcp_relay \
-"
-
 # Run tests_2vlans on vlab-01 virtual switch
+tgname=2vlans
+tests="dhcp_relay/test_dhcp_relay.py"
+
 pushd /data/sonic-mgmt/tests
-run_pytest $tgname $tests
+./run_tests.sh $PYTEST_CLI_COMMON_OPTS -c "$tests" -p logs/$tgname
 popd
