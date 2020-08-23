@@ -30,8 +30,7 @@ pipeline {
 
 cd sonic-swss-common
 
-./autogen.sh
-fakeroot debian/rules binary
+dpkg-buildpackage -us -uc -b
 
 cd ../
 
