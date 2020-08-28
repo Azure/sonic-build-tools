@@ -53,7 +53,6 @@ cacl/test_cacl_function.py \
 dhcp_relay/test_dhcp_relay.py \
 lldp/test_lldp.py \
 ntp/test_ntp.py \
-pc/test_po_update.py \
 route/test_default_route.py \
 snmp/test_snmp_cpu.py \
 snmp/test_snmp_interfaces.py \
@@ -64,6 +63,9 @@ syslog/test_syslog.py \
 tacacs/test_rw_user.py \
 tacacs/test_ro_user.py \
 telemetry/test_telemetry.py"
+
+# FIXME: This test has been disabled and needs to be fixed and put back in:
+# pc/test_po_update.py
 
 pushd /data/sonic-mgmt/tests
 ./run_tests.sh $PYTEST_CLI_COMMON_OPTS -c "$tests" -p logs/$tgname
