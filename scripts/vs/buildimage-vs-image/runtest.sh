@@ -62,7 +62,8 @@ snmp/test_snmp_queue.py \
 syslog/test_syslog.py \
 tacacs/test_rw_user.py \
 tacacs/test_ro_user.py \
-telemetry/test_telemetry.py"
+telemetry/test_telemetry.py \
+pc/test_po_cleanup.py"
 
 # FIXME: This test has been disabled and needs to be fixed and put back in:
 # pc/test_po_update.py
