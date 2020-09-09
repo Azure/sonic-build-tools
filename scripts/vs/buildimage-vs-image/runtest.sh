@@ -53,6 +53,7 @@ cacl/test_cacl_function.py \
 dhcp_relay/test_dhcp_relay.py \
 lldp/test_lldp.py \
 ntp/test_ntp.py \
+pc/test_po_cleanup.py \
 route/test_default_route.py \
 snmp/test_snmp_cpu.py \
 snmp/test_snmp_interfaces.py \
