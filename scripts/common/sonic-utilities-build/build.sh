@@ -31,8 +31,8 @@ sudo dpkg -i buildimage/target/debs/buster/python2-yang_1.0.73_amd64.deb
 
 cd sonic-utilities
 
-# Test building the Debian package
-sudo python setup.py --command-packages=stdeb.command bdist_deb
+# Test building the Python wheel
+sudo python setup.py bdist_wheel
 
 EOF
 
@@ -43,7 +43,7 @@ docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWD sonicdev-microsoft.azurec
 docker pull sonicdev-microsoft.azurecr.io:443/sonic-slave-buster-johnar:latest
 docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonicdev-microsoft.azurecr.io:443/sonic-slave-buster-johnar ./build_sonic_utilities.sh
 
-cp sonic-utilities/deb_dist/python-sonic-utilities_*.deb buildimage/target/python-debs/
+cp sonic-utilities/dist/sonic_utilities-*.whl buildimage/target/python-wheels/
 
 cd sairedis
 cp *.deb ../buildimage/target/debs/buster/
