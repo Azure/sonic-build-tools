@@ -4,7 +4,7 @@
 sudo apt-get install -y libhiredis0.14 libhiredis-dev
 
 # Install libzmq
-sudo apt-get install -y libzmq-dev
+sudo apt-get install -y libzmq3-dev
 
 # Install libnl3
 sudo dpkg -i buildimage/target/debs/buster/libnl-3-200_*.deb
