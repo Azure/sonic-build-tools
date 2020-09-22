@@ -64,7 +64,6 @@ on_exit()
 {
     sudo umount docker-sonic-vs/debs
     sudo umount docker-sonic-vs/files
-    sudo umount docker-sonic-vs/python-debs
     sudo umount docker-sonic-vs/python-wheels
 }
 trap on_exit EXIT
