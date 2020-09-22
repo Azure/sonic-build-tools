@@ -72,11 +72,9 @@ trap on_exit EXIT
 cd buildimage/platform/vs
 mkdir -p docker-sonic-vs/debs
 mkdir -p docker-sonic-vs/files
-mkdir -p docker-sonic-vs/python-debs
 mkdir -p docker-sonic-vs/python-wheels
 sudo mount --bind ../../target/debs/buster docker-sonic-vs/debs
 sudo mount --bind ../../target/files/buster docker-sonic-vs/files
-sudo mount --bind ../../target/python-debs docker-sonic-vs/python-debs
 sudo mount --bind ../../target/python-wheels docker-sonic-vs/python-wheels
 docker load < ../../target/docker-config-engine-buster.gz
 docker build --no-cache -t docker-sonic-vs:${JOB_NAME##*/}.${BUILD_NUMBER} docker-sonic-vs
