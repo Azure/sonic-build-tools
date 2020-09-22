@@ -31,7 +31,10 @@ sudo dpkg -i buildimage/target/debs/buster/python2-yang_1.0.73_amd64.deb
 
 cd sonic-utilities
 
-# Test building the Python wheel
+# Run unit tests
+sudo python setup.py test
+
+# Build the Python wheel
 sudo python setup.py bdist_wheel
 
 EOF
