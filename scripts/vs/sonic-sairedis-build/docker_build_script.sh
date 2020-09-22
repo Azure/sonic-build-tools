@@ -18,6 +18,9 @@ sudo dpkg -i buildimage/target/debs/buster/libnl-nf-3-dev_*.deb
 sudo dpkg -i buildimage/target/debs/buster/libnl-cli-3-200_*.deb
 sudo dpkg -i buildimage/target/debs/buster/libnl-cli-3-dev_*.deb
 
+# Instal libboost
+sudo apt-get install -y libboost-all-dev
+
 # Install common library
 sudo dpkg -i common/libswsscommon_*.deb
 sudo dpkg -i common/libswsscommon-dev_*.deb
