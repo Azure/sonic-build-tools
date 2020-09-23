@@ -1,0 +1,61 @@
+pipeline {
+    agent { node { label 'sonic-slave' } }
+
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
+    }
+
+    environment {
+        SONIC_TEAM_WEBHOOK = credentials('public-jenkins-builder')
+    }
+
+    triggers {
+        cron('H * * * *')
+    }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                checkout([$class: 'GitSCM',
+                          branches: [[name: 'refs/heads/master']],
+                          extensions: [[$class: 'SubmoduleOption',
+                                        disableSubmodules: false,
+                                        parentCredentials: false,
+                                        recursiveSubmodules: true,
+                                        reference: '',
+                                        trackingSubmodules: false],
+                                        [$class: 'LocalBranch',
+                                        localBranch: "**"]],
+                          userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-py-swsssdk']]])
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''#!/bin/bash -x
+python2 setup.py bdist_wheel
+python3 setup.py bdist_wheel
+mkdir -p target/python-wheels/
+cp dist/swsssdk-2.0.1-{py2,py3}-none-any.whl target/python-wheels/
+'''
+            }
+        }
+
+    }
+    post {
+        success {
+            archiveArtifacts(artifacts: 'target/python-wheels/*.whl', fingerprint: true)
+        }
+        fixed {
+            slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_WEBHOOK}")
+        }
+        regression {
+            slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_WEBHOOK}")
+        }
+        cleanup {
+            cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
+        }
+    }
+}
