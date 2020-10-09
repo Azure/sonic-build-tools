@@ -7,6 +7,9 @@
 STATUS=0
 DEBDIR=$(realpath sonic-mgmt-common/debian/sonic-mgmt-common)
 
+[[ -f sonic-mgmt-common/tools/test/database_config.json ]] && \
+    export DB_CONFIG_PATH=${PWD}/sonic-mgmt-common/tools/test/database_config.json
+
 pushd sonic-mgmt-framework/build/tests/rest
 
 export CVL_SCHEMA_PATH=${DEBDIR}/usr/sbin/schema
