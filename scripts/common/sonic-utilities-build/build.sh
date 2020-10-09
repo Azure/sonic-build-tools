@@ -6,22 +6,11 @@ cat <<EOF > build_sonic_utilities.sh
 #!/bin/bash -xe
 ls -lrt
 
-# TODO: Clean this section up. Remove packages which get installed implicitly by sonic-utilities/setup.py
-sudo apt-get install python-m2crypto
-sudo apt-get -y purge python-click
-sudo pip install "click>=7.0"
-sudo pip install tabulate
-sudo pip install natsort
+sudo pip install --upgrade setuptools
 sudo pip install buildimage/target/python-wheels/swsssdk-2.0.1-py2-none-any.whl
 sudo pip install buildimage/target/python-wheels/sonic_py_common-1.0-py2-none-any.whl
 sudo pip install buildimage/target/python-wheels/sonic_config_engine-1.0-py2-none-any.whl
 sudo pip install buildimage/target/python-wheels/sonic_yang_mgmt-1.0-py2-none-any.whl
-sudo pip install mockredispy==2.9.3
-sudo pip install netifaces==0.10.9
-sudo pip install --upgrade setuptools
-sudo pip install pytest-runner==4.4
-sudo pip install xmltodict==0.12.0
-sudo pip install jsondiff==1.2.0
 
 sudo pip3 install buildimage/target/python-wheels/sonic_yang_models-1.0-py3-none-any.whl
 
