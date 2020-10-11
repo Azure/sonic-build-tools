@@ -44,6 +44,7 @@ mkdir -p logs
 # TODO: Use a marker to select these tests rather than providing a hard-coded list here.
 tgname=1vlan
 tests="\
+monit/test_monit_status.py \
 test_interfaces.py \
 bgp/test_bgp_fact.py \
 bgp/test_bgp_gr_helper.py \
