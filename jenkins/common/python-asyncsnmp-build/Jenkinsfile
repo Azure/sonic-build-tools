@@ -11,7 +11,7 @@ pipeline {
     }
 
     triggers {
-        upstream 'python-swssdk-build'
+        upstream 'python-swsssdk-build'
         pollSCM 'H * * * *'
     }
 
