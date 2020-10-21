@@ -14,6 +14,7 @@ pipeline {
     stages {
         stage('Prepare') {
             steps {
+                milestone(ordinal: 1, label: "BUILD_START_MILESTONE")
                 cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
                 checkout([$class: 'GitSCM',
                           branches: [[name: 'refs/heads/201911']],
