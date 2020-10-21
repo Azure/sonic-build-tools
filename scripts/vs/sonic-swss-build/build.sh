@@ -9,7 +9,6 @@ docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonicdev-microso
 mkdir -p scripts/vs/sonic-swss-build/debs
 cp sairedis/libsai*.deb sairedis/syncd-vs_1.0.0_amd64.deb scripts/vs/sonic-swss-build/debs
 cp common/*swsscommon*.deb scripts/vs/sonic-swss-build/debs
-cp utilities/*.deb scripts/vs/sonic-swss-build/debs
 cp *.deb scripts/vs/sonic-swss-build/debs
 
 docker load < buildimage/target/docker-sonic-vs.gz

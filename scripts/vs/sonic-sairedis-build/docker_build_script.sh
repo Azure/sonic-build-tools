@@ -4,7 +4,7 @@
 sudo apt-get install -y libhiredis0.14 libhiredis-dev
 
 # Install libzmq
-sudo apt-get install -y libzmq3-dev
+sudo apt-get install -y libzmq5 libzmq3-dev
 
 # Install libnl3
 sudo dpkg -i buildimage/target/debs/buster/libnl-3-200_*.deb
@@ -17,6 +17,9 @@ sudo dpkg -i buildimage/target/debs/buster/libnl-nf-3-200_*.deb
 sudo dpkg -i buildimage/target/debs/buster/libnl-nf-3-dev_*.deb
 sudo dpkg -i buildimage/target/debs/buster/libnl-cli-3-200_*.deb
 sudo dpkg -i buildimage/target/debs/buster/libnl-cli-3-dev_*.deb
+
+# Instal libboost
+sudo apt-get install -y libboost-all-dev
 
 # Install common library
 sudo dpkg -i common/libswsscommon_*.deb
