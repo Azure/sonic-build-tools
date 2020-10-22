@@ -3,13 +3,11 @@ pipeline {
 
     options {
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '20'))
-
     }
 
     triggers {
         pollSCM('H */12 * * *')
     }
-
 
     stages {
         stage('Prepare') {
@@ -42,10 +40,9 @@ make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-aboot-broadcom.swi
 '''
             }
         }
-
     }
-    post {
 
+    post {
         success {
             archiveArtifacts(artifacts: 'target/**')
         }
