@@ -2,7 +2,7 @@ pipeline {
     agent { node { label 'sonic-slave' } }
 
     options {
-        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '20'))
     }
 
     environment {
@@ -10,7 +10,7 @@ pipeline {
     }
 
     triggers {
-        cron('H * * * *')
+        pollSCM('H * * * *')
     }
 
     stages {
