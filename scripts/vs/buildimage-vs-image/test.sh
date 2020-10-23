@@ -28,7 +28,7 @@ cd sonic-mgmt/ansible
 sed -i s:use_own_value:johnar: veos_vtb
 echo abc > password.txt
 cd ../../
-docker run --rm=true -v $(pwd):/data -w /data -i sonicdev-microsoft.azurecr.io:443/docker-sonic-mgmt ./scripts/vs/buildimage-vs-image/runtest.sh $tbname $dut
+docker run --rm=true -v $(pwd):/data -w /data -i sonicdev-microsoft.azurecr.io:443/docker-sonic-mgmt bash -c "if [ -x /data/sonic-mgmt/tests/kvmtest.sh ]; then /data/sonic-mgmt/tests/kvmtest.sh $tbname $dut; else ./scripts/vs/buildimage-vs-image/runtest.sh $tbname $dut; fi"
 
 # save dut state if test fails
 if [ $? != 0 ]; then
