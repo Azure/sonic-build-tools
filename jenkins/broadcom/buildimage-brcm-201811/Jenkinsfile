@@ -1,0 +1,59 @@
+pipeline {
+    agent { node { label 'jenkins-workers-slow' } }
+
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '20'))
+    }
+
+    triggers {
+        pollSCM('H */12 * * *')
+    }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                milestone(ordinal: 1, label: "BUILD_START_MILESTONE")
+                cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
+                checkout([$class: 'GitSCM',
+                          branches: [[name: 'refs/heads/201811']],
+                          extensions: [[$class: 'SubmoduleOption',
+                                        disableSubmodules: false,
+                                        parentCredentials: false,
+                                        recursiveSubmodules: true,
+                                        reference: '',
+                                        trackingSubmodules: false],
+                                       [$class: 'LocalBranch',
+                                        localBranch: "**"]],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage']]])
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''#!/bin/bash
+
+git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
+
+make configure PLATFORM=broadcom
+make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-broadcom.bin
+make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-aboot-broadcom.swi
+'''
+            }
+        }
+    }
+
+    post {
+        success {
+            archiveArtifacts(artifacts: 'target/**')
+        }
+        fixed {
+            slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        regression {
+            slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        cleanup {
+            cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
+        }
+    }
+}
