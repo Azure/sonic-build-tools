@@ -3,7 +3,7 @@ pipeline {
 
     options {
         timestamps()
-        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '20'))
     }
 
     environment {
@@ -11,7 +11,7 @@ pipeline {
     }
 
     triggers {
-        upstream 'python-swssdk-build'
+        upstream 'python-swsssdk-build'
         pollSCM 'H * * * *'
     }
 
@@ -25,7 +25,7 @@ pipeline {
                               extensions: [[$class: 'SubmoduleOption', disableSubmodules: false, parentCredentials: false, recursiveSubmodules: true, reference: '', trackingSubmodules: false]],
                               submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-snmpagent']]])
 
-                    copyArtifacts filter: 'target/python-wheels/*-py3-*.whl', fingerprintArtifacts: true, flatten: true, projectName: 'python-swssdk-build', target: 'target/python-wheels/'
+                    copyArtifacts filter: 'target/python-wheels/*-py3-*.whl', fingerprintArtifacts: true, flatten: true, projectName: 'python-swsssdk-build', target: 'target/python-wheels/'
                     copyArtifacts filter: 'target/debs/stretch/*.deb', fingerprintArtifacts: true, flatten: true, projectName: 'dep-build', target: 'target/debs/'
                 }
             }
