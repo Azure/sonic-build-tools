@@ -6,11 +6,11 @@ cat <<EOF > build_sonic_utilities.sh
 #!/bin/bash -xe
 ls -lrt
 
-sudo pip install --upgrade setuptools
-sudo pip install buildimage/target/python-wheels/swsssdk-2.0.1-py2-none-any.whl
-sudo pip install buildimage/target/python-wheels/sonic_py_common-1.0-py2-none-any.whl
-sudo pip install buildimage/target/python-wheels/sonic_config_engine-1.0-py2-none-any.whl
-sudo pip install buildimage/target/python-wheels/sonic_yang_mgmt-1.0-py2-none-any.whl
+sudo pip2 install --upgrade setuptools
+sudo pip2 install buildimage/target/python-wheels/swsssdk-2.0.1-py2-none-any.whl
+sudo pip2 install buildimage/target/python-wheels/sonic_py_common-1.0-py2-none-any.whl
+sudo pip2 install buildimage/target/python-wheels/sonic_config_engine-1.0-py2-none-any.whl
+sudo pip2 install buildimage/target/python-wheels/sonic_yang_mgmt-1.0-py2-none-any.whl
 
 sudo pip3 install buildimage/target/python-wheels/sonic_yang_models-1.0-py3-none-any.whl
 
@@ -21,10 +21,10 @@ sudo dpkg -i buildimage/target/debs/buster/python2-yang_1.0.73_amd64.deb
 cd sonic-utilities
 
 # Run unit tests
-sudo python setup.py test
+sudo python2 setup.py test
 
 # Build the Python wheel
-sudo python setup.py bdist_wheel
+sudo python2 setup.py bdist_wheel
 
 EOF
 
