@@ -19,6 +19,7 @@ sudo dpkg -i buildimage/target/debs/buster/libyang-cpp_1.0.73_amd64.deb
 sudo dpkg -i buildimage/target/debs/buster/python2-yang_1.0.73_amd64.deb
 sudo dpkg -i buildimage/target/debs/buster/libswsscommon_1.0.0_amd64.deb
 sudo dpkg -i buildimage/target/debs/buster/python-swsscommon_1.0.0_amd64.deb
+sudo dpkg -i buildimage/target/debs/buster/python3-swsscommon_1.0.0_amd64.deb
 
 cd sonic-utilities
 
