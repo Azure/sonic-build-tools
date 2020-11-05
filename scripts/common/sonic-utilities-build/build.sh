@@ -17,8 +17,10 @@ sudo pip3 install buildimage/target/python-wheels/sonic_yang_models-1.0-py3-none
 sudo dpkg -i buildimage/target/debs/buster/libyang_1.0.73_amd64.deb
 sudo dpkg -i buildimage/target/debs/buster/libyang-cpp_1.0.73_amd64.deb
 sudo dpkg -i buildimage/target/debs/buster/python2-yang_1.0.73_amd64.deb
-sudo dpkg -i buildimage/target/debs/buster/libswsscommon_1.0.0_amd64.deb
+
+# Below is required for swsscommon
 sudo dpkg -i buildimage/target/debs/buster/{libnl-3-200_*.deb,libnl-genl-3-200_*.deb,libnl-nf-3-200_*.deb,libnl-route-3-200_*.deb,libhiredis0.14_*.deb}
+sudo dpkg -i buildimage/target/debs/buster/libswsscommon_1.0.0_amd64.deb
 sudo dpkg -i buildimage/target/debs/buster/python-swsscommon_1.0.0_amd64.deb
 sudo dpkg -i buildimage/target/debs/buster/python3-swsscommon_1.0.0_amd64.deb
 
