@@ -38,12 +38,12 @@ git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --rel
 
 make configure PLATFORM=vs
 
-echo "NUM_ASIC=6" > ./device/virtual/x86_64-kvm_x86_64-r0/asic.conf
+sudo bash -c "echo "NUM_ASIC=6" > ./device/virtual/x86_64-kvm_x86_64-r0/asic.conf"
 
 sudo bash -c "echo 1 > /proc/sys/vm/compact_memory"
 
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-vs.img.gz
-cp target/sonic-vs.img.gz target/sonic-multiasic-vs.img.gz
+mv target/sonic-vs.img.gz target/sonic-multiasic-vs.img.gz
 '''
             }
         }
