@@ -6,43 +6,29 @@ cat <<EOF > build_sonic_utilities.sh
 #!/bin/bash -xe
 ls -lrt
 
-sudo pip2 install --upgrade setuptools
 sudo pip3 install --upgrade setuptools
-sudo pip2 install buildimage/target/python-wheels/swsssdk-2.0.1-py2-none-any.whl
 sudo pip3 install buildimage/target/python-wheels/swsssdk-2.0.1-py3-none-any.whl
-sudo pip2 install buildimage/target/python-wheels/sonic_py_common-1.0-py2-none-any.whl
 sudo pip3 install buildimage/target/python-wheels/sonic_py_common-1.0-py3-none-any.whl
-sudo pip2 install buildimage/target/python-wheels/sonic_config_engine-1.0-py2-none-any.whl
 sudo pip3 install buildimage/target/python-wheels/sonic_config_engine-1.0-py3-none-any.whl
-sudo pip2 install buildimage/target/python-wheels/sonic_yang_mgmt-1.0-py2-none-any.whl
 sudo pip3 install buildimage/target/python-wheels/sonic_yang_mgmt-1.0-py3-none-any.whl
-
 sudo pip3 install buildimage/target/python-wheels/sonic_yang_models-1.0-py3-none-any.whl
 
 sudo dpkg -i buildimage/target/debs/buster/libyang_1.0.73_amd64.deb
 sudo dpkg -i buildimage/target/debs/buster/libyang-cpp_1.0.73_amd64.deb
-sudo dpkg -i buildimage/target/debs/buster/python2-yang_1.0.73_amd64.deb
 sudo dpkg -i buildimage/target/debs/buster/python3-yang_1.0.73_amd64.deb
 
 # Below is required for swsscommon
 sudo dpkg -i buildimage/target/debs/buster/{libnl-3-200_*.deb,libnl-genl-3-200_*.deb,libnl-nf-3-200_*.deb,libnl-route-3-200_*.deb,libhiredis0.14_*.deb}
 sudo dpkg -i buildimage/target/debs/buster/libswsscommon_1.0.0_amd64.deb
-sudo dpkg -i buildimage/target/debs/buster/python-swsscommon_1.0.0_amd64.deb
 sudo dpkg -i buildimage/target/debs/buster/python3-swsscommon_1.0.0_amd64.deb
 
 cd sonic-utilities
 
 # Run unit tests
-sudo python3 setup.py test || true
+sudo python3 setup.py test
 
 # Build the Python wheel
-sudo python3 setup.py bdist_wheel || true
-
-# Run unit tests
-sudo python2 setup.py test
-
-# Build the Python wheel
-sudo python2 setup.py bdist_wheel
+sudo python3 setup.py bdist_wheel
 
 EOF
 
