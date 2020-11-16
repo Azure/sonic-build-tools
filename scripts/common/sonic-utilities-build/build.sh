@@ -34,7 +34,7 @@ EOF
 
 chmod 755 build_sonic_utilities.sh
 
-# Build sonic-utilities and copy resulting Debian package
+# Build sonic-utilities and copy resulting Python wheel
 docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWD sonicdev-microsoft.azurecr.io:443
 docker pull sonicdev-microsoft.azurecr.io:443/sonic-slave-buster-johnar:latest
 docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonicdev-microsoft.azurecr.io:443/sonic-slave-buster-johnar ./build_sonic_utilities.sh
