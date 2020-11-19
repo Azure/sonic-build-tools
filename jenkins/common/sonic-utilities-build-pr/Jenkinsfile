@@ -12,7 +12,7 @@ pipeline {
                 }
 
                 script {
-                    if ('${ghprbTargetBranch}' == '201911') {
+                    if ('${env.ghprbTargetBranch}' == '201911') {
                         copyArtifacts(projectName: 'vs/buildimage-vs-201911', filter: '**/*', target: 'buildimage', flatten: false)
                     } else {
                         copyArtifacts(projectName: 'common/sonic-swss-common-build', filter: '**/*.deb', target: 'swss-common', flatten: true)
@@ -28,7 +28,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'sonicdev-cr', usernameVariable: 'REGISTRY_USERNAME', passwordVariable: 'REGISTRY_PASSWD')]) {
                     script {
-                        if ('${ghprbTargetBranch}' == '201911') {
+                        if ('${env.ghprbTargetBranch}' == '201911') {
                             sh './scripts/common/sonic-utilities-build/build_201911.sh'
                         } else {
                             sh './scripts/common/sonic-utilities-build/build.sh'
@@ -51,7 +51,7 @@ pipeline {
                 wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
                     script {
                         /* We will only run SwSS tests against master branch PRs */
-                        if ('${ghprbTargetBranch}' == 'master') {
+                        if ('${env.ghprbTargetBranch}' == 'master') {
                             sh './scripts/common/sonic-utilities-build/test.sh'
                         }
                     }
