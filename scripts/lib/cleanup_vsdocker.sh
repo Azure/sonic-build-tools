@@ -12,7 +12,7 @@ while read -r img name date time tshift tzname cmd status; do
             echo "remove base container $name"
             docker rm -f $name
             ip netns list | grep ${name}-srv | awk '{print $1}' | xargs -I {} sudo ip netns delete {}
-        elif [[ $cmd == "\"/usr/bin/supervisord\"" ]]; then
+        elif [[ $cmd == "\"/usr/bin/supervisord\"" || $cmd =~ \"/usr/local/bin/supe.*\" ]]; then
             echo "remove vs container $name"
             docker rm -f $name
         fi
