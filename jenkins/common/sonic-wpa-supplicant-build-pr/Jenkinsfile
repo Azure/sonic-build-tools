@@ -1,0 +1,33 @@
+pipeline {
+    agent { node { label 'sonic-slave-buster' } }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                dir('sonic-wpa-supplicant') {
+                    checkout([$class: 'GitSCM',
+                          branches: [[name: '${sha1}']],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-wpa-supplicant',
+                                               refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
+                }
+                dir('sonic-mgmt-common') {
+                    checkout([$class: 'GitSCM',
+                          branches: [[name: 'refs/heads/master']],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-mgmt-common']]])
+                }
+                copyArtifacts(projectName: 'vs/buildimage-vs-all', filter: '**/*.deb', target: 'buildimage', flatten: false)
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh './scripts/common/sonic-wpa-supplicant/build.sh'
+            }
+        }
+    }
+    post {
+        success {
+            archiveArtifacts(artifacts: 'target/*.deb')
+        }
+    }
+}
