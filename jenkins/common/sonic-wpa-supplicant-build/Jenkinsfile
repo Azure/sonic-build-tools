@@ -27,7 +27,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh './scripts/common/sonic-wpa-supplicant/build.sh'
+                sh './scripts/common/sonic-wpa-supplicant-build/build.sh'
             }
         }
     }
