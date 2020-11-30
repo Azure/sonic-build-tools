@@ -16,7 +16,7 @@ sudo pip2 install natsort
 sudo pip2 install buildimage/target/python-wheels/swsssdk-2.0.1-py2-none-any.whl
 sudo pip2 install buildimage/target/python-wheels/sonic_py_common-1.0-py2-none-any.whl
 sudo pip2 install buildimage/target/python-wheels/sonic_config_engine-1.0-py2-none-any.whl
-sudo pip2 install mock==4.0.2
+sudo pip2 install mock==3.0.5
 sudo pip2 install mockredispy==2.9.3
 sudo pip2 install netifaces==0.10.9
 sudo pip2 install pytest-runner==4.4
