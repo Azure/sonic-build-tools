@@ -39,6 +39,7 @@ pipeline {
                       make SONIC_BUILD_JOBS=4 INSTALL_DEBUG_TOOLS=y NOJESSIE=1 target/sonic-centec-arm64.bin
                       mv target/sonic-centec-arm64.bin target/sonic-centec-dbg.bin
                       make SONIC_BUILD_JOBS=4 NOJESSIE=1 target/sonic-centec-arm64.bin
+                      sudo docker -H unix:///var/run/march/docker.sock system prune -f
                       '''
             }
         }
