@@ -63,7 +63,7 @@ sudo cp ../target/sonic-vs.bin /nfs/jenkins/sonic-vs-${JOB_NAME##*/}.${BUILD_NUM
                           extensions: [[$class: 'SubmoduleOption',
                                         disableSubmodules: false,
                                         parentCredentials: false,
-                                        recursiveSubmodules: false,
+                                        recursiveSubmodules: true,
                                         reference: '',
                                         trackingSubmodules: false]],
                           userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage',
