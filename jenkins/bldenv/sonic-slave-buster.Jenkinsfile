@@ -7,6 +7,7 @@ pipeline {
 
     environment {
         DISTRO = 'buster'
+        ARCH = 'amd64'
         SONIC_TEAM_WEBHOOK = credentials('public-jenkins-builder')
     }
 
