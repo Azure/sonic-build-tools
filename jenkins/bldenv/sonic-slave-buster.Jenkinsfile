@@ -1,5 +1,5 @@
 pipeline {
-    agent { node { label 'jenkins-worker-1' } }
+    agent { node { label 'jenkins-workers-slow' } }
 
     options {
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
@@ -7,7 +7,6 @@ pipeline {
 
     environment {
         DISTRO = 'buster'
-        ARCH = 'amd64'
         SONIC_TEAM_WEBHOOK = credentials('public-jenkins-builder')
     }
 
