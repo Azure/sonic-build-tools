@@ -3,6 +3,7 @@ pipeline {
 
     options {
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
+        disableConcurrentBuilds()
     }
 
     environment {
@@ -38,9 +39,9 @@ pipeline {
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 export DOCKER_DATA_ROOT_FOR_MULTIARCH=/data/march/docker
 make configure PLATFORM=marvell-armhf PLATFORM_ARCH=armhf
-make SONIC_CONFIG_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y target/sonic-marvell-armhf.bin
+make SONIC_CONFIG_BUILD_JOBS=4 INSTALL_DEBUG_TOOLS=y target/sonic-marvell-armhf.bin || make SONIC_CONFIG_BUILD_JOBS=2 INSTALL_DEBUG_TOOLS=y target/sonic-marvell-armhf.bin || make SONIC_CONFIG_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y target/sonic-marvell-armhf.bin
 mv target/sonic-marvell-armhf.bin target/sonic-marvell-armhf-dbg.bin
-make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-marvell-armhf.bin
+make SONIC_CONFIG_BUILD_JOBS=4 target/sonic-marvell-armhf.bin || make SONIC_CONFIG_BUILD_JOBS=2 target/sonic-marvell-armhf.bin || make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-marvell-armhf.bin
 sudo docker -H unix:///var/run/march/docker.sock system prune -f
 '''
             }
