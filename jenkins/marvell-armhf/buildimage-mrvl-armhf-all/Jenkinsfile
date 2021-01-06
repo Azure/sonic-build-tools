@@ -39,10 +39,19 @@ pipeline {
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 export DOCKER_DATA_ROOT_FOR_MULTIARCH=/data/march/docker
 make configure PLATFORM=marvell-armhf PLATFORM_ARCH=armhf
-make SONIC_BUILD_JOBS=4 INSTALL_DEBUG_TOOLS=y target/sonic-marvell-armhf.bin || make SONIC_BUILD_JOBS=2 INSTALL_DEBUG_TOOLS=y target/sonic-marvell-armhf.bin || make SONIC_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y target/sonic-marvell-armhf.bin
-mv target/sonic-marvell-armhf.bin target/sonic-marvell-armhf-dbg.bin
+#
+# Skip debug build for now until build time improvements can be made
+# make SONIC_BUILD_JOBS=4 INSTALL_DEBUG_TOOLS=y target/sonic-marvell-armhf.bin || make SONIC_BUILD_JOBS=2 INSTALL_DEBUG_TOOLS=y target/sonic-marvell-armhf.bin || make SONIC_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y target/sonic-marvell-armhf.bin
+# mv target/sonic-marvell-armhf.bin target/sonic-marvell-armhf-dbg.bin
+#
+# Build as much as we can concurrently, backing off if failure
 make SONIC_BUILD_JOBS=4 target/sonic-marvell-armhf.bin || make SONIC_BUILD_JOBS=2 target/sonic-marvell-armhf.bin || make SONIC_BUILD_JOBS=1 target/sonic-marvell-armhf.bin
-sudo docker -H unix:///var/run/march/docker.sock system prune -f
+#
+# Cleanup for next build (dockerd and docker multi-arch artifacts)
+if sudo [ -f dockerfs/var/run/docker.pid ] ; then
+    pid=`sudo cat dockerfs/var/run/docker.pid` ; sudo kill $pid
+fi
+sudo rm -rf ${DOCKER_DATA_ROOT_FOR_MULTIARCH}
 '''
             }
         }
