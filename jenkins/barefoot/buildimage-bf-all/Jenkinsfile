@@ -39,7 +39,6 @@ pipeline {
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
 make configure PLATFORM=barefoot
-BLDENV=stretch make stretch
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-barefoot.bin
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-aboot-barefoot.swi
 '''
