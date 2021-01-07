@@ -12,7 +12,7 @@ cp common/*swsscommon*_1.0.0_amd64.deb scripts/vs/sonic-sairedis-build/docker-so
 
 docker load < buildimage/target/docker-sonic-vs.gz
 
-pushd scripts/vs/sonic-sairedis-build
+pushd scripts/vs/sonic-swss-build
 docker build --no-cache -t docker-sonic-vs:${JOB_NAME##*/}.${BUILD_NUMBER} docker-sonic-vs
 popd
 
