@@ -1,0 +1,77 @@
+pipeline {
+    agent { node { label 'jenkins-workers-slow' } }
+
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
+        disableConcurrentBuilds()
+    }
+
+    environment {
+        SONIC_TEAM_WEBHOOK = credentials('public-jenkins-builder')
+    }
+
+    triggers {
+        pollSCM('@midnight')
+    }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                step([$class: 'WsCleanup'])
+                checkout([$class: 'GitSCM',
+                          branches: [[name: 'refs/heads/202012']],
+                          extensions: [[$class: 'SubmoduleOption',
+                                        disableSubmodules: false,
+                                        parentCredentials: false,
+                                        recursiveSubmodules: true,
+                                        reference: '',
+                                        trackingSubmodules: false],
+                                       [$class: 'LocalBranch',
+                                        localBranch: "**"]],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage']]])
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''#!/bin/bash -xe
+
+git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
+export DOCKER_DATA_ROOT_FOR_MULTIARCH=/data/march/docker
+make configure PLATFORM=marvell-armhf PLATFORM_ARCH=armhf
+#
+# Skip debug build for now until build time improvements can be made
+# make SONIC_BUILD_JOBS=4 INSTALL_DEBUG_TOOLS=y target/sonic-marvell-armhf.bin || make SONIC_BUILD_JOBS=2 INSTALL_DEBUG_TOOLS=y target/sonic-marvell-armhf.bin || make SONIC_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y target/sonic-marvell-armhf.bin
+# mv target/sonic-marvell-armhf.bin target/sonic-marvell-armhf-dbg.bin
+#
+# Build as much as we can concurrently, backing off if failure
+make SONIC_BUILD_JOBS=4 target/sonic-marvell-armhf.bin || make SONIC_BUILD_JOBS=2 target/sonic-marvell-armhf.bin || make SONIC_BUILD_JOBS=1 target/sonic-marvell-armhf.bin
+#
+# Cleanup for next build (dockerd and docker multi-arch artifacts)
+if sudo [ -f dockerfs/var/run/docker.pid ] ; then
+    pid=`sudo cat dockerfs/var/run/docker.pid` ; sudo kill $pid
+fi
+sudo rm -rf ${DOCKER_DATA_ROOT_FOR_MULTIARCH}
+'''
+            }
+        }
+
+    }
+    post {
+
+        success {
+            archiveArtifacts(artifacts: 'target/**')
+        }
+        fixed {
+            slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_WEBHOOK}")
+        }
+        regression {
+            slackSend(color:'#FF0000', message: "Build job Regression: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            office365ConnectorSend(webhookUrl: "${env.SONIC_TEAM_WEBHOOK}")
+        }
+        cleanup {
+            cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
+        }
+    }
+}
