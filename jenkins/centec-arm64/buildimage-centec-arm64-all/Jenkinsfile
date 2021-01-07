@@ -37,10 +37,15 @@ pipeline {
                       git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
                       export DOCKER_DATA_ROOT_FOR_MULTIARCH=/data/march/docker
                       make configure PLATFORM=centec-arm64 PLATFORM_ARCH=arm64
-                      make SONIC_BUILD_JOBS=4 INSTALL_DEBUG_TOOLS=y target/sonic-centec-arm64.bin
-                      mv target/sonic-centec-arm64.bin target/sonic-centec-dbg.bin
-                      make SONIC_BUILD_JOBS=4 NOJESSIE=1 target/sonic-centec-arm64.bin
-                      sudo docker -H unix:///var/run/march/docker.sock system prune -f
+                      #Skip debug build until build time improvements can be made
+                      #make SONIC_BUILD_JOBS=4 INSTALL_DEBUG_TOOLS=y target/sonic-centec-arm64.bin
+                      #mv target/sonic-centec-arm64.bin target/sonic-centec-dbg.bin
+                      make SONIC_BUILD_JOBS=4 target/sonic-centec-arm64.bin || make SONIC_BUILD_JOBS=2 target/sonic-centec-arm64.bin || make SONIC_BUILD_JOBS=1 target/sonic-centec-arm64.bin
+                      # Cleanup for next build (dockerd and docker multi-arch artifacts)
+                      if sudo [ -f dockerfs/var/run/docker.pid ] ; then
+                          pid=`sudo cat dockerfs/var/run/docker.pid` ; sudo kill $pid
+                      fi
+                      sudo rm -rf ${DOCKER_DATA_ROOT_FOR_MULTIARCH}
                       '''
             }
         }
