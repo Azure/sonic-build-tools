@@ -33,6 +33,7 @@ pipeline {
 
         stage('Build') {
             steps {
+              lock(resource: "arm_build_${env.NODE_NAME}") {
                 sh '''#!/bin/bash -xe
                       git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
                       export DOCKER_DATA_ROOT_FOR_MULTIARCH=/data/march/docker
@@ -46,7 +47,8 @@ pipeline {
                           pid=`sudo cat dockerfs/var/run/docker.pid` ; sudo kill $pid
                       fi
                       sudo rm -rf ${DOCKER_DATA_ROOT_FOR_MULTIARCH}
-                      '''
+                   '''
+              }
             }
         }
 
