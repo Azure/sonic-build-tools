@@ -11,7 +11,7 @@ sudo sed -ri 's/redis-server.sock/redis.sock/' /etc/redis/redis.conf
 sudo service redis-server start
 
 # Install libyang
-sudo dpkg -i buildimage/target/debs/buster/libyang*.deb
+sudo dpkg -i buildimage/target/debs/buster/libyang*1.0.73*.deb
 
 # Build sonic-mgmt-common first
 
