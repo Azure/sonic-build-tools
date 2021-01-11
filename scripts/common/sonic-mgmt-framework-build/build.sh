@@ -12,7 +12,7 @@ sudo sed -ri 's/redis-server.sock/redis.sock/' /etc/redis/redis.conf
 sudo service redis-server start
 
 # LIBYANG
-sudo dpkg -i buildimage/target/debs/${DISTRO}/libyang*.deb
+sudo dpkg -i buildimage/target/debs/${DISTRO}/libyang*1.0.73*.deb
 
 # Install from "requirement" files in sonic-mgmt-framework/tools/test directory.
 pushd sonic-mgmt-framework/tools/test
