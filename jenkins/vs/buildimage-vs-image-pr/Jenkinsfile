@@ -87,7 +87,7 @@ sudo cp ../target/sonic-vs.bin /nfs/jenkins/sonic-vs-${JOB_NAME##*/}.${BUILD_NUM
             post {
                 always {
                     junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'sonic-mgmt/tests/logs/**/*.xml')
-                    archiveArtifacts(artifacts: 'target/**, sonic-mgmt/tests/logs/**')
+                    archiveArtifacts(artifacts: 'target/**, sonic-mgmt/tests/logs/**', excludes: 'target/sonic-vs.bin, target/sonic-vs.vhdx')
                 }
 
                 failure {
@@ -98,10 +98,6 @@ sudo cp ../target/sonic-vs.bin /nfs/jenkins/sonic-vs-${JOB_NAME##*/}.${BUILD_NUM
     }
 
     post {
-        always {
-            archiveArtifacts(artifacts: 'target/**')
-        }
-
         cleanup {
             cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
         }
