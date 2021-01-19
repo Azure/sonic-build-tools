@@ -35,6 +35,8 @@ pipeline {
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
 make configure PLATFORM=broadcom
+make SONIC_CONFIG_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y target/sonic-broadcom.bin
+mv target/sonic-broadcom.bin target/sonic-broadcom-dbg.bin
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-broadcom.bin
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-aboot-broadcom.swi
 '''

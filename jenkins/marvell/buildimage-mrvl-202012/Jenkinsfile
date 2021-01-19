@@ -39,6 +39,8 @@ pipeline {
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
 make configure PLATFORM=marvell
+make SONIC_CONFIG_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y target/sonic-marvell.bin
+mv target/sonic-marvell.bin target/sonic-marvell-dbg.bin
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-marvell.bin
 '''
             }
