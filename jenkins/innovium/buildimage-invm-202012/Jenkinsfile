@@ -38,6 +38,8 @@ pipeline {
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 
 make configure PLATFORM=innovium
+make SONIC_CONFIG_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y target/sonic-innovium.bin
+mv target/sonic-innovium.bin target/sonic-innovium-dbg.bin
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-innovium.bin
 '''
             }

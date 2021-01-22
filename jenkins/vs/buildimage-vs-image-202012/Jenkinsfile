@@ -40,7 +40,7 @@ make configure PLATFORM=vs
 
 sudo bash -c "echo 1 > /proc/sys/vm/compact_memory"
 
-make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-vs.img.gz
+make SONIC_CONFIG_BUILD_JOBS=1 INSTALL_DEBUG_TOOLS=y target/sonic-vs.img.gz
 '''
             }
         }
