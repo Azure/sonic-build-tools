@@ -10,7 +10,6 @@ sudo pip3 install --upgrade setuptools
 sudo pip3 install buildimage/target/python-wheels/swsssdk-2.0.1-py3-none-any.whl
 sudo pip3 install buildimage/target/python-wheels/sonic_py_common-1.0-py3-none-any.whl
 sudo pip3 install buildimage/target/python-wheels/sonic_config_engine-1.0-py3-none-any.whl
-sudo pip3 install buildimage/target/python-wheels/sonic_platform_common-1.0-py3-none-any.whl
 sudo pip3 install buildimage/target/python-wheels/sonic_yang_mgmt-1.0-py3-none-any.whl
 sudo pip3 install buildimage/target/python-wheels/sonic_yang_models-1.0-py3-none-any.whl
 
