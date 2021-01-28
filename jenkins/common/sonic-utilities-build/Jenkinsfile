@@ -20,7 +20,7 @@ pipeline {
                 copyArtifacts(projectName: 'common/sonic-swss-common-build', filter: '**/*.deb', target: 'swss-common', flatten: true)
                 copyArtifacts(projectName: 'vs/sonic-swss-build', filter: '**/*.deb', target: 'swss', flatten: true)
                 copyArtifacts(projectName: 'vs/sonic-sairedis-build', filter: '**/*.deb', target: 'sairedis', flatten: true)
-                copyArtifacts(projectName: 'vs/buildimage-vs-image', filter: '**/*', target: 'buildimage', flatten: false)
+                copyArtifacts(projectName: 'vs/buildimage-vs-all', filter: '**/*', target: 'buildimage', flatten: false)
             }
         }
 
