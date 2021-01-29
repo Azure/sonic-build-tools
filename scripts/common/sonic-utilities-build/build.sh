@@ -26,7 +26,7 @@ sudo dpkg -i buildimage/target/debs/buster/python3-swsscommon_1.0.0_amd64.deb
 cd sonic-utilities
 
 # Run unit tests
-sudo python3 setup.py test
+python3 setup.py test
 
 # Build the Python wheel
 sudo python3 setup.py bdist_wheel
