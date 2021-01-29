@@ -7,9 +7,6 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE_FILE = 'docker-ptf.gz'
-        DOCKER_IMAGE_TAG  = 'latest'
-        DOCKER_IMAGE_FILE_DIR = 'sonic-buildimage/target'
         SONIC_TEAM_WEBHOOK = credentials('public-jenkins-builder')
     }
 
@@ -46,16 +43,8 @@ git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --rel
 
 CACHE_OPTIONS="SONIC_DPKG_CACHE_METHOD=wcache SONIC_DPKG_CACHE_SOURCE=/nfs/dpkg_cache/generic"
 make configure PLATFORM=generic
-make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/sonic-generic.bin target/sonic-aboot-generic.swi target/docker-ptf.gz
+make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/sonic-generic.bin target/sonic-aboot-generic.swi
 '''
-            }
-        }
-
-        stage('Upload') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'sonicdev-cr', usernameVariable: 'REGISTRY_USERNAME', passwordVariable: 'REGISTRY_PASSWD')]) {
-                    sh './scripts/lib/docker-upload.sh'
-                }
             }
         }
     }

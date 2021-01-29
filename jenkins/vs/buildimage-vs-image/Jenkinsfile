@@ -6,6 +6,9 @@ pipeline {
     }
 
     environment {
+        DOCKER_IMAGE_FILE = 'docker-ptf.gz'
+        DOCKER_IMAGE_TAG  = 'latest'
+        DOCKER_IMAGE_FILE_DIR = 'target'
         SONIC_TEAM_WEBHOOK = credentials('public-jenkins-builder')
     }
 
@@ -48,7 +51,7 @@ sudo bash -c "echo 1 > /proc/sys/vm/compact_memory"
 make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS INSTALL_DEBUG_TOOLS=y target/sonic-vs.bin
 mv target/sonic-vs.bin target/sonic-vs-dbg.bin
 mv target/sonic-vs.bin.log target/sonic-vs-dbg.bin.log
-make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/sonic-vs.bin
+make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/sonic-vs.bin target/docker-ptf.gz
 
 rm -rf ../target
 mv target ../
@@ -57,6 +60,14 @@ mv target ../
 sudo cp ../target/sonic-vs.bin /nfs/jenkins/sonic-vs-${JOB_NAME##*/}.${BUILD_NUMBER}.bin
 sudo cp ../target/sonic-vs-dbg.bin /nfs/jenkins/sonic-vs-dbg-${JOB_NAME##*/}.${BUILD_NUMBER}.bin
 '''
+            }
+        }
+
+        stage('Upload') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'sonicdev-cr', usernameVariable: 'REGISTRY_USERNAME', passwordVariable: 'REGISTRY_PASSWD')]) {
+                    sh './scripts/lib/docker-upload.sh'
+                }
             }
         }
 

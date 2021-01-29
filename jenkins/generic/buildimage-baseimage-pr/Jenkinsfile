@@ -32,7 +32,7 @@ git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --rel
 CACHE_OPTIONS="SONIC_DPKG_CACHE_METHOD=rcache SONIC_DPKG_CACHE_SOURCE=/nfs/dpkg_cache/generic"
 make configure PLATFORM=generic
 
-make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/docker-ptf.gz target/sonic-generic.bin target/sonic-aboot-generic.swi
+make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/sonic-generic.bin target/sonic-aboot-generic.swi
 '''
             }
         }
