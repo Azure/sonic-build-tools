@@ -1,0 +1,51 @@
+pipeline {
+    agent { node { label 'jenkins-build-cache' } }
+
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
+
+    }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                step([$class: 'WsCleanup'])
+                checkout([$class: 'GitSCM',
+                          branches: [[name: 'refs/heads/master']],
+                          extensions: [[$class: 'SubmoduleOption',
+                                        disableSubmodules: false,
+                                        parentCredentials: false,
+                                        recursiveSubmodules: true,
+                                        reference: '',
+                                        trackingSubmodules: false]],
+                          userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-buildimage']]])
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''#!/bin/bash -xe
+
+git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
+
+CACHE_OPTIONS="SONIC_DPKG_CACHE_METHOD=cache SONIC_DPKG_CACHE_SOURCE=/nfs/dpkg_cache/mellanox"
+make configure PLATFORM=mellanox
+make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS all
+
+'''
+            }
+        }
+
+    }
+    post {
+        failure {
+            archiveArtifacts(artifacts: 'target/**/*.log, target/*')
+        }
+        success {
+            archiveArtifacts(artifacts: 'target/**')
+        }
+        cleanup {
+            cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
+        }
+    }
+}
