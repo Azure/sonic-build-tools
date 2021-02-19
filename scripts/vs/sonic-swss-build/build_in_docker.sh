@@ -25,6 +25,10 @@ sudo dpkg -i buildimage/target/debs/buster/libteamdctl0_*.deb
 sudo dpkg -i buildimage/target/debs/buster/libteam-utils_*.deb
 sudo dpkg -i buildimage/target/debs/buster/libteam-dev_*.deb
 
+# Install common library
+sudo dpkg -i common/libswsscommon_*.deb
+sudo dpkg -i common/libswsscommon-dev_*.deb
+
 # Install SAIVS
 sudo dpkg -i sairedis/libsaivs_*.deb
 sudo dpkg -i sairedis/libsaivs-dev_*.deb
@@ -33,10 +37,6 @@ sudo dpkg -i sairedis/libsairedis-dev_*.deb
 sudo dpkg -i sairedis/libsaimetadata_*.deb
 sudo dpkg -i sairedis/libsaimetadata-dev_*.deb
 sudo dpkg -i sairedis/syncd-vs_*.deb
-
-# Install common library
-sudo dpkg -i common/libswsscommon_*.deb
-sudo dpkg -i common/libswsscommon-dev_*.deb
 
 pushd swss
 
