@@ -22,6 +22,7 @@ sudo pip2 install netifaces==0.10.9
 sudo pip2 install pytest-runner==4.4
 sudo pip2 install xmltodict==0.12.0
 sudo pip2 install jsondiff==1.2.0
+sudo pip2 install pyroute2==0.5.14
 
 cd sonic-utilities
 
