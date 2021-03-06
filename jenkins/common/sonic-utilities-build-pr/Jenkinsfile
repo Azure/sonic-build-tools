@@ -12,7 +12,9 @@ pipeline {
                 }
 
                 script {
-                    if (env.ghprbTargetBranch == '201911') {
+                    if (env.ghprbTargetBranch == '201811') {
+                        copyArtifacts(projectName: 'vs/buildimage-vs-201811', filter: '**/*', target: 'buildimage', flatten: false)
+                    } else if (env.ghprbTargetBranch == '201911') {
                         copyArtifacts(projectName: 'vs/buildimage-vs-201911', filter: '**/*', target: 'buildimage', flatten: false)
                     } else {
                         copyArtifacts(projectName: 'common/sonic-swss-common-build', filter: '**/*.deb', target: 'swss-common', flatten: true)
@@ -28,7 +30,9 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'sonicdev-cr', usernameVariable: 'REGISTRY_USERNAME', passwordVariable: 'REGISTRY_PASSWD')]) {
                     script {
-                        if (env.ghprbTargetBranch == '201911') {
+                        if (env.ghprbTargetBranch == '201811') {
+                            sh './scripts/common/sonic-utilities-build/build_201811.sh'
+                        } else if (env.ghprbTargetBranch == '201911') {
                             sh './scripts/common/sonic-utilities-build/build_201911.sh'
                         } else {
                             sh './scripts/common/sonic-utilities-build/build.sh'
@@ -66,7 +70,7 @@ pipeline {
 
             script {
                 /* 201911 branch does not generate Pytest coverage report */
-                if (env.ghprbTargetBranch != '201911') {
+                if (env.ghprbTargetBranch != '201811' && env.ghprbTargetBranch != '201911') {
                     publishHTML(target: [
                         allowMissing: false,
                         alwaysLinkToLastBuild: false,
@@ -85,7 +89,9 @@ pipeline {
 
         success {
             script {
-                if (env.ghprbTargetBranch == '201911') {
+                if (env.ghprbTargetBranch == '201811') {
+                    archiveArtifacts(artifacts: 'sonic-utilities/deb_dist/python-sonic-utilities_1.2-1_all.deb,wheels/sonic_config_engine-1.0-py2-none-any.whl,wheels/swsssdk-2.0.1-py2-none-any.whl, sonic-swss-tests/tests/log/**')
+                } else if (env.ghprbTargetBranch == '201911') {
                     archiveArtifacts(artifacts: 'sonic-utilities/deb_dist/python-sonic-utilities_1.2-1_all.deb,wheels/sonic_config_engine-1.0-py2-none-any.whl,wheels/swsssdk-2.0.1-py2-none-any.whl,wheels/sonic_py_common-1.0-py2-none-any.whl,wheels/sonic_py_common-1.0-py3-none-any.whl, sonic-swss-tests/tests/log/**')
                 } else {
                     archiveArtifacts(artifacts: 'sonic-utilities/dist/sonic_utilities-1.2-py3-none-any.whl,wheels/sonic_config_engine-1.0-py3-none-any.whl,wheels/swsssdk-2.0.1-py3-none-any.whl,wheels/sonic_py_common-1.0-py3-none-any.whl,wheels/sonic_platform_common-1.0-py3-none-any.whl,sonic-swss-tests/tests/log/**')
