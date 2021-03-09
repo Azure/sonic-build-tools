@@ -5,11 +5,16 @@ pipeline {
         stage('Prepare') {
             steps {
                 dir('sonic-utilities') {
+                    sh 'ls'
                     deleteDir()
+                    sh 'ls'
                     checkout([$class: 'GitSCM',
                           branches: [[name: '${sha1}']],
                           userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-utilities',
                                                refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]])
+                    sh 'ls sonic-utilities-tests/sku_create_input'
+                    sh 'ls sonic-utilities-tests/sku_create_input/2700_files'
+                    sh 'ls sonic-utilities-tests/sku_create_input/3800_files'
                 }
 
                 script {
