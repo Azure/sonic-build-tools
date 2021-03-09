@@ -5,6 +5,7 @@ pipeline {
         stage('Prepare') {
             steps {
                 dir('sonic-utilities') {
+                    deleteDir()
                     checkout([$class: 'GitSCM',
                           branches: [[name: '${sha1}']],
                           userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-utilities',
