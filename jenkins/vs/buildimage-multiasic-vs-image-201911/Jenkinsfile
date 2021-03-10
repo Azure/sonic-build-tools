@@ -47,7 +47,6 @@ sudo bash -c "echo DEV_ID_ASIC_3=3 >> ./device/virtual/x86_64-kvm_x86_64-r0/asic
 sudo bash -c "echo 1 > /proc/sys/vm/compact_memory"
 
 make SONIC_CONFIG_BUILD_JOBS=1 target/sonic-vs.img.gz
-mv target/sonic-vs.img.gz target/sonic-multiasic-vs.img.gz
 '''
             }
         }
