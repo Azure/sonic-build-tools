@@ -38,7 +38,11 @@ git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --rel
 
 make configure PLATFORM=vs
 
-sudo bash -c "echo -e \"NUM_ASIC=4\nDEV_ID_ASIC_0=0\nDEV_ID_ASIC_1=1\nDEV_ID_ASIC_2=2\nDEV_ID_ASIC_3=3\" > ./device/virtual/x86_64-kvm_x86_64-r0/asic.conf"
+sudo bash -c "echo NUM_ASIC=4 > ./device/virtual/x86_64-kvm_x86_64-r0/asic.conf"
+sudo bash -c "echo DEV_ID_ASIC_0=0 >> ./device/virtual/x86_64-kvm_x86_64-r0/asic.conf"
+sudo bash -c "echo DEV_ID_ASIC_1=1 >> ./device/virtual/x86_64-kvm_x86_64-r0/asic.conf"
+sudo bash -c "echo DEV_ID_ASIC_2=2 >> ./device/virtual/x86_64-kvm_x86_64-r0/asic.conf"
+sudo bash -c "echo DEV_ID_ASIC_3=3 >> ./device/virtual/x86_64-kvm_x86_64-r0/asic.conf"
 
 sudo bash -c "echo 1 > /proc/sys/vm/compact_memory"
 
