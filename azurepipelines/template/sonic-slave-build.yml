@@ -55,6 +55,6 @@ steps:
     containerRegistry: 'soniccr2'
     command: 'push'
     tags: |
-      $(SLAVE_BASE_IMAGE)-$(USER):latest
-      $(SLAVE_BASE_IMAGE):latest
-      $(SLAVE_BASE_IMAGE):$(SLAVE_BASE_TAG)
+      soniccr2.azurecr.io:443/$(SLAVE_BASE_IMAGE)-$(USER):latest
+      soniccr2.azurecr.io:443/$(SLAVE_BASE_IMAGE):latest
+      soniccr2.azurecr.io:443/$(SLAVE_BASE_IMAGE):$(SLAVE_BASE_TAG)
