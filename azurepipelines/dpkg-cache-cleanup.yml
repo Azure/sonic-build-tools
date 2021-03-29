@@ -1,0 +1,27 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+schedules:
+- cron: "0 0 * * *"
+  displayName: Daily midnight run
+  branches:
+    include:
+    - master
+  always: true
+
+trigger: none
+pr: none
+
+jobs:
+- job: Build
+  pool: sonicbld
+  timeoutInMinutes: 5
+  steps:
+  - checkout: none
+  - script: |
+      set -xe
+      sudo find /nfs/dpkg_cache/ -name *.tgz -mtime +30 -type f -delete
+    displayName: clean dpkg chache
+    

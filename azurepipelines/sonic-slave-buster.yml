@@ -1,0 +1,53 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+schedules:
+- cron: "0 8 * * *"
+  displayName: Daily midnight build
+  branches:
+    include:
+    - master
+
+trigger: none
+pr: none
+
+variables:
+- group: Container-Registry
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    pool: sonicbld
+    timeoutInMinutes: 360
+    strategy:
+      matrix:
+        buster:
+          distro: 'buster'
+        jessie:
+          distro: 'jessie'
+        stretch:
+          distro: 'stretch'
+    steps:
+    - template: ../cleanup.yml
+    - checkout: self
+      clean: true
+      submodules: recursive
+    - script: |
+        set -xe
+        ID=`id -un`
+        sudo mkdir /home/$ID/.docker -p
+        sudo chown -R $ID:$ID /home/$ID
+        bash .azure-pipelines/scripts/build.sh
+        rm /home/$ID/.docker/config.json || true
+      displayName: Build slave docker
+      env:
+        DISTRO: $(distro)
+        REGISTRY_USERNAME: $(sonicdev-user)
+        REGISTRY_PASSWD: $(sonicdev-password)
+        REGISTRY_SERVER: 'sonicdev-microsoft.azurecr.io'
+        REGISTRY_PORT: 443
+    - publish: target
+      artifact: DockerSlave.$(distro)
