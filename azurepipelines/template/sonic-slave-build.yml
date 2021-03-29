@@ -1,12 +1,10 @@
 parameters:
 - name: arch
-  type: object
   values:
   - amd64
   - armhf
   - arm64
 - name: distro
-  type: object
   values:
   - buster
   - jessie
@@ -20,10 +18,10 @@ variables:
 - name: SLAVE_BASE_TAG
   value: ''
 
-
 jobs:
 - job:
   displayName: build sonic-slave-${{ parameters.distro }}
+  pool: sonicbld
   steps:
   - bash: |
       set -ex
