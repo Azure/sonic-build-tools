@@ -44,9 +44,9 @@ stages:
         echo "##vso[task.setvariable variable=DISTRO]$distro"
       displayName: set DISTRO value
     - template: template/cleanup.yml
-    - checkout: none
+    - checkout: buildimage
       clean: true
-      submodules: recursive
+      #submodules: recursive
     - ${{ each arch in parameters.arches }}:
       - ${{ if endswith(variables['Build.DefinitionName'], 'buster') }}:
         - template: template/sonic-slave-build.yml
