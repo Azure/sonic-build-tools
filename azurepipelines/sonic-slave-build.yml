@@ -44,7 +44,7 @@ stages:
         echo "##vso[task.setvariable variable=DISTRO]$distro"
       displayName: set DISTRO value
     - template: template/cleanup.yml
-    - checkout: buildimage
+    - checkout: none
       clean: true
       submodules: recursive
     - ${{ each arch in parameters.arches }}:
