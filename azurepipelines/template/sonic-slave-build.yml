@@ -10,14 +10,6 @@ parameters:
   - jessie
   - stretch
 
-variables:
-- name: SLAVE_BASE_IMAGE
-  value: ''
-- name: USER
-  value: ''
-- name: SLAVE_BASE_TAG
-  value: ''
-
 steps:
   - bash: |
       set -ex
