@@ -57,8 +57,8 @@ steps:
     containerRegistry: soniccr2
 - task: Docker@2
   inputs:
-    containerRegistry: soniccr2.azurecr.io:443
-    repository: $(SLAVE_BASE_IMAGE)-$(USER)
+    containerRegistry: soniccr2
+    repository: soniccr2.azurecr.io:443/$(SLAVE_BASE_IMAGE)-$(USER)
     command: 'push'
     tags: latest
 - task: Docker@2
