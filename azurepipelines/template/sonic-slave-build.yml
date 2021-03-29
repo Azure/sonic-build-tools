@@ -53,7 +53,7 @@ steps:
 - task: Docker@2
   inputs:
     containerRegistry: 'soniccr2'
-    repository: $(SLAVE_BASE_IMAGE)-$(USER)
+    repository: $(SLAVE_BASE_IMAGE)-$(USER):latest
     command: 'push'
     tags: latest
 - task: Docker@2
