@@ -57,7 +57,7 @@ steps:
     env:
       REGISTRY_SERVER: soniccr2.azurecr.io
       REGISTRY_PORT: 443
-  displayName: build sonic-slave-${{ parameters.distro }}
+    displayName: build sonic-slave-${{ parameters.distro }}
   - task: Docker@2
     inputs:
       containerRegistry: 'soniccr2'
