@@ -18,11 +18,7 @@ variables:
 - name: SLAVE_BASE_TAG
   value: ''
 
-jobs:
-- job:
-  displayName: build sonic-slave-${{ parameters.distro }}
-  pool: sonicbld
-  steps:
+steps:
   - bash: |
       set -ex
       docker --version
@@ -61,6 +57,7 @@ jobs:
     env:
       REGISTRY_SERVER: soniccr2.azurecr.io
       REGISTRY_PORT: 443
+  displayName: build sonic-slave-${{ parameters.distro }}
   - task: Docker@2
     inputs:
       containerRegistry: 'soniccr2'
