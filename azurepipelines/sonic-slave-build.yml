@@ -1,0 +1,54 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+schedules:
+- cron: "0 8 * * *"
+  displayName: Daily midnight build
+  branches:
+    include:
+    - master
+
+trigger: none
+pr: none
+
+variables:
+- name: DISTRO
+  value: ''
+
+parameters:
+- name: 'arches'
+  type: object
+  default: 
+  - amd64
+  - armhf
+  - arm64
+
+resources:
+  repositories:
+  - repository: buildimage
+    type: github
+    name: Azure/sonic-buildimage
+    endpoint: build
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    pool: sonicbld
+    steps:
+    - script: |
+        # use job name postfix as DISTRO
+        distro=`echo $(Build.DefinitionName) | rev | cut -d. -f1 | rev`
+        echo "##vso[task.setvariable variable=DISTRO]$distro"
+      displayName: set DISTRO value
+    - template: template/cleanup.yml
+    - checkout: buildimage
+      clean: true
+      submodules: recursive
+    - ${{ each arch in parameters.arches }}:
+      - template: template/sonic-slave-build.yml
+        parameters:
+          arch: ${{ arch }}
+          distro: $(DISTRO)
