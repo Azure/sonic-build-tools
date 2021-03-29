@@ -67,8 +67,7 @@ jobs:
     inputs:
       containerRegistry: 'soniccr2'
       command: 'push'
-      tags: 
-      - $(SLAVE_BASE_IMAGE-$USER):latest
-      - $(SLAVE_BASE_IMAGE):latest
-      - $(SLAVE_BASE_IMAGE):$(SLAVE_BASE_TAG)
-    addPipelineData: false
+      tags: |
+        $(SLAVE_BASE_IMAGE)-$(USER):latest
+        $(SLAVE_BASE_IMAGE):latest
+        $(SLAVE_BASE_IMAGE):$(SLAVE_BASE_TAG)
