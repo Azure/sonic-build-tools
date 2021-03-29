@@ -51,15 +51,10 @@ steps:
     REGISTRY_PORT: 443
   displayName: build sonic-slave-${{ parameters.distro }}
 - task: Docker@2
-  displayName: login to ACR
-  inputs:
-    command: login
-    containerRegistry: soniccr2
-- task: Docker@2
   inputs:
     containerRegistry: soniccr2
-    repository: soniccr2.azurecr.io:443/$(SLAVE_BASE_IMAGE)-$(USER)
-    command: 'push'
+    repository: $(SLAVE_BASE_IMAGE)-$(USER)
+    command: push
     tags: latest
 - task: Docker@2
   inputs:
