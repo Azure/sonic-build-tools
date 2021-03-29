@@ -11,9 +11,12 @@ parameters:
   - stretch
 
 variables:
-- SLAVE_BASE_IMAGE: ''
-- USER: ''
-- SLAVE_BASE_TAG: ''
+- name: SLAVE_BASE_IMAGE
+  value: ''
+- name: USER
+  value: ''
+- name: SLAVE_BASE_TAG
+  value: ''
 
 
 jobs:
