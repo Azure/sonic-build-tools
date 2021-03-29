@@ -5,6 +5,7 @@ parameters:
   - armhf
   - arm64
 - name: distro
+  values:
   - buster
   - jessie
   - stretch
