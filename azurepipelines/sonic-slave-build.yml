@@ -48,17 +48,17 @@ stages:
       clean: true
       submodules: recursive
     - ${{ each arch in parameters.arches }}:
-      - ${{ if endswith(variables['Build.DefinitionName'], 'buster') }}
+      - ${{ if endswith(variables['Build.DefinitionName'], 'buster') }}:
         - template: template/sonic-slave-build.yml
           parameters:
           arch: ${{ arch }}
           distro: buster
-      - ${{ if endswith(variables['Build.DefinitionName'], 'stretch') }}
+      - ${{ if endswith(variables['Build.DefinitionName'], 'stretch') }}:
         - template: template/sonic-slave-build.yml
           parameters:
           arch: ${{ arch }}
           distro: stretch
-      - ${{ if endswith(variables['Build.DefinitionName'], 'jessie') }}
+      - ${{ if endswith(variables['Build.DefinitionName'], 'jessie') }}:
         - template: template/sonic-slave-build.yml
           parameters:
           arch: ${{ arch }}
