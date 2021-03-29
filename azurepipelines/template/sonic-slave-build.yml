@@ -55,7 +55,12 @@ steps:
     containerRegistry: 'soniccr2'
     repository: $(SLAVE_BASE_IMAGE)-$(USER)
     command: 'push'
+    tags: latest
+- task: Docker@2
+  inputs:
+    containerRegistry: 'soniccr2'
+    repository: $(SLAVE_BASE_IMAGE)
+    command: 'push'
     tags: |
-      $(SLAVE_BASE_IMAGE)-$(USER):latest
-      $(SLAVE_BASE_IMAGE):latest
-      $(SLAVE_BASE_IMAGE):$(SLAVE_BASE_TAG)
+      latest
+      $(SLAVE_BASE_TAG)
