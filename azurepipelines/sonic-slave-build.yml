@@ -51,4 +51,4 @@ stages:
       - template: template/sonic-slave-build.yml
         parameters:
           arch: ${{ arch }}
-          distro: $(DISTRO)
+          distro: $[variables.DISTRO]
