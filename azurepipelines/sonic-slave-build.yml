@@ -15,7 +15,7 @@ pr: none
 
 variables:
 - name: DISTRO
-  value: ''
+  value: 'buster'
 
 parameters:
 - name: 'arches'
