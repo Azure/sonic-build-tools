@@ -15,7 +15,7 @@ steps:
     set -ex
     docker --version
     echo "Build docker container for ${{ parameters.distro }} and ${{ parameters.arch }}"
-  
+
     USER=`id -un | tr A-Z a-z`
     SLAVE_DIR=sonic-slave-${{ parameters.distro }}
     if [ x${{ parameters.arch }} == x"amd64" ]; then
@@ -23,33 +23,33 @@ steps:
     else
       SLAVE_BASE_IMAGE=${SLAVE_DIR}-${{ parameters.arch }}
     fi
-  
+
     tmpfile=$(mktemp)
-  
+
     echo ${{ parameters.arch }} > .arch
-  
+
     DOCKER_DATA_ROOT_FOR_MULTIARCH=/data/march/docker BLDENV=${{ parameters.distro }} make -f Makefile.work sonic-slave-build | tee $tmpfile
     SLAVE_BASE_TAG=$(grep "^Checking sonic-slave-base image:" $tmpfile | awk -F ':' '{print $3}')
     SLAVE_TAG=$(grep "^Checking sonic-slave image:" $tmpfile | awk -F ':' '{print $3}')
-  
-    echo $USER
-    echo $SLAVE_BASE_TAG
-    echo $SLAVE_TAG
+
+    echo USER: $USER
+    echo SLAVE_BASE_TAG: $SLAVE_BASE_TAG
+    echo SLAVE_TAG: $SLAVE_TAG
     mkdir -p target
-    docker images
-    #docker save $SLAVE_BASE_IMAGE-$USER:$SLAVE_TAG | gzip -c > target/$SLAVE_BASE_IMAGE.gz
+
+    docker save $SLAVE_BASE_IMAGE-$USER:$SLAVE_TAG | gzip -c > target/$SLAVE_BASE_IMAGE.gz
     docker tag $SLAVE_BASE_IMAGE-$USER:$SLAVE_TAG local/$SLAVE_BASE_IMAGE-$USER:latest
-    docker tag $SLAVE_BASE_IMAGE-$USER:$SLAVE_TAG $REGISTRY_SERVER:$REGISTRY_PORT/$SLAVE_BASE_IMAGE-$USER:latest
-    docker tag $SLAVE_BASE_IMAGE:$SLAVE_BASE_TAG $REGISTRY_SERVER:$REGISTRY_PORT/$SLAVE_BASE_IMAGE:latest
-    docker tag $SLAVE_BASE_IMAGE:$SLAVE_BASE_TAG $REGISTRY_SERVER:$REGISTRY_PORT/$SLAVE_BASE_IMAGE:$SLAVE_BASE_TAG
-    
+    docker tag $SLAVE_BASE_IMAGE-$USER:$SLAVE_TAG $REGISTRY_SERVER/$SLAVE_BASE_IMAGE-$USER:latest
+    docker tag $SLAVE_BASE_IMAGE:$SLAVE_BASE_TAG $REGISTRY_SERVER/$SLAVE_BASE_IMAGE:latest
+    docker tag $SLAVE_BASE_IMAGE:$SLAVE_BASE_TAG $REGISTRY_SERVER/$SLAVE_BASE_IMAGE:$SLAVE_BASE_TAG
+
     echo "##vso[task.setvariable variable=SLAVE_BASE_IMAGE]$SLAVE_BASE_IMAGE"
     echo "##vso[task.setvariable variable=USER]$USER"
     echo "##vso[task.setvariable variable=SLAVE_BASE_TAG]$SLAVE_BASE_TAG"
   env:
     REGISTRY_SERVER: soniccr2.azurecr.io
-    REGISTRY_PORT: 443
   displayName: build sonic-slave-${{ parameters.distro }}
+
 - task: Docker@2
   inputs:
     containerRegistry: soniccr2
@@ -64,3 +64,5 @@ steps:
     tags: |
       latest
       $(SLAVE_BASE_TAG)
+- publish: target
+  artifact: DockerSlave-${{ parameters.distro }}-${{ parameters.arch }}
