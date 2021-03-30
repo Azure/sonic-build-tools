@@ -62,7 +62,8 @@ steps:
     repository: $(SLAVE_BASE_IMAGE)
     command: push
     tags: |
-      latest
       $(SLAVE_BASE_TAG)
+      latest
+
 - publish: target
   artifact: DockerSlave-${{ parameters.distro }}-${{ parameters.arch }}
