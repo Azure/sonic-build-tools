@@ -20,7 +20,7 @@ stages:
     pool: sonicbld
     timeoutInMinutes: 360
     steps:
-    - template: ../cleanup.yml
+    - template: ./template/cleanup.yml
     - checkout: self
       clean: true
       submodules: recursive
