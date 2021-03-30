@@ -56,6 +56,7 @@ steps:
     command: push
     tags: |
       latest
+
 - task: Docker@2
   inputs:
     containerRegistry: soniccr2
