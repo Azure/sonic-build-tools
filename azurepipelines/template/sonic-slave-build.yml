@@ -46,7 +46,7 @@ steps:
     echo "##vso[task.setvariable variable=USER]$USER"
     echo "##vso[task.setvariable variable=SLAVE_BASE_TAG]$SLAVE_BASE_TAG"
   env:
-    REGISTRY_SERVER: soniccr2.azurecr.io
+    REGISTRY_SERVER: soniccr2
   displayName: build sonic-slave-${{ parameters.distro }}
 
 - task: Docker@2
