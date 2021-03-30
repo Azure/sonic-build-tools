@@ -65,6 +65,3 @@ steps:
     tags: |
       $(SLAVE_BASE_TAG)
       latest
-
-- publish: target
-  artifact: DockerSlave-${{ parameters.distro }}-${{ parameters.arch }}
