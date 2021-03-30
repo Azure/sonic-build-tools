@@ -37,7 +37,6 @@ steps:
     echo SLAVE_TAG: $SLAVE_TAG
     mkdir -p target
 
-    docker save $SLAVE_BASE_IMAGE-$USER:$SLAVE_TAG | gzip -c > target/$SLAVE_BASE_IMAGE.gz
     docker tag $SLAVE_BASE_IMAGE-$USER:$SLAVE_TAG local/$SLAVE_BASE_IMAGE-$USER:latest
     docker tag $SLAVE_BASE_IMAGE-$USER:$SLAVE_TAG $REGISTRY_SERVER/$SLAVE_BASE_IMAGE-$USER:latest
     docker tag $SLAVE_BASE_IMAGE:$SLAVE_BASE_TAG $REGISTRY_SERVER/$SLAVE_BASE_IMAGE:latest
