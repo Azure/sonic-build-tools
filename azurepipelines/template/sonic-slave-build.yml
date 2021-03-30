@@ -54,7 +54,8 @@ steps:
     containerRegistry: soniccr2
     repository: $(SLAVE_BASE_IMAGE)-$(USER)
     command: push
-    tags: latest
+    tags: |
+      latest
 - task: Docker@2
   inputs:
     containerRegistry: soniccr2
