@@ -13,6 +13,13 @@ schedules:
 trigger: none
 pr: none
 
+resources:
+  repositories:
+  - repository: buildimage
+    type: github
+    name: Azure/sonic-buildimage
+    endpoint: build
+
 stages:
 - stage: Build
   jobs:
@@ -21,7 +28,7 @@ stages:
     timeoutInMinutes: 360
     steps:
     - template: ./template/cleanup.yml
-    - checkout: self
+    - checkout: buildimage
       clean: true
       submodules: recursive
     - bash: |
