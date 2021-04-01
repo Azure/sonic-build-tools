@@ -57,9 +57,9 @@ jobs:
     displayName: build sonic-slave-${{ parameters.distro }}-${{ parameters.arch }}
 
   - bash: |
+      echo "aaa$(SLAVE_BASE_IMAGE)-$(USER)bbb"
+      echo "aaa$(SLAVE_BASE_TAG)bbb"
     displayName: show variable
-      echo aaa$(SLAVE_BASE_IMAGE)-$(USER)bbb
-      echo aaa$(SLAVE_BASE_TAG)bbb
   - task: Docker@2
     inputs:
       containerRegistry: soniccr2
