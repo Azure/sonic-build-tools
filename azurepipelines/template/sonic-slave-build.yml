@@ -69,6 +69,7 @@ jobs:
         latest
 
   - task: Docker@2
+    condition: ne(variables['IMAGE'], '')
     inputs:
       containerRegistry: soniccr2
       repository: $(IMAGE)
