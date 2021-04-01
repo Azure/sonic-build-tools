@@ -10,13 +10,6 @@ parameters:
   - jessie
   - stretch
 
-resources:
-  repositories:
-  - repository: buildimage
-    type: github
-    name: Azure/sonic-buildimage
-    endpoint: build
-
 jobs:
 - job: Build
   pool: sonicbld
