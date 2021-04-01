@@ -19,7 +19,7 @@ jobs:
   - checkout: buildimage
     clean: true
   - bash: |
-      set -ex
+      set -e
       docker --version
       echo "Build docker container for ${{ parameters.distro }} and ${{ parameters.arch }}"
 
