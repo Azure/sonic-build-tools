@@ -11,7 +11,7 @@ parameters:
   - stretch
 
 jobs:
-- job: Build-${{ parameters.distro }}-${{ parameters.arch }}
+- job: Build_${{ parameters.distro }}_${{ parameters.arch }}
   pool: sonicbld
   timeoutInMinutes: 360
   steps:
