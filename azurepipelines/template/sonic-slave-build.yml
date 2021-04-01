@@ -50,11 +50,11 @@ jobs:
       docker tag $SLAVE_BASE_IMAGE:$SLAVE_BASE_TAG $REGISTRY_SERVER/$SLAVE_BASE_IMAGE:$SLAVE_BASE_TAG
 
       echo "##vso[task.setvariable variable=VARIABLE_SLAVE_BASE_IMAGE]$SLAVE_BASE_IMAGE"
-      echo ""
+      echo "[task.setvariable variable=VARIABLE_SLAVE_BASE_IMAGE]$SLAVE_BASE_IMAGE"
       echo "##vso[task.setvariable variable=VARIABLE_SALVE_USER]$USER"
-      echo ""
+      echo "[task.setvariable variable=VARIABLE_SALVE_USER]$USER"
       echo "##vso[task.setvariable variable=VARIABLE_SLAVE_BASE_TAG]$SLAVE_BASE_TAG"
-      echo ""
+      echo "[task.setvariable variable=VARIABLE_SLAVE_BASE_TAG]$SLAVE_BASE_TAG"
     env:
       REGISTRY_SERVER: soniccr2.azurecr.io
     displayName: build sonic-slave-${{ parameters.distro }}-${{ parameters.arch }}
