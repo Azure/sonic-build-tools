@@ -10,58 +10,72 @@ parameters:
   - jessie
   - stretch
 
-steps:
-- bash: |
-    set -ex
-    docker --version
-    echo "Build docker container for ${{ parameters.distro }} and ${{ parameters.arch }}"
+resources:
+  repositories:
+  - repository: buildimage
+    type: github
+    name: Azure/sonic-buildimage
+    endpoint: build
 
-    USER=`id -un | tr A-Z a-z`
-    SLAVE_DIR=sonic-slave-${{ parameters.distro }}
-    if [ x${{ parameters.arch }} == x"amd64" ]; then
-      SLAVE_BASE_IMAGE=${SLAVE_DIR}
-    else
-      SLAVE_BASE_IMAGE=${SLAVE_DIR}-${{ parameters.arch }}
-    fi
+jobs:
+- job: Build
+  pool: sonicbld
+  timeoutInMinutes: 360
+  steps:
+  - template: cleanup.yml
+  - checkout: buildimage
+    clean: true
+  - bash: |
+      set -ex
+      docker --version
+      echo "Build docker container for ${{ parameters.distro }} and ${{ parameters.arch }}"
 
-    tmpfile=$(mktemp)
+      USER=`id -un | tr A-Z a-z`
+      SLAVE_DIR=sonic-slave-${{ parameters.distro }}
+      if [ x${{ parameters.arch }} == x"amd64" ]; then
+        SLAVE_BASE_IMAGE=${SLAVE_DIR}
+      else
+        SLAVE_BASE_IMAGE=${SLAVE_DIR}-${{ parameters.arch }}
+      fi
 
-    echo ${{ parameters.arch }} > .arch
+      tmpfile=$(mktemp)
 
-    DOCKER_DATA_ROOT_FOR_MULTIARCH=/data/march/docker BLDENV=${{ parameters.distro }} make -f Makefile.work sonic-slave-build | tee $tmpfile
-    SLAVE_BASE_TAG=$(grep "^Checking sonic-slave-base image:" $tmpfile | awk -F ':' '{print $3}')
-    SLAVE_TAG=$(grep "^Checking sonic-slave image:" $tmpfile | awk -F ':' '{print $3}')
+      echo ${{ parameters.arch }} > .arch
 
-    echo USER: $USER
-    echo SLAVE_BASE_TAG: $SLAVE_BASE_TAG
-    echo SLAVE_TAG: $SLAVE_TAG
-    mkdir -p target
+      DOCKER_DATA_ROOT_FOR_MULTIARCH=/data/march/docker BLDENV=${{ parameters.distro }} make -f Makefile.work sonic-slave-build | tee $tmpfile
+      SLAVE_BASE_TAG=$(grep "^Checking sonic-slave-base image:" $tmpfile | awk -F ':' '{print $3}')
+      SLAVE_TAG=$(grep "^Checking sonic-slave image:" $tmpfile | awk -F ':' '{print $3}')
 
-    docker tag $SLAVE_BASE_IMAGE-$USER:$SLAVE_TAG local/$SLAVE_BASE_IMAGE-$USER:latest
-    docker tag $SLAVE_BASE_IMAGE-$USER:$SLAVE_TAG $REGISTRY_SERVER/$SLAVE_BASE_IMAGE-$USER:latest
-    docker tag $SLAVE_BASE_IMAGE:$SLAVE_BASE_TAG $REGISTRY_SERVER/$SLAVE_BASE_IMAGE:latest
-    docker tag $SLAVE_BASE_IMAGE:$SLAVE_BASE_TAG $REGISTRY_SERVER/$SLAVE_BASE_IMAGE:$SLAVE_BASE_TAG
+      echo USER: $USER
+      echo SLAVE_BASE_TAG: $SLAVE_BASE_TAG
+      echo SLAVE_TAG: $SLAVE_TAG
+      mkdir -p target
 
-    echo "##vso[task.setvariable variable=SLAVE_BASE_IMAGE]$SLAVE_BASE_IMAGE"
-    echo "##vso[task.setvariable variable=USER]$USER"
-    echo "##vso[task.setvariable variable=SLAVE_BASE_TAG]$SLAVE_BASE_TAG"
-  env:
-    REGISTRY_SERVER: soniccr2.azurecr.io
-  displayName: build sonic-slave-${{ parameters.distro }}-${{ parameters.arch }}
+      docker tag $SLAVE_BASE_IMAGE-$USER:$SLAVE_TAG local/$SLAVE_BASE_IMAGE-$USER:latest
+      docker tag $SLAVE_BASE_IMAGE-$USER:$SLAVE_TAG $REGISTRY_SERVER/$SLAVE_BASE_IMAGE-$USER:latest
+      docker tag $SLAVE_BASE_IMAGE:$SLAVE_BASE_TAG $REGISTRY_SERVER/$SLAVE_BASE_IMAGE:latest
+      docker tag $SLAVE_BASE_IMAGE:$SLAVE_BASE_TAG $REGISTRY_SERVER/$SLAVE_BASE_IMAGE:$SLAVE_BASE_TAG
 
-- task: Docker@2
-  inputs:
-    containerRegistry: soniccr2
-    repository: $(SLAVE_BASE_IMAGE)-$(USER)
-    command: push
-    tags: |
-      latest
+      echo "##vso[task.setvariable variable=SLAVE_BASE_IMAGE]$SLAVE_BASE_IMAGE"
+      echo "##vso[task.setvariable variable=USER]$USER"
+      echo "##vso[task.setvariable variable=SLAVE_BASE_TAG]$SLAVE_BASE_TAG"
+    env:
+      REGISTRY_SERVER: soniccr2.azurecr.io
+    displayName: build sonic-slave-${{ parameters.distro }}-${{ parameters.arch }}
 
-- task: Docker@2
-  inputs:
-    containerRegistry: soniccr2
-    repository: $(SLAVE_BASE_IMAGE)
-    command: push
-    tags: |
-      $(SLAVE_BASE_TAG)
-      latest
+  - task: Docker@2
+    inputs:
+      containerRegistry: soniccr2
+      repository: $(SLAVE_BASE_IMAGE)-$(USER)
+      command: push
+      tags: |
+        latest
+
+  - task: Docker@2
+    inputs:
+      containerRegistry: soniccr2
+      repository: $(SLAVE_BASE_IMAGE)
+      command: push
+      tags: |
+        $(SLAVE_BASE_TAG)
+        latest
