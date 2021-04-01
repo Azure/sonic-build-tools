@@ -19,7 +19,7 @@ jobs:
   - checkout: buildimage
     clean: true
   - bash: |
-      set -e
+      set -ex
       docker --version
       echo "Build docker container for ${{ parameters.distro }} and ${{ parameters.arch }}"
 
@@ -48,13 +48,10 @@ jobs:
       docker tag $SLAVE_BASE_IMAGE-$USER:$SLAVE_TAG $REGISTRY_SERVER/$SLAVE_BASE_IMAGE-$USER:latest
       docker tag $SLAVE_BASE_IMAGE:$SLAVE_BASE_TAG $REGISTRY_SERVER/$SLAVE_BASE_IMAGE:latest
       docker tag $SLAVE_BASE_IMAGE:$SLAVE_BASE_TAG $REGISTRY_SERVER/$SLAVE_BASE_IMAGE:$SLAVE_BASE_TAG
-
+      set +x
       echo "##vso[task.setvariable variable=VARIABLE_SLAVE_BASE_IMAGE]$SLAVE_BASE_IMAGE"
-      echo "[task.setvariable variable=VARIABLE_SLAVE_BASE_IMAGE]$SLAVE_BASE_IMAGE"
       echo "##vso[task.setvariable variable=VARIABLE_SALVE_USER]$USER"
-      echo "[task.setvariable variable=VARIABLE_SALVE_USER]$USER"
       echo "##vso[task.setvariable variable=VARIABLE_SLAVE_BASE_TAG]$SLAVE_BASE_TAG"
-      echo "[task.setvariable variable=VARIABLE_SLAVE_BASE_TAG]$SLAVE_BASE_TAG"
     env:
       REGISTRY_SERVER: soniccr2.azurecr.io
     displayName: build sonic-slave-${{ parameters.distro }}-${{ parameters.arch }}
