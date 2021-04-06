@@ -13,6 +13,7 @@ sudo pip2 install "click>=7.0"
 sudo pip2 install click-default-group==1.2
 sudo pip2 install tabulate
 sudo pip2 install natsort
+sudo pip2 install deepdiff==3.3.0
 sudo pip2 install buildimage/target/python-wheels/swsssdk-2.0.1-py2-none-any.whl
 sudo pip2 install buildimage/target/python-wheels/sonic_py_common-1.0-py2-none-any.whl
 sudo pip2 install buildimage/target/python-wheels/sonic_config_engine-1.0-py2-none-any.whl
