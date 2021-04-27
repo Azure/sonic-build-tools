@@ -18,7 +18,7 @@ build_and_push_docker()
     if [ x$arch == x"amd64" ]; then
         SLAVE_BASE_IMAGE=${SLAVE_DIR}
     else
-        SLAVE_BASE_IMAGE=${SLAVE_DIR}-${arch}
+        SLAVE_BASE_IMAGE=${SLAVE_DIR}-march-${arch}
     fi
 
     tmpfile=$(mktemp)
