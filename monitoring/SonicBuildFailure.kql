@@ -1,0 +1,124 @@
+
+// Public sonic official build
+// Kusto to Metrics
+cluster('sonic.westus2.kusto.windows.net').database('build').AzurePipelineBuilds
+| where definitionName startswith "Azure.sonic-buildimage.official."
+| where status == 'completed'
+| where queueTime > ago(30d)
+| extend d_Platform=trim_start('Azure.sonic-buildimage.official.',definitionName)
+| extend d_Branch=trim_start('refs/heads/',sourceBranch)
+| extend tag = strcat(d_Platform,d_Branch)
+| extend m_count=iff(result == 'succeeded',0,1)
+| partition hint.strategy=shuffle by tag
+(
+    top 2 by queueTime
+    | project d_Branch,d_Platform,m_count
+    | summarize timestamp=now(),m_SonicPubFailCount=sum(m_count) by d_Branch,d_Platform
+    | where m_SonicPubFailCount == 2
+)
+
+// Diagnostic
+cluster('sonic.westus2.kusto.windows.net').database('build').AzurePipelineBuilds
+| where definitionName startswith "Azure.sonic-buildimage.official."
+| where status == 'completed'
+| where result != 'succeeded'
+| where queueTime > ago(30d)
+| extend d_platform=trim_start('Azure.sonic-buildimage.official.',definitionName)
+| extend d_branch=trim_start('refs/heads/',sourceBranch)
+| where d_branch == "{Monitor.Dimension.Branch}"
+| where d_platform == "{Monitor.Dimension.Platform}"
+| sort by queueTime desc
+| project queueTime,url,reason
+| take 2
+| extend url=replace_string(url,'_apis/build/Builds/','_build/results?buildId=')
+
+
+
+// Public component coverage
+cluster('sonic.westus2.kusto.windows.net').database('build').AzurePipelineBuildCoverages
+| where definitionName startswith "Azure."
+| where reason != 'pullRequest'
+| extend covered=parse_json(coverage).coverageData[0].coverageStats[0].covered
+| extend total=parse_json(coverage).coverageData[0].coverageStats[0].total
+| project definitionName,queueTime,startTime,finishTime,url=replace_string(url,"_apis/build/Builds/","_build/results?buildId="),branch=replace_string(sourceBranch,"refs/heads/",""),covered,total
+
+
+
+// Public docker image build
+// Kusto to Metrics
+cluster('sonic.westus2.kusto.windows.net').database('build').AzurePipelineBuilds
+| where definitionName startswith "Azure.docker"
+| where status == 'completed'
+| where queueTime > ago(30d)
+| where reason != 'pullRequest'
+| extend tag=strcat(definitionName,sourceBranch)
+| extend d_branch=trim_start('refs/heads/',sourceBranch)
+| extend d_name=trim_start('Azure.',definitionName)
+| extend m_SonicPubDockerFail=iif(result == 'succeeded',0,1)
+| where d_branch in ('master','202012')
+| partition hint.strategy=shuffle by tag
+(
+    top 1 by queueTime
+    | where m_SonicPubDockerFail == 1
+    | project timestamp=now(),d_branch,d_name,m_SonicPubDockerFail
+)
+
+// Diagnostic
+cluster('sonic.westus2.kusto.windows.net').database('build').AzurePipelineBuilds
+| where definitionName startswith "Azure.docker"
+| where status == 'completed'
+| where queueTime > ago(30d)
+| where reason != 'pullRequest'
+| extend tag=strcat(definitionName, sourceBranch)
+| extend d_branch=trim_start('refs/heads/', sourceBranch)
+| extend d_name=trim_start('Azure.', definitionName)
+| extend result != 'succeeded'
+| where d_branch == "master"//"{Monitor.Dimension.Branch}"
+| where d_name == "docker-slave-bullseye"// "{Monitor.Dimension.Name}"
+| sort by queueTime desc 
+| take 1
+| project strcat("https://dev.azure.com/mssonic/build/_build/results?buildId=", trim(".*/", url))
+
+
+
+// PowerBI for internal Sonic, need MyAccess Group 'CloudMine-Data'. https://1esdocs.azurewebsites.net/datainsights/cloudmine/howto/get-access.html
+cluster('1ES.westus2.kusto.windows.net').database('AzureDevOps').BuildTimelineRecord
+| where OrganizationName == 'msazure'
+| where ProjectId == 'b32aa71e-8ed2-41b2-9d77-5bc261222004'
+| where RepositoryId == '8721f84d-7905-4f85-b5f1-0e19e8eac66b'
+| where Type == 'Job'
+| where State == "completed"
+| where Order == 1
+| join kind=leftouter Build on BuildId, $left.BuildId == $right.BuildId, $left.ProjectId == $right.ProjectId, $left.OrganizationName == $right.OrganizationName
+| where Reason == "schedule"
+| extend branch=trim_start("refs/heads/",SourceBranch)
+| extend queueTime=startofday(QueueTime)
+| extend build_fail=iff(Result == 'succeeded',0,1)
+| extend platform=RecordName
+| where branch in ('internal','internal-201811','internal-201911','internal-202012','internal-202106')
+| where platform in ('centec_arm64','barefoot','marvell_armhf','generic','nephos','innovium','mellanox','vs','broadcom','centec')
+| project queueTime,build_fail,platform,branch
+
+
+// For Public Pipeline access, you need to request access 'Azure DevOps' for mssonic organization
+// For Internal Pipeline access, you need to request MyAccessGroup 'CloudMine-Data'
+// Internal Data Source
+cluster('1ES.westus2.kusto.windows.net').database('AzureDevOps').BuildTimelineRecord
+| where OrganizationName == 'msazure'
+| where ProjectId == 'b32aa71e-8ed2-41b2-9d77-5bc261222004'
+| where RepositoryId == '8721f84d-7905-4f85-b5f1-0e19e8eac66b'
+| where Type == 'Job'
+| where State == "completed"
+| where RecordName in ("barefoot", "broadcom", "vs", "generic", "marvell_armhf", "mellanox")
+| join kind=leftouter (cluster('1ES.westus2.kusto.windows.net').database('AzureDevOps').Build | where OrganizationName == 'msazure' | where ProjectName == 'One'| where DefinitionName == 'Networking-acs-buildimage-Official'| where Reason in ("schedule", "individualCI", "batchedCI") | project BuildId, QueueTime, Reason, SourceBranch) on BuildId, $left.BuildId == $right.BuildId 
+| where SourceBranch != ""
+| where Issues == ""
+| project BuildId, RecordName, QueueTime, StartTime, FinishTime, Result, Reason, SourceBranch
+
+
+cluster('sonic.westus2.kusto.windows.net').database('build').AzurePipelineBuildCoverages
+| where definitionName startswith "Azure."
+| where reason != 'pullRequest'
+| extend covered=parse_json(coverage).coverageData[0].coverageStats[0].covered
+| extend total=parse_json(coverage).coverageData[0].coverageStats[0].total
+| project definitionName,queueTime,startTime,finishTime,url=replace_string(url,"_apis/build/Builds/","_build/results?buildId="),branch=replace_string(sourceBranch,"refs/heads/",""),covered,total
