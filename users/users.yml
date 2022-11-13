@@ -53,3 +53,6 @@ users:
   -
     name: sumeenak
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCySa6kPb/ZueGwBszwzvqAyYx9sdQdqITVIqMQHdFLqLblKF9RIwBvkcy4DEIEOl+xnrCTE7LDELNccJlZcZeYtfMBpuUIQcNcCuaP+7kXsp3jMUwlk6utEwvZmiukOTpxL9YrRQnuL6WZk9x0eBO4/z7JQsims+1vibVG8Yap79uhpT26ruD2POB70Mq2O7QUsEGMjina2cas3iryrQXYXri7vSYtz1HHn5Qjcq+dQKmVaw8K+1/4bXVsmku9bQ1VSBja6v0rIXMV/DT/x1XD2zILDs+uqytZy4fmKbCZPyEbObxphkUhS49KyPkWWnXLLhBJWHKMba8y7GUarjwf sumeenak@sumeenak-ubuntu-vm0"
+  -
+    name: sarcot
+    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOizqFQ4+46qzvZJjazm0KV5lMVyvDbMKq/y/I8NBsjh sarcot@sarcot-dev-vm-01"
