@@ -1,30 +1,17 @@
 #!/bin/bash -ex
 
-# Install swig
-sudo apt-get install -y swig
+echo ${JOB_NAME##*/}.${BUILD_NUMBER}
 
-# Install HIREDIS
-sudo apt-get install -y libhiredis0.14 libhiredis-dev
+docker pull sonicdev-microsoft.azurecr.io:443/sonic-slave-buster-johnar:latest
+docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonicdev-microsoft.azurecr.io:443/sonic-slave-buster-johnar:latest ./scripts/common/sonic-swss-common-build/docker_build_script.sh
 
-# Install libnl3
-sudo dpkg -i buildimage/target/debs/buster/libnl-3-200_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libnl-3-dev_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libnl-genl-3-200_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libnl-genl-3-dev_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libnl-route-3-200_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libnl-route-3-dev_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libnl-nf-3-200_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libnl-nf-3-dev_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libnl-cli-3-200_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libnl-cli-3-dev_*.deb
+mkdir -p scripts/common/sonic-swss-common-build/docker-sonic-vs/debs
+cp *.deb scripts/common/sonic-swss-common-build/docker-sonic-vs/debs
 
-pushd sonic-swss-common
+docker load < buildimage/target/docker-sonic-vs.gz
 
-./autogen.sh
-fakeroot debian/rules binary
-
+pushd scripts/common/sonic-swss-common-build
+docker build --no-cache -t docker-sonic-vs:${JOB_NAME##*/}.${BUILD_NUMBER} docker-sonic-vs
 popd
 
-mkdir -p target
-cp *.deb target/
-
+docker save docker-sonic-vs:${JOB_NAME##*/}.${BUILD_NUMBER} | gzip -c > buildimage/target/docker-sonic-vs.gz

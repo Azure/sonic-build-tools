@@ -1,17 +1,6 @@
 #!/bin/bash -ex
 
-# Install Redis
-sudo pip install Pympler==0.8
-sudo apt-get install -y redis-server
-sudo sed -i 's/notify-keyspace-events ""/notify-keyspace-events AKE/' /etc/redis/redis.conf
-sudo sed -ri 's/^# unixsocket/unixsocket/' /etc/redis/redis.conf
-sudo sed -ri 's/^unixsocketperm .../unixsocketperm 777/' /etc/redis/redis.conf
-sudo sed -ri 's/redis-server.sock/redis.sock/' /etc/redis/redis.conf
-sudo service redis-server restart
+echo ${JOB_NAME##*/}.${BUILD_NUMBER}
 
-sudo dpkg -i libswsscommon_*.deb
-sudo dpkg -i python-swsscommon_*.deb
-
-cd sonic-swss-common
-
-sudo ./tests/tests && redis-cli FLUSHALL && pytest
+docker pull sonicdev-microsoft.azurecr.io:443/sonic-slave-buster-johnar:latest
+docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonicdev-microsoft.azurecr.io:443/sonic-slave-buster-johnar:latest ./scripts/common/sonic-swss-common-build/docker_test_script.sh
