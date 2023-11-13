@@ -19,7 +19,7 @@ pipeline {
                 }
                 copyArtifacts(projectName: 'vs/sonic-sairedis-build', filter: '**/*.deb', target: 'sairedis', flatten: true)
                 copyArtifacts(projectName: 'common/sonic-swss-common-build', filter: '**/*.deb', target: 'common', flatten: true)
-                copyArtifacts(projectName: 'vs/buildimage-vs-all', filter: '**/*.deb,**/docker-sonic-vs.gz', target: 'buildimage', flatten: false)
+                copyArtifacts(projectName: 'vs/buildimage-vs-all', filter: '**/*.deb,**/docker-sonic-vs.gz,**/gcno.tar.gz', target: 'buildimage', flatten: false)
             }
         }
 
@@ -52,6 +52,14 @@ pipeline {
             archiveArtifacts(artifacts: 'buildimage/target/docker-sonic-vs.gz, swss/tests/log/**, swss_*.deb, swss-dbg_*.deb, swss/tests/*.py')
             junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'swss/tests/tr.xml')
             cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
+            publishHTML(target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: false,
+                keepAll: true,
+                reportDir: '/gcov_output/AllMergeReport',
+                reportFiles: 'index.html',
+                reportName: 'Gcov Report'
+            ])
         }
         fixed {
             slackSend(color:'#00FF00', message: "Build job back to normal: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")

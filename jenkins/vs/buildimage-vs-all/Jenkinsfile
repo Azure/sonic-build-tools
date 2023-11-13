@@ -40,8 +40,10 @@ git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --rel
 
 CACHE_OPTIONS="SONIC_DPKG_CACHE_METHOD=wcache SONIC_DPKG_CACHE_SOURCE=/nfs/dpkg_cache/vs"
 make configure PLATFORM=vs
+./gcov_support.sh init all
 make SONIC_CONFIG_BUILD_JOBS=1 $CACHE_OPTIONS target/docker-sonic-vs.gz
 sudo cp target/docker-sonic-vs.gz /nfs/jenkins/docker-sonic-vs.${JOB_NAME##*/}.${BUILD_NUMBER}.gz
+./gcov_support.sh collect
 '''
             }
         }
