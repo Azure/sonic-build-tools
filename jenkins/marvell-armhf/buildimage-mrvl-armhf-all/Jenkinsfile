@@ -34,11 +34,18 @@ pipeline {
 
         stage('Build') {
             steps {
+              script {
+                System.setProperty("org.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL", "86400");
+              }
               lock(resource: "arm_build_${env.NODE_NAME}") {
                 sh '''#!/bin/bash -xe
 
 git submodule foreach --recursive '[ -f .git ] && echo "gitdir: $(realpath --relative-to=. $(cut -d" " -f2 .git))" > .git'
 export DOCKER_DATA_ROOT_FOR_MULTIARCH=/data/march/docker
+#
+# Cleanup disk space before getting started
+sudo rm -rf ${DOCKER_DATA_ROOT_FOR_MULTIARCH}
+#
 make configure PLATFORM=marvell-armhf PLATFORM_ARCH=armhf
 #
 # Skip debug build for now until build time improvements can be made
